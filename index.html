@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Nexsera Ai Chat bot</title>
+    <title>Nexsera Ai Chat UI</title>
     <script src="https://cdn.tailwindcss.com"></script>
 <script>
 // --- User Management Logic ---
@@ -552,7 +552,7 @@ pre code {
         </div>
     </main>
 
-    <footer class="w-full border-t px-2 sm:px-4 py-3 space-y-2 bg-white">
+    <footer class="w-full border-t px-2 sm:px-4 py-3 space-y-2 bg-white mb-4">
         <div class="w-full max-w-[95%] mx-auto flex flex-col gap-2">
             <div id="filePreview" class="flex flex-wrap gap-2"></div>
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-2">
@@ -717,7 +717,8 @@ pre code {
                 </div>
             `;
             chatWindow.appendChild(msgContainer);
-            chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the bottom
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+                chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' }); // Scroll to the bottom
 
             const deleteButton = msgContainer.querySelector('.delete-message-btn');
             deleteButton.addEventListener('click', () => deleteMessage(currentChatId, messageIndex));
@@ -747,6 +748,7 @@ pre code {
             `;
             chatWindow.appendChild(typingDiv);
             chatWindow.scrollTop = chatWindow.scrollHeight;
+                chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
 
         /**
@@ -779,6 +781,7 @@ pre code {
             for (let i = 0; i < words.length; i++) {
                 messageDiv.textContent += (i > 0 ? " " : "") + words[i];
                 chatWindow.scrollTop = chatWindow.scrollHeight;
+                chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' });
                 // Adjust speed based on preferred response speed and total words
                 await new Promise(resolve => setTimeout(resolve, preferredResponseSpeed / words.length));
             }
@@ -927,6 +930,7 @@ pre code {
                     createChatEntry(msg.content, msg.role, index);
                 });
                 chatWindow.scrollTop = chatWindow.scrollHeight;
+                chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' });
                 renderHistoryList(); // Re-render history to highlight active chat
                 if (isMobile()) {
                     hideSidebar(); // Hide sidebar on mobile after loading chat
