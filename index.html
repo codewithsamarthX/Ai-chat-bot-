@@ -1300,8 +1300,8 @@ document.addEventListener("DOMContentLoaded", () => {
   fontSizeSelector.className = "w-full mt-2 p-1 border border-gray-300 text-sm rounded text-black";
   fontSizeSelector.innerHTML = `
     <option value="text-xs">Small</option>
-    <option value="text-sm" >Medium</option>
-    <option value="text-base"selected>Large</option>
+    <option value="text-sm"selected>Medium</option>
+    <option value="text-base">Large</optioted  
     <option value="text-lg">Extra Large</option>
   `;
   fontSizeSelector.addEventListener("change", () => {
@@ -1328,14 +1328,7 @@ document.addEventListener("DOMContentLoaded", () => {
     location.reload();
   });
 
-  // Auto Scroll Toggle
-  const autoScrollToggle = document.createElement("button");
-  autoScrollToggle.className = "w-full mt-2 px-3 py-1 rounded text-sm bg-gray-600 text-white hover:bg-gray-700";
-  autoScrollToggle.textContent = "Toggle Auto Scroll";
-  autoScrollToggle.addEventListener("click", () => {
-    const current = localStorage.getItem("autoScroll") === "true";
-    localStorage.setItem("autoScroll", !current);
-  });
+
 
   // Insert into Settings Modal
   const settingsModal = document.getElementById("settingsModal");
