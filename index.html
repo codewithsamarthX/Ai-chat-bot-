@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Nexsera Ai Chat UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+<script>
+// --- User Management Logic ---
+document.addEventListener("DOMContentLoaded", () => {
+  const userButton = document.getElementById("userBtn");
+  const userBox = document.getElementById("userManagementBox");
+  const closeUserBox = document.getElementById("closeUserBox");
+  const addUserBtn = document.getElementById("addUserBtn");
+  const removeUserBtn = document.getElementById("removeUserBtn");
+  const addUserInput = document.getElementById("addUserInput");
+  const userSelect = document.getElementById("userSelect");
+
+  let users = JSON.parse(localStorage.getItem("userList")) || [];
+  let currentUser = localStorage.getItem("currentUser") || null;
+
+  function renderUserList() {
+    userSelect.innerHTML = '<option disabled>Select User</option>';
+    users.forEach(user => {
+      const option = document.createElement("option");
+      option.value = user;
+      option.textContent = user;
+      if (user === currentUser) option.selected = true;
+      userSelect.appendChild(option);
+    });
+  }
+
+  function saveUsers() {
+    localStorage.setItem("userList", JSON.stringify(users));
+  }
+
+  function getUserChatKey(username) {
+    return `chatHistory_${username}`;
+  }
+
+  function loadUserChatHistory(username) {
+    const saved = localStorage.getItem(getUserChatKey(username));
+    if (saved) chatHistory = JSON.parse(saved);
+    else chatHistory = [];
+
+    currentChatId = null;
+    renderHistoryList();
+    startNewChat();
+  }
+
+  function saveChatHistoryForUser() {
+    if (currentUser) {
+      localStorage.setItem(getUserChatKey(currentUser), JSON.stringify(chatHistory));
+    }
+  }
+
+  function switchUser(username) {
+  updateLoggedInUserUI();
+    currentUser = username;
+    localStorage.setItem("currentUser", username);
+    loadUserChatHistory(username);
+  }
+
+  // Toggle box
+  userButton.addEventListener("click", () => {
+    const isVisible = !userBox.classList.contains("hidden");
+    if (isVisible) {
+      userBox.classList.add("opacity-0", "scale-95");
+      setTimeout(() => userBox.classList.add("hidden"), 200);
+    } else {
+      userBox.classList.remove("hidden");
+      setTimeout(() => userBox.classList.remove("opacity-0", "scale-95"), 10);
+    }
+  });
+
+  // Close button
+  closeUserBox.addEventListener("click", () => {
+    userBox.classList.add("opacity-0", "scale-95");
+    setTimeout(() => userBox.classList.add("hidden"), 200);
+  });
+
+  // Add user
+  addUserBtn.addEventListener("click", () => {
+    const name = addUserInput.value.trim();
+    if (name && !users.includes(name)) {
+      users.push(name);
+      saveUsers();
+      addUserInput.value = "";
+      renderUserList();
+    }
+  });
+
+  // Remove user
+  removeUserBtn.addEventListener("click", () => {
+    const selected = userSelect.value;
+    if (selected && users.includes(selected)) {
+      users = users.filter(u => u !== selected);
+      saveUsers();
+      localStorage.removeItem(getUserChatKey(selected));
+      if (selected === currentUser) {
+        currentUser = null;
+        localStorage.removeItem("currentUser");
+        chatHistory = [];
+        currentChatId = null;
+        renderHistoryList();
+        startNewChat();
+      }
+      renderUserList();
+    }
+  });
+
+  // Change user
+  userSelect.addEventListener("change", () => {
+    const selected = userSelect.value;
+    if (selected) {
+      switchUser(selected);
+    }
+  });
+
+  // Override saveChatHistory globally
+  saveChatHistory = saveChatHistoryForUser;
+
+  // Init user list
+  renderUserList();
+  if (currentUser) loadUserChatHistory(currentUser);
+});
+const userBox = document.getElementById("userManagementBox");
+const closeUserBox = document.getElementById("closeUserBox");
+
+const addUserBtn = document.getElementById("addUserBtn");
+const removeUserBtn = document.getElementById("removeUserBtn");
+const addUserInput = document.getElementById("addUserInput");
+const userSelect = document.getElementById("userSelect");
+
+let users = JSON.parse(localStorage.getItem("userList")) || [];
+let currentUser = localStorage.getItem("currentUser") || null;
+
+function renderUserList() {
+  userSelect.innerHTML = '<option disabled>Select User</option>';
+  users.forEach(user => {
+    const option = document.createElement("option");
+    option.value = user;
+    option.textContent = user;
+    if (user === currentUser) option.selected = true;
+    userSelect.appendChild(option);
+  });
+}
+
+function saveUsers() {
+  localStorage.setItem("userList", JSON.stringify(users));
+}
+
+function getUserChatKey(username) {
+  return `chatHistory_${username}`;
+}
+
+function loadUserChatHistory(username) {
+  const saved = localStorage.getItem(getUserChatKey(username));
+  if (saved) chatHistory = JSON.parse(saved);
+  else chatHistory = [];
+
+  currentChatId = null;
+  renderHistoryList();
+  startNewChat();
+}
+
+function saveChatHistoryForUser() {
+  if (currentUser) {
+    localStorage.setItem(getUserChatKey(currentUser), JSON.stringify(chatHistory));
+  }
+}
+
+function switchUser(username) {
+  updateLoggedInUserUI();
+  currentUser = username;
+  localStorage.setItem("currentUser", username);
+  loadUserChatHistory(username);
+}
+
+// Toggle box
+userButton.addEventListener("click", () => {
+  const isVisible = !userBox.classList.contains("hidden");
+  if (isVisible) {
+    userBox.classList.add("opacity-0", "scale-95");
+    setTimeout(() => userBox.classList.add("hidden"), 200);
+  } else {
+    userBox.classList.remove("hidden");
+    setTimeout(() => userBox.classList.remove("opacity-0", "scale-95"), 10);
+  }
+});
+
+// Close button
+closeUserBox.addEventListener("click", () => {
+  userBox.classList.add("opacity-0", "scale-95");
+  setTimeout(() => userBox.classList.add("hidden"), 200);
+});
+
+// Add user
+addUserBtn.addEventListener("click", () => {
+  const name = addUserInput.value.trim();
+  if (name && !users.includes(name)) {
+    users.push(name);
+    saveUsers();
+    addUserInput.value = "";
+    renderUserList();
+  }
+});
+
+// Remove user
+removeUserBtn.addEventListener("click", () => {
+  const selected = userSelect.value;
+  if (selected && users.includes(selected)) {
+    users = users.filter(u => u !== selected);
+    saveUsers();
+    localStorage.removeItem(getUserChatKey(selected));
+    if (selected === currentUser) {
+      currentUser = null;
+      localStorage.removeItem("currentUser");
+      chatHistory = [];
+      currentChatId = null;
+      renderHistoryList();
+      startNewChat();
+    }
+    renderUserList();
+  }
+});
+
+// Change user
+userSelect.addEventListener("change", () => {
+  const selected = userSelect.value;
+  if (selected) {
+    switchUser(selected);
+  }
+});
+
+// Override saveChatHistory globally
+saveChatHistory = saveChatHistoryForUser;
+
+// Init on DOM load
+document.addEventListener("DOMContentLoaded", () => {
+  renderUserList();
+  if (currentUser) loadUserChatHistory(currentUser);
+});
+</script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Apply Inter font to the entire body */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Custom scrollbar for chat window */
+        .chat-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-scrollbar::-webkit-scrollbar-track {
+            background: #f0f0f0; /* Light gray for track */
+            border-radius: 10px;
+        }
+
+        .chat-scrollbar::-webkit-scrollbar-thumb {
+            background: #c0c0c0; /* Gray for thumb */
+            border-radius: 10px;
+        }
+
+        .chat-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a0a0a0; /* Darker gray on hover */
+        }
+
+        /* Dark mode scrollbar */
+        .dark .chat-scrollbar::-webkit-scrollbar-track {
+            background: #333;
+        }
+
+        .dark .chat-scrollbar::-webkit-scrollbar-thumb {
+            background: #666;
+        }
+
+        .dark .chat-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #888;
+        }
+
+        /* Typing indicator animation */
+        .typing-indicator span {
+            animation: blink 1s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        /* Transition for sidebar */
+        .transition-transform {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Adjust sidebar position below header (desktop/tablet) */
+        @media (min-width: 641px) { /* sm breakpoint and up */
+            aside#sidebar {
+                top: 4.5rem; /* Approximate height of header + margin-top */
+                height: calc(100% - 4.5rem); /* Remaining height */
+            }
+        }
+
+        /* Mobile specific styles (max-width: 640px) */
+        @media (max-width: 640px) {
+            header {
+                height: 4.5rem; /* Explicit height for the header to prevent overlap */
+            }
+            aside#sidebar {
+                width: 80%; /* Slightly less than full width to show some main content */
+                max-width: 300px; /* Cap width for larger mobile devices */
+                top: 4.5rem; /* Position sidebar directly below the header */
+                height: calc(100% - 4.5rem); /* Fill remaining vertical space */
+                border-right: none;
+                /* Adjust transform for mobile to slide in from left */
+                transform: translateX(-100%);
+            }
+            body.sidebar-open aside#sidebar {
+                transform: translateX(0);
+            }
+            body.sidebar-open {
+                overflow: hidden; /* Prevent scrolling on main content when sidebar is open */
+            }
+            body.sidebar-open .overlay {
+                display: block; /* Show overlay */
+            }
+        }
+
+        /* Style for chat message containers to allow positioning delete button */
+        .chat-message-container {
+            position: relative;
+            display: inline-block; /* Essential for aligning messages and actions */
+            max-width: 80%;
+        }
+
+        /* Styles for the message actions container (buttons will be inside this) */
+        .message-actions {
+            display: flex;
+            gap: 0.25rem; /* Space between buttons (equivalent to Tailwind's gap-1) */
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.2s ease-in-out;
+            margin-top: 0.25rem; /* Space above buttons (equivalent to Tailwind's mt-1) */
+            align-items: center; /* Vertically center the icons */
+        }
+
+        /* Show actions on chat message container hover */
+        .chat-message-container:hover .message-actions {
+            opacity: 1;
+        }
+
+        /* Align actions for AI messages (left-aligned text) */
+        .text-left .message-actions {
+            justify-content: flex-start;
+        }
+
+        /* Align actions for user messages (right-aligned text) */
+        .text-right .message-actions {
+            justify-content: flex-end;
+        }
+
+        /* Common button styles */
+        .delete-message-btn,
+        .copy-message-btn {
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border: none;
+            z-index: 10;
+        }
+
+        /* Specific colors for delete and copy buttons */
+        .delete-message-btn {
+            background-color: #ef4444; /* Red color */
+            color: white;
+        }
+
+        .copy-message-btn {
+            background-color: #3b82f6; /* Blue color */
+            color: white;
+        }
+    </style>
+
+<!-- Prism.js for syntax highlighting -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/normalize-whitespace/prism-normalize-whitespace.min.js"></script>
+<script>
+Prism.plugins.NormalizeWhitespace.setDefaults({
+  'remove-trailing': true,
+  'remove-indent': true,
+  'left-trim': true,
+  'right-trim': true
+});
+</script>
+<style>
+pre code {
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  border-radius: 0.375rem;
+}
+.code-container {
+  position: relative;
+}
+.copy-code-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  opacity: 0.8;
+}
+.copy-code-btn:hover {
+  opacity: 1;
+}
+</style>
+
+</head>
+<body class="bg-gray-100 text-gray-800 h-screen flex flex-col text-sm relative">
+
+    <div id="sidebarOverlay" class="overlay fixed inset-0 bg-black bg-opacity-50 z-10 hidden sm:hidden"></div>
+
+    <header class="z-30 sticky top-0 px-2 sm:px-4 mt-2">
+        <div class="w-full shadow-md rounded-lg px-4 py-2 flex items-center justify-between bg-white border border-gray-200 max-w-[98%] mx-auto">
+            <div class="flex items-center space-x-2">
+                <button id="toggleSidebar" aria-label="Toggle sidebar" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                    </svg>
+                </button>
+                <span id="headerTitle" class="font-semibold text-base text-gray-800 tracking-wide">Nexsera Ai</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button id="themeToggle" title="Toggle Theme" class="p-2 rounded-full hover:bg-gray-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 19.5V21M4.22 4.22l1.06 1.06M17.72 17.72l1.06 1.06M3 12h1.5M19.5 12H21M4.22 19.78l1.06-1.06M17.72 6.28l1.06-1.06M12 6.75A5.25 5.25 0 1 1 6.75 12 5.26 5.26 0 0 1 12 6.75z" />
+                    </svg>
+                </button>
+                <button id="settingsBtn" title="Settings" class="p-2 rounded-full hover:bg-gray-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.827 3.31-2.37 2.37a1.724 1.724 0 0 0-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.827-2.37-2.37a1.724 1.724 0 0 0-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.827-3.31 2.37-2.37a1.724 1.724 0 0 0 2.573-1.066z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                    </svg>
+                </button>
+                <div id="userBtn" class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600">S</div>
+            </div>
+        </div>
+    </header>
+<div id="userManagementBox" class="absolute right-4 top-[4.5rem] bg-white border border-gray-200 rounded-md shadow-lg p-4 w-64 hidden z-40 transition-all duration-300 transform opacity-0 scale-95">
+  <div class="flex justify-between items-center mb-3">
+    <h3 class="text-sm font-semibold text-gray-700">Manage Users</h3>
+    <button id="closeUserBox" title="Close" class="text-gray-500 hover:text-black">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+  <div class="space-y-2">
+    <input type="text" placeholder="Add user name" id="addUserInput" class="w-full px-2 py-1 border border-gray-300 rounded text-sm">
+    <button id="addUserBtn" class="w-full text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm flex items-center justify-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+      </svg>
+      Add User
+    </button>
+    <select id="userSelect" class="w-full px-2 py-1 border border-gray-300 rounded text-sm">
+      <option selected disabled>Select User</option>
+    </select>
+    <button id="removeUserBtn" class="w-full text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm flex items-center justify-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+      Remove User
+    </button>
+  </div>
+</div>
+
+
+    <aside id="sidebar" class="fixed left-0 w-64 bg-white border-r border-gray-200 shadow-md p-4 z-20 transform -translate-x-full transition-transform overflow-y-auto sm:top-0 sm:h-full">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+                <img width="48" height="48" src="https://img.icons8.com/pulsar-line/48/nfc-n.png" alt="nfc-n" />
+                <span class="font-bold text-base text-gray-900">Nexsera Ai</span>
+            </div>
+            <button id="closeSidebar" aria-label="Close sidebar" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50 sm:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <h2 class="font-semibold text-sm mb-3 text-black">Menu</h2>
+
+        <button id="newChatBtn" class="w-full mb-3 flex items-center gap-2 px-3 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            New Chat
+        </button>
+
+        <input type="text" id="searchHistory" placeholder="Search History..." class="mb-2 w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 placeholder-gray-400 text-black"/>
+
+        <h2 class="font-semibold text-sm mb-2 mt-4 text-black">History</h2>
+        <ul id="historyList" class="text-sm text-gray-700 space-y-1">
+            </ul>
+
+        
+<div class="mt-6 pt-4 border-t border-gray-200">
+    <h2 class="font-semibold text-sm mb-2 text-black">User Info</h2>
+    <div class="text-sm text-gray-600 pl-1">
+        Logged in as: <span id="loggedInUser">Guest</span>
+    </div>
+</div>
+<div class="mt-6 pt-4 border-t border-gray-200">
+            <button id="sidebarSettingsBtn" class="flex items-center w-full px-2 py-1.5 rounded-md hover:bg-gray-200 transition text-left text-sm text-black">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.827 3.31-2.37 2.37a1.724 1.724 0 0 0-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.827-2.37-2.37a1.724 1.724 0 0 0-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.827-3.31 2.37-2.37a1.724 1.724 0 0 0 2.573-1.066z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                </svg>
+                Settings
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-grow overflow-y-auto px-4 chat-scrollbar">
+        <div id="chatWindow" class="max-w-4xl mx-auto space-y-3 py-4">
+            <p id="introText" class="text-center text-gray-600 text-sm">Hello! I'm Nexsera Ai, your personal assistant. How can I help you today?</p>
+        </div>
+    </main>
+
+    <footer class="w-full border-t px-2 sm:px-4 py-3 space-y-2 bg-white mb-4">
+        <div class="w-full max-w-[95%] mx-auto flex flex-col gap-2">
+            <div id="filePreview" class="flex flex-wrap gap-2"></div>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-2">
+<div class="flex w-full items-center space-x-2">
+  <!-- Upload Button -->
+  <div class="w-fit bg-white border border-gray-300 rounded-md p-1.5 shadow-sm hover:border-gray-400 hover:shadow transition">
+    <label for="file-upload" class="cursor-pointer hover:bg-gray-200 transition rounded-md p-1.5 block text-black" title="Upload File">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+      </svg>
+    </label>
+    <input id="file-upload" type="file" class="hidden" multiple />
+  </div>
+
+  <div class="flex-grow"></div> <!-- Spacer -->
+
+  <!-- Record Button -->
+  <div class="w-fit bg-white border border-gray-300 rounded-md p-1.5 shadow-sm hover:border-gray-400 hover:shadow transition">
+    <button id="recordBtn" class="cursor-pointer hover:bg-gray-200 transition rounded-md p-1.5 block text-black" title="Start Recording">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+      </svg>
+    </button>
+  </div>
+</div>
+</div>
+                <div class="flex-grow flex items-center bg-white border border-gray-300 rounded-md px-3 py-2 shadow-sm hover:border-gray-400 hover:shadow transition">
+                    <input id="chatInput" type="text" placeholder="Message Nexsera Ai..." class="flex-grow px-2 py-1 bg-transparent text-sm focus:outline-none placeholder-gray-400 text-black"/>
+                    <button id="sendBtn" title="Send" class="bg-black text-white p-2 rounded-md hover:bg-gray-800 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <p class="text-[10px] text-center text-gray-500">
+                Nexsera Ai may make mistakes. Consider checking important information. <a href="#" class="underline text-black">Terms</a> and <a href="#" class="underline text-black">Privacy</a>.
+            </p>
+        </div>
+    </footer>
+
+    <div id="settingsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-11/12 max-w-md">
+            <h2 class="text-xl font-bold mb-4 text-black">Settings</h2>
+            <div class="mb-4">
+                <label for="modelSelect" class="block text-sm font-medium text-gray-700">Select AI Model:</label>
+                <select id="modelSelect" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white text-black">
+                    <option value="default">Default Model</option>
+                    <option value="creative">Creative Model</option>
+                    <option value="factual">Factual Model</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="responseSpeed" class="block text-sm font-medium text-gray-700">Response Speed:</label>
+                <input type="range" id="responseSpeed" min="50" max="2000" value="500" class="mt-1 w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                <span id="responseSpeedValue" class="text-xs text-gray-500">500 ms</span>
+            </div>
+            <div class="flex justify-end">
+                <button id="closeSettingsModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get references to DOM elements
+        const chatInput = document.getElementById("chatInput");
+        const sendBtn = document.getElementById("sendBtn");
+        const chatWindow = document.getElementById("chatWindow");
+        const introText = document.getElementById("introText");
+        const toggleSidebar = document.getElementById("toggleSidebar");
+        const closeSidebar = document.getElementById("closeSidebar"); // New close button for sidebar
+        const sidebar = document.getElementById("sidebar");
+        const historyList = document.getElementById("historyList");
+        const searchHistory = document.getElementById("searchHistory");
+        const fileUpload = document.getElementById("file-upload");
+        const filePreview = document.getElementById("filePreview");
+        const newChatBtn = document.getElementById("newChatBtn");
+        const themeToggle = document.getElementById("themeToggle");
+        const settingsBtn = document.getElementById("settingsBtn");
+        const sidebarSettingsBtn = document.getElementById("sidebarSettingsBtn");
+        const settingsModal = document.getElementById("settingsModal");
+        const closeSettingsModal = document.getElementById("closeSettingsModal");
+        const modelSelect = document.getElementById("modelSelect");
+        const responseSpeed = document.getElementById("responseSpeed");
+        const responseSpeedValue = document.getElementById("responseSpeedValue");
+        const sidebarOverlay = document.getElementById("sidebarOverlay"); // New overlay element
+        const headerTitle = document.getElementById("headerTitle"); // Header title element
+
+        // State variables
+        let filesToSend = [];
+        let chatHistory = []; // Stores all chat sessions
+        let currentChatId = null; // ID of the currently active chat session
+        let isTyping = false; // Flag to manage typing indicator state
+        let preferredResponseSpeed = 500; // Default AI response speed in milliseconds
+
+        // --- Utility Functions ---
+
+        /**
+         * Checks if the current viewport width is considered mobile.
+         * Corresponds to Tailwind's 'sm' breakpoint.
+         * @returns {boolean} True if mobile, false otherwise.
+         */
+        function isMobile() {
+            return window.innerWidth <= 640;
+        }
+
+        /**
+         * Saves the current chat history to localStorage.
+         */
+        function saveChatHistory() {
+            localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+        }
+
+        /**
+         * Loads chat history from localStorage and renders the history list.
+         */
+        function loadChatHistory() {
+            const storedHistory = localStorage.getItem("chatHistory");
+            if (storedHistory) {
+                chatHistory = JSON.parse(storedHistory);
+                renderHistoryList();
+            }
+        }
+
+        /**
+         * Generates a unique ID for a new chat session using a timestamp.
+         * @returns {string} A unique chat ID.
+         */
+        function generateChatId() {
+            return Date.now().toString();
+        }
+
+        /**
+         * Creates and appends a chat message to the chat window.
+         * @param {string} message - The content of the message.
+         * @param {'user'|'ai'} type - The type of message ('user' or 'ai').
+         * @param {number} messageIndex - The index of the message within the current chat's messages array.
+         * @returns {HTMLElement} The outer div element containing the message and its delete button.
+         */
+        function createChatEntry(message, type, messageIndex) {
+            const msgContainer = document.createElement("div");
+            msgContainer.className = type === "user" ? "text-right" : "text-left";
+            msgContainer.innerHTML = `
+                <div class="chat-message-container">
+                    <div class="inline-block rounded-md px-3 py-1.5 break-words ${
+                        type === "user" ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-white border border-gray-300 text-black"
+                    } transition">
+                        ${message}
+                    </div>
+                    <div class="message-actions flex gap-1 mt-1">
+                        <button class="copy-message-btn" data-index="${messageIndex}" data-role="${type}" title="Copy message">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
+                            </svg>
+                        </button>
+                        <button class="delete-message-btn" data-index="${messageIndex}" data-role="${type}" title="Delete message">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+            chatWindow.appendChild(msgContainer);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+                chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' }); // Scroll to the bottom
+
+            const deleteButton = msgContainer.querySelector('.delete-message-btn');
+            deleteButton.addEventListener('click', () => deleteMessage(currentChatId, messageIndex));
+
+            const copyButton = msgContainer.querySelector('.copy-message-btn');
+            copyButton.addEventListener('click', () => copyMessage(msgContainer.querySelector('.inline-block').textContent));
+
+
+            return msgContainer.querySelector('.inline-block'); // Return the inner div for potential streaming
+        }
+
+        // --- Typing Indicator ---
+
+        /**
+         * Displays a typing indicator in the chat window.
+         */
+        function showTypingIndicator() {
+            if (isTyping) return; // Prevent multiple typing indicators
+            isTyping = true;
+            const typingDiv = document.createElement("div");
+            typingDiv.id = "typingIndicator";
+            typingDiv.className = "text-left mt-2";
+            typingDiv.innerHTML = `
+                <div class="inline-block bg-white border border-gray-300 text-black rounded-md px-3 py-1.5">
+                    <span class="typing-indicator"><span>.</span><span>.</span><span>.</span></span>
+                </div>
+            `;
+            chatWindow.appendChild(typingDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+                chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+
+        /**
+         * Hides the typing indicator from the chat window.
+         */
+        function hideTypingIndicator() {
+            const typingDiv = document.getElementById("typingIndicator");
+            if (typingDiv) {
+                typingDiv.remove();
+                isTyping = false;
+            }
+        }
+
+        // --- Chat Management ---
+
+        /**
+         * Simulates streaming of a reply into a message div.
+         * @param {HTMLElement} messageDiv - The div element to stream the text into.
+         * @param {string} fullReply - The complete reply text to stream.
+         */
+        async function streamReply(messageDiv, fullReply) {
+            // Ensure the messageDiv exists and is an element
+            if (!messageDiv || !messageDiv.tagName) {
+                console.error("Invalid messageDiv provided for streaming:", messageDiv);
+                return;
+            }
+
+            const words = fullReply.split(" ");
+            messageDiv.textContent = ""; // Clear existing content for streaming
+            for (let i = 0; i < words.length; i++) {
+                messageDiv.textContent += (i > 0 ? " " : "") + words[i];
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+                chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                // Adjust speed based on preferred response speed and total words
+                await new Promise(resolve => setTimeout(resolve, preferredResponseSpeed / words.length));
+            }
+        }
+
+        /**
+         * Handles sending a message, displaying user input, simulating AI response,
+         * and managing chat history.
+         */
+        async function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message && filesToSend.length === 0) return; // Don't send empty messages
+
+            // Remove intro text if it exists
+            if (introText) {
+                introText.remove();
+            }
+
+            // Prepare user message content, including file names
+            let fileNames = filesToSend.map(file => `📁 ${file.name}`).join("<br>");
+            const userMessageContent = `${message || ""}${fileNames ? "<br>" + fileNames : ""}`;
+
+            let currentChat = chatHistory.find(chat => chat.id === currentChatId);
+
+            // Initialize a new chat session if not already in one
+            if (!currentChatId) {
+                currentChatId = generateChatId();
+                currentChat = { id: currentChatId, title: message.substring(0, 30) + (message.length > 30 ? "..." : ""), messages: [] };
+                chatHistory.unshift(currentChat); // Add new chat session to the beginning
+                renderHistoryList(); // Update sidebar history
+            }
+
+            // Add user message to the current chat session's messages
+            const userMessageIndex = currentChat.messages.length; // Get index before pushing
+            currentChat.messages.push({ role: "user", content: userMessageContent });
+            createChatEntry(userMessageContent, "user", userMessageIndex); // Render with its index
+            saveChatHistory(); // Save updated history
+
+            // Clear input and file preview area
+            chatInput.value = "";
+            filesToSend = [];
+            updateFilePreview();
+
+            showTypingIndicator(); // Show AI typing indicator
+
+            // Simulate AI response after a short delay
+            setTimeout(async () => {
+                hideTypingIndicator(); // Hide typing indicator before streaming starts
+
+                let reply;
+                // Simple AI response logic based on user input
+                if (["hi", "hello"].includes(message.toLowerCase())) {
+                    reply = "Hey there! 👋 How can I help you today?";
+                }
+                else if (message.toLowerCase().includes("help")) {
+                    reply = "Sure! I'm here to help. What do you need assistance with?";
+                } else if (message.toLowerCase().includes("who are you")) {
+                    reply = "I'm Nexsera Ai, your intelligent assistant here to make your work easier!";
+                } else if (message.toLowerCase().includes("features")) {
+                    reply = "Nexsera Ai can chat, summarize text, manage files, and more!";
+                } else if (message.toLowerCase().includes("thank you") || message.toLowerCase().includes("thanks")) {
+                    reply = "You're welcome! 😊";
+                } else if (message.toLowerCase().includes("goodbye") || message.toLowerCase().includes("bye")) {
+                    reply = "Goodbye! Come back anytime you need help.";
+                }
+                else if (message.toLowerCase().includes("make a password")) {
+                  const characters = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                    let password = "";
+                  for (let i = 0; i < 12; i++) {
+                     password += characters.charAt(Math.floor(Math.random() * characters.length));
+                }
+                   reply = `Here is your 12-digit strong password: \`${password}\` 🔐`;
+                }
+                else if (message.toLowerCase().includes("joke")) {
+                   reply = "Sure! Why don’t scientists trust atoms? Because they make up everything! 😄";
+                }
+                else if (message.toLowerCase().includes("quote")) {
+                   reply = "“The best way to get started is to quit talking and begin doing.” – Walt Disney ✨";
+                }
+                else if (message.toLowerCase().includes("weather")) {
+                   reply = await getWeatherData(
+  message.toLowerCase().includes("weather in") ? message.split("in").pop().trim() : ""
+);
+                }
+                else if (message.toLowerCase().includes("motivate me")) {
+                   reply = "You are capable of amazing things. Believe in yourself and go for it! 💪";
+                }
+                else if (message.toLowerCase().includes("who made you")) {
+                  reply = "I was created by Samarth Nagpure, designed to be your smart companion!";
+                }
+                else if (message.toLowerCase().includes("what can you do")) {
+                  reply = "I can chat, generate passwords, tell jokes, show quotes, summarize text, and more!";
+                }
+                  else if (message.toLowerCase().includes("settings")) {
+                    reply = "You can access settings from the top right corner or the sidebar.";
+                } else if (message.toLowerCase().includes("dark mode") || message.toLowerCase().includes("light mode")) {
+                    reply = "You can toggle light/dark mode using the sun/moon icon in the header!";
+                } else if (message.toLowerCase().includes("new chat")) {
+                    reply = "To start a new chat, click the 'New Chat' button in the sidebar.";
+                }
+
+                else if (["ok", "okay", "sure"].includes(message.toLowerCase())) {
+                    reply = "Great! What would you like to do next? Let me know how I can help you. 😊";
+                }
+                else if (["how are you", "how are you doing"].some(q => message.toLowerCase().includes(q))) {
+                    reply = "I'm doing great! Thanks for asking 😊. How can I assist you today?";
+                }
+                else if (message.toLowerCase().includes("what's your name")) {
+                    reply = "My name is Nexsera Ai! I'm here to be your helpful assistant.";
+                }
+                else if (message.toLowerCase().includes("tell me something")) {
+                    reply = "Did you know? Honey never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3000 years old! 🐝";
+                }
+ else {
+                    reply = "You said: " + (message || "You uploaded a file.");
+                }
+
+                // Store AI response in chat history *before* rendering to get its index
+                const aiMessageIndex = currentChat.messages.length;
+                currentChat.messages.push({ role: "ai", content: reply });
+
+                // Create the AI message div and stream the reply into it
+                const aiMessageDiv = createChatEntry("", "ai", aiMessageIndex); // Render with its index
+                await streamReply(aiMessageDiv, reply); // Pass the inner div directly
+
+                saveChatHistory(); // Save updated history
+            }, 1000); // Simulate network delay
+        }
+
+        /**
+         * Starts a new chat session, clearing the chat window and resetting currentChatId.
+         */
+        function startNewChat() {
+            chatWindow.innerHTML = `<p id="introText" class="text-center text-gray-600 text-sm">Hello! I'm Nexsera Ai, your personal assistant. How can I help you today?</p>`;
+            currentChatId = null; // Reset current chat ID
+            renderHistoryList(); // Re-render to ensure no chat is highlighted
+            if (isMobile()) {
+                hideSidebar(); // Hide sidebar on mobile after starting new chat
+                headerTitle.textContent = "Nexsera Ai"; // Reset header title
+            }
+        }
+
+        // --- History Management ---
+
+        /**
+         * Renders the chat history list in the sidebar based on `chatHistory` array.
+         */
+        function renderHistoryList() {
+            historyList.innerHTML = '';
+            chatHistory.forEach(chat => {
+                const historyItem = document.createElement("li");
+                historyItem.className = `flex justify-between items-center px-2 py-1.5 rounded-md hover:bg-gray-200 transition text-black ${chat.id === currentChatId ? 'bg-gray-200 font-semibold' : ''}`;
+
+                const titleSpan = document.createElement("span");
+                titleSpan.textContent = chat.title;
+                titleSpan.classList.add('flex-grow', 'cursor-pointer', 'pr-2'); // Add pr-2 for spacing
+                titleSpan.onclick = () => loadChat(chat.id);
+                historyItem.appendChild(titleSpan);
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.className = "text-red-500 hover:text-red-700 px-1 py-0.5 rounded-sm hover:bg-gray-300";
+                deleteBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                    </svg>
+                `;
+                deleteBtn.title = "Delete chat";
+                deleteBtn.dataset.chatId = chat.id;
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation(); // Prevent loading chat when deleting
+                    deleteChat(chat.id);
+                };
+                historyItem.appendChild(deleteBtn);
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        /**
+         * Loads and displays a specific chat session from history into the chat window.
+         * @param {string} chatId - The ID of the chat session to load.
+         */
+        function loadChat(chatId) {
+            const chat = chatHistory.find(c => c.id === chatId);
+            if (chat) {
+                chatWindow.innerHTML = ''; // Clear current chat window
+                currentChatId = chatId; // Set the current chat ID
+                chat.messages.forEach((msg, index) => {
+                    createChatEntry(msg.content, msg.role, index);
+                });
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+                chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                renderHistoryList(); // Re-render history to highlight active chat
+                if (isMobile()) {
+                    hideSidebar(); // Hide sidebar on mobile after loading chat
+                    headerTitle.textContent = chat.title.substring(0, 20) + (chat.title.length > 20 ? "..." : ""); // Update header title
+                }
+            }
+        }
+
+        /**
+         * Deletes a chat session from the history.
+         * @param {string} chatIdToDelete - The ID of the chat session to delete.
+         */
+        function deleteChat(chatIdToDelete) {
+            const chatIndex = chatHistory.findIndex(chat => chat.id === chatIdToDelete);
+            if (chatIndex > -1) {
+                chatHistory.splice(chatIndex, 1); // Remove chat from array
+                saveChatHistory(); // Save updated history
+
+                if (currentChatId === chatIdToDelete) {
+                    startNewChat(); // If current chat is deleted, start a new one
+                } else {
+                    renderHistoryList(); // Otherwise, just re-render the history
+                }
+            }
+        }
+
+        /**
+         * Deletes a specific message from the current chat session.
+         * @param {string} chatId - The ID of the chat session.
+         * @param {number} messageIndex - The index of the message to delete.
+         */
+        function deleteMessage(chatId, messageIndex) {
+            const chat = chatHistory.find(c => c.id === chatId);
+            if (chat && chat.messages.length > messageIndex) {
+                chat.messages.splice(messageIndex, 1); // Remove message
+                saveChatHistory(); // Save updated history
+                loadChat(chatId); // Reload current chat to reflect changes and update indices
+            }
+        }
+
+        /**
+         * Copies the given text to the clipboard.
+         * @param {string} text - The text to copy.
+         */
+        async function copyMessage(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                // Optionally, add visual feedback (e.g., a temporary "Copied!" tooltip)
+                console.log('Message copied to clipboard:', text);
+            }
+            catch (err) {
+                console.error('Failed to copy message: ', err);
+            }
+        }
+
+        /**
+         * Filters the chat history displayed in the sidebar based on a search term.
+         */
+        function filterHistory() {
+            const searchTerm = searchHistory.value.toLowerCase();
+            const filteredHistory = chatHistory.filter(chat =>
+                chat.title.toLowerCase().includes(searchTerm) ||
+                chat.messages.some(msg => msg.content.toLowerCase().includes(searchTerm))
+            );
+            historyList.innerHTML = ''; // Clear current list
+            filteredHistory.forEach(chat => {
+                const historyItem = document.createElement("li");
+                historyItem.className = `flex justify-between items-center px-2 py-1.5 rounded-md hover:bg-gray-200 cursor-pointer transition text-black ${chat.id === currentChatId ? 'bg-gray-200 font-semibold' : ''}`;
+
+                const titleSpan = document.createElement("span");
+                titleSpan.textContent = chat.title;
+                titleSpan.classList.add('flex-grow', 'cursor-pointer', 'pr-2');
+                titleSpan.onclick = () => loadChat(chat.id);
+                historyItem.appendChild(titleSpan);
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.className = "text-red-500 hover:text-red-700 px-1 py-0.5 rounded-sm hover:bg-gray-300";
+                deleteBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                    </svg>
+                `;
+                deleteBtn.title = "Delete chat";
+                deleteBtn.dataset.chatId = chat.id;
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation(); // Prevent loading chat when deleting
+                    deleteChat(chat.id);
+                };
+                historyItem.appendChild(deleteBtn);
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        // --- File Handling ---
+
+        /**
+         * Updates the file preview area based on the `filesToSend` array.
+         */
+        function updateFilePreview() {
+            filePreview.innerHTML = ''; // Clear current preview
+            filesToSend.forEach((file, index) => {
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'flex items-center bg-gray-100 border border-gray-300 rounded px-2 py-1 text-xs text-black';
+                fileDiv.innerHTML = `
+                    📁 ${file.name}
+                    <button class="ml-2 text-red-500 hover:text-red-700" data-index="${index}">&times;</button>
+                `;
+                filePreview.appendChild(fileDiv);
+            });
+
+            // Add event listeners to remove buttons
+            filePreview.querySelectorAll('button').forEach(btn => {
+                btn.onclick = () => {
+                    const i = parseInt(btn.dataset.index);
+                    filesToSend.splice(i, 1); // Remove file from array
+                    updateFilePreview(); // Re-render preview
+                };
+            });
+        }
+
+        // --- UI Toggles ---
+
+        /**
+         * Toggles between light and dark mode, and saves the preference to localStorage.
+         */
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark");
+            if (document.body.classList.contains("dark")) {
+                localStorage.setItem("theme", "dark");
+                document.body.classList.remove("bg-gray-100", "text-gray-800");
+                document.body.classList.add("bg-gray-900", "text-gray-100");
+            } else {
+                localStorage.setItem("theme", "light");
+                document.body.classList.remove("bg-gray-900", "text-gray-100");
+                document.body.classList.add("bg-gray-100", "text-gray-800");
+            }
+        }
+
+        /**
+         * Hides the sidebar by adding a transform class.
+         */
+        function hideSidebar() {
+            sidebar.classList.add("-translate-x-full");
+            document.body.classList.remove("sidebar-open");
+            sidebarOverlay.classList.add("hidden"); // Hide overlay
+            if (!currentChatId) {
+                headerTitle.textContent = "Nexsera Ai"; // Reset header title if no chat is active
+            } else {
+                const currentChat = chatHistory.find(chat => chat.id === currentChatId);
+                if (currentChat) {
+                     headerTitle.textContent = currentChat.title.substring(0, 20) + (currentChat.title.length > 20 ? "..." : "");
+                }
+            }
+        }
+
+        /**
+         * Shows the sidebar by removing a transform class.
+         */
+        function showSidebar() {
+            sidebar.classList.remove("-translate-x-full");
+            document.body.classList.add("sidebar-open");
+            sidebarOverlay.classList.remove("hidden"); // Show overlay
+            if (isMobile()) {
+                 headerTitle.textContent = "Menu"; // Change header title to "Menu" on mobile
+            }
+        }
+
+        // --- Event Listeners ---
+
+        // Send message on button click
+        sendBtn.addEventListener("click", sendMessage);
+
+        // Send message on Enter key press (without Shift)
+        chatInput.addEventListener("keydown", e => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault(); // Prevent new line in input
+                sendMessage();
+            }
+        });
+
+        // Toggle sidebar visibility
+        toggleSidebar.addEventListener("click", () => {
+            if (sidebar.classList.contains("-translate-x-full")) {
+                showSidebar();
+            } else {
+                hideSidebar();
+            }
+        });
+
+        // Close sidebar using the new close button
+        closeSidebar.addEventListener("click", hideSidebar);
+
+        // Close sidebar if overlay is clicked on mobile
+        sidebarOverlay.addEventListener("click", hideSidebar);
+
+        // Handle file selection
+        fileUpload.addEventListener("change", () => {
+            filesToSend.push(...Array.from(fileUpload.files));
+            updateFilePreview();
+            fileUpload.value = ""; // Clear file input
+        });
+
+        // Filter history on search input
+        searchHistory.addEventListener("input", filterHistory);
+
+        // Start a new chat session
+        newChatBtn.addEventListener("click", startNewChat);
+
+        // Toggle theme (light/dark mode)
+        themeToggle.addEventListener("click", toggleDarkMode);
+
+        // Open settings modal from header
+        settingsBtn.addEventListener("click", () => settingsModal.classList.remove("hidden"));
+
+        // Open settings modal from sidebar and hide sidebar
+        sidebarSettingsBtn.addEventListener("click", () => {
+            settingsModal.classList.remove("hidden");
+            if (isMobile()) {
+                hideSidebar(); // Hide sidebar when settings are opened from sidebar on mobile
+            }
+        });
+
+        // Close settings modal
+        closeSettingsModal.addEventListener("click", () => settingsModal.classList.add("hidden"));
+
+        // Handle AI model selection (for demonstration, logs to console)
+        modelSelect.addEventListener("change", (e) => {
+            console.log("Selected AI Model:", e.target.value);
+            // In a real application, you would send this to your backend API
+        });
+
+        // Update response speed based on slider input
+        responseSpeed.addEventListener("input", (e) => {
+            preferredResponseSpeed = parseInt(e.target.value);
+            responseSpeedValue.textContent = `${preferredResponseSpeed} ms`;
+        });
+
+        
+
+async function getWeatherData(city = "") {
+  const apiKey = "870665bf2180b59f08a6d6b31e6bb2d0";
+  try {
+    if (!city) {
+      const ipRes = await fetch("https://ipapi.co/json/");
+      const ipData = await ipRes.json();
+      city = ipData.city;
+    }
+    const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`);
+    const data = await res.json();
+    if (data.cod !== 200) throw new Error(data.message);
+    return `📍 Weather in ${data.name}: ${data.weather[0].description}, 🌡️ ${data.main.temp}°C`;
+  } catch (error) {
+    return `❌ Could not get weather: ${error.message}`;
+  }
+}
+
+
+// --- Initializations ---
+
+        // Execute on DOM content loaded
+        document.addEventListener("DOMContentLoaded", () => {
+            // Apply saved theme preference: Light mode first by default
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme === "dark") {
+                document.body.classList.add("dark", "bg-gray-900", "text-gray-100");
+                document.body.classList.remove("bg-gray-100", "text-gray-800");
+            } else {
+                document.body.classList.remove("dark", "bg-gray-900", "text-gray-100");
+                document.body.classList.add("bg-gray-100", "text-gray-800");
+                localStorage.setItem("theme", "light"); // Explicitly set to light if not already
+            }
+
+            loadChatHistory(); // Load history on page load
+            // Set initial value for response speed display
+            responseSpeedValue.textContent = `${responseSpeed.value} ms`;
+
+            // Check if there's any chat history; if not, ensure intro text is visible
+            if (chatHistory.length === 0) {
+                if (!document.getElementById("introText")) {
+                    const p = document.createElement("p");
+                    p.id = "introText";
+                    p.className = "text-center text-gray-600 text-sm";
+                    p.textContent = "Hello! I'm Nexsera Ai, your personal assistant. How can I help you today?";
+                    chatWindow.appendChild(p);
+                }
+            } else {
+                // If history exists, load the most recent chat automatically
+                loadChat(chatHistory[0].id);
+            }
+        });
+
+        // Close sidebar when clicking on a chat history item on mobile
+        historyList.addEventListener('click', (event) => {
+            // Check if the click was on the list item's text span and not the delete button
+            if (event.target.tagName === 'SPAN' && event.target.closest('li') && isMobile()) {
+                hideSidebar();
+            }
+        });
+
+        // Update header title based on sidebar state on resize
+        window.addEventListener('resize', () => {
+            if (!isMobile() && sidebar.classList.contains("-translate-x-full")) {
+                // If resized to desktop and sidebar is hidden, ensure header title is "Nexsera Ai"
+                headerTitle.textContent = "Nexsera Ai";
+                sidebarOverlay.classList.add("hidden"); // Ensure overlay is hidden on desktop
+            } else if (isMobile() && !sidebar.classList.contains("-translate-x-full")) {
+                // If resized to mobile and sidebar is open, change title to "Menu"
+                headerTitle.textContent = "Menu";
+                sidebarOverlay.classList.remove("hidden"); // Ensure overlay is visible on mobile
+            }
+        });
+
+
+function updateLoggedInUserUI() {
+    const loggedInUserSpan = document.getElementById("loggedInUser");
+    if (loggedInUserSpan) {
+        loggedInUserSpan.textContent = currentUser || "Guest";
+    }
+}
+document.addEventListener("DOMContentLoaded", () => {
+    updateLoggedInUserUI();
+});
+
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('pre code').forEach((block) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "code-container";
+    block.parentNode.insertBefore(wrapper, block);
+    wrapper.appendChild(block);
+
+    const copyButton = document.createElement("button");
+    copyButton.className = "copy-code-btn";
+    copyButton.textContent = "Copy";
+    wrapper.appendChild(copyButton);
+
+    copyButton.addEventListener("click", () => {
+      navigator.clipboard.writeText(block.textContent)
+        .then(() => {
+          copyButton.textContent = "Copied!";
+          setTimeout(() => copyButton.textContent = "Copy", 1500);
+        });
+    });
+  });
+});
+</script>
+
+</body>
+</html>
+<!-- Enhanced Settings Script -->
+
+<!-- Enhanced Settings Script -->
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Font Size Selector
+  const chatWindow = document.getElementById("chatWindow");
+  const fontSizeSelector = document.createElement("select");
+  fontSizeSelector.className = "w-full mt-2 p-1 border border-gray-300 text-sm rounded text-black";
+  fontSizeSelector.innerHTML = `
+    <option value="text-xs">Small</option>
+    <option value="text-sm" selected>Medium</option>
+    <option value="text-base">Large</option>
+    <option value="text-lg">Extra Large</option>
+  `;
+  fontSizeSelector.addEventListener("change", () => {
+    chatWindow.classList.remove("text-xs", "text-sm", "text-base", "text-lg");
+    chatWindow.classList.add(fontSizeSelector.value);
+    localStorage.setItem("chatFontSize", fontSizeSelector.value);
+  });
+
+  // Timestamp Toggle
+  const timestampToggle = document.createElement("button");
+  timestampToggle.className = "w-full mt-2 px-3 py-1 rounded text-sm bg-blue-600 text-white hover:bg-blue-700";
+  timestampToggle.textContent = "Toggle Message Timestamps";
+  timestampToggle.addEventListener("click", () => {
+    document.body.classList.toggle("show-timestamps");
+    localStorage.setItem("showTimestamps", document.body.classList.contains("show-timestamps"));
+  });
+
+  // Reset Settings
+  const resetSettings = document.createElement("button");
+  resetSettings.className = "w-full mt-2 px-3 py-1 rounded text-sm bg-red-600 text-white hover:bg-red-700";
+  resetSettings.textContent = "Reset All Settings";
+  resetSettings.addEventListener("click", () => {
+    localStorage.clear();
+    location.reload();
+  });
+
+  // Clear All History
+  const clearHistory = document.createElement("button");
+  clearHistory.className = "w-full mt-2 px-3 py-1 rounded text-sm bg-red-500 text-white hover:bg-red-600";
+  clearHistory.textContent = "Clear All Chat History";
+  clearHistory.addEventListener("click", () => {
+    localStorage.removeItem("chatHistory");
+    location.reload();
+  });
+
+  // Auto Scroll Toggle
+  const autoScrollToggle = document.createElement("button");
+  autoScrollToggle.className = "w-full mt-2 px-3 py-1 rounded text-sm bg-gray-600 text-white hover:bg-gray-700";
+  autoScrollToggle.textContent = "Toggle Auto Scroll";
+  autoScrollToggle.addEventListener("click", () => {
+    const current = localStorage.getItem("autoScroll") === "true";
+    localStorage.setItem("autoScroll", !current);
+  });
+
+  // Insert into Settings Modal
+  const settingsModal = document.getElementById("settingsModal");
+  settingsModal.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", autoScrollToggle);
+  settingsModal.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", clearHistory);
+  settingsModal.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", resetSettings);
+  settingsModal.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", timestampToggle);
+  settingsModal.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", fontSizeSelector);
+
+  // Load saved preferences
+  const savedFontSize = localStorage.getItem("chatFontSize") || "text-sm";
+  chatWindow.classList.add(savedFontSize);
+  fontSizeSelector.value = savedFontSize;
+
+  if (localStorage.getItem("showTimestamps") === "true") {
+    document.body.classList.add("show-timestamps");
+  }
+});
+</script>
+
+<style>
+body.show-timestamps .chat-message-container::after {
+  content: attr(data-timestamp);
+  display: block;
+  font-size: 10px;
+  color: #888;
+  margin-top: 2px;
+}
+</style>
