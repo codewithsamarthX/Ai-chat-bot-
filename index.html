@@ -847,7 +847,33 @@ pre code {
                 } else if (message.toLowerCase().includes("goodbye") || message.toLowerCase().includes("bye")) {
                     reply = "Goodbye! Come back anytime you need help.";
                 }
- else if (message.toLowerCase().includes("settings")) {
+                else if (message.toLowerCase().includes("make a password")) {
+                  const characters = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                    let password = "";
+                  for (let i = 0; i < 12; i++) {
+                     password += characters.charAt(Math.floor(Math.random() * characters.length));
+                }
+                   reply = `Here is your 12-digit strong password: \`${password}\` 🔐`;
+                }
+                else if (message.toLowerCase().includes("joke")) {
+                   reply = "Sure! Why don’t scientists trust atoms? Because they make up everything! 😄";
+                }
+                else if (message.toLowerCase().includes("quote")) {
+                   reply = "“The best way to get started is to quit talking and begin doing.” – Walt Disney ✨";
+                }
+                else if (message.toLowerCase().includes("weather")) {
+                   reply = "I'm not connected to live weather data yet, but I recommend checking a reliable weather app! 🌤️";
+                }
+                else if (message.toLowerCase().includes("motivate me")) {
+                   reply = "You are capable of amazing things. Believe in yourself and go for it! 💪";
+                }
+                else if (message.toLowerCase().includes("who made you")) {
+                  reply = "I was created by Samarth Nagpure, designed to be your smart companion!";
+                }
+                else if (message.toLowerCase().includes("what can you do")) {
+                  reply = "I can chat, generate passwords, tell jokes, show quotes, summarize text, and more!";
+                }
+                  else if (message.toLowerCase().includes("settings")) {
                     reply = "You can access settings from the top right corner or the sidebar.";
                 } else if (message.toLowerCase().includes("dark mode") || message.toLowerCase().includes("light mode")) {
                     reply = "You can toggle light/dark mode using the sun/moon icon in the header!";
