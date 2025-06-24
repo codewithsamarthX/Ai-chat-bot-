@@ -1300,23 +1300,14 @@ document.addEventListener("DOMContentLoaded", () => {
   fontSizeSelector.className = "w-full mt-2 p-1 border border-gray-300 text-sm rounded text-black";
   fontSizeSelector.innerHTML = `
     <option value="text-xs">Small</option>
-    <option value="text-sm" selected>Medium</option>
-    <option value="text-base">Large</option>
+    <option value="text-sm" >Medium</option>
+    <option value="text-base"selected>Large</option>
     <option value="text-lg">Extra Large</option>
   `;
   fontSizeSelector.addEventListener("change", () => {
     chatWindow.classList.remove("text-xs", "text-sm", "text-base", "text-lg");
     chatWindow.classList.add(fontSizeSelector.value);
     localStorage.setItem("chatFontSize", fontSizeSelector.value);
-  });
-
-  // Timestamp Toggle
-  const timestampToggle = document.createElement("button");
-  timestampToggle.className = "w-full mt-2 px-3 py-1 rounded text-sm bg-blue-600 text-white hover:bg-blue-700";
-  timestampToggle.textContent = "Toggle Message Timestamps";
-  timestampToggle.addEventListener("click", () => {
-    document.body.classList.toggle("show-timestamps");
-    localStorage.setItem("showTimestamps", document.body.classList.contains("show-timestamps"));
   });
 
   // Reset Settings
