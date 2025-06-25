@@ -401,14 +401,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/normalize-whitespace/prism-normalize-whitespace.min.js"></script>
-<script>
-Prism.plugins.NormalizeWhitespace.setDefaults({
-  'remove-trailing': true,
-  'remove-indent': true,
-  'left-trim': true,
-  'right-trim': true
-});
-</script>
+
 <style>
 pre code {
   display: block;
@@ -614,7 +607,7 @@ pre code {
         const themeToggle = document.getElementById("themeToggle");
         const settingsBtn = document.getElementById("settingsBtn");
         const sidebarSettingsBtn = document.getElementById("sidebarSettingsBtn");
-        const settingsModal = document.getElementById("settingsModal");
+        const settingsPanel = document.getElementById("settingsPanel");
         const closeSettingsModal = document.getElementById("closeSettingsModal");
         const modelSelect = document.getElementById("modelSelect");
         const responseSpeed = document.getElementById("responseSpeed");
@@ -1166,18 +1159,18 @@ pre code {
         themeToggle.addEventListener("click", toggleDarkMode);
 
         // Open settings modal from header
-        settingsBtn.addEventListener("click", () => settingsModal.classList.remove("hidden"));
+        settingsBtn.addEventListener("click", () => settingsPanel.classList.remove("hidden"));
 
         // Open settings modal from sidebar and hide sidebar
         sidebarSettingsBtn.addEventListener("click", () => {
-            settingsModal.classList.remove("hidden");
+            settingsPanel.classList.remove("hidden");
             if (isMobile()) {
                 hideSidebar(); // Hide sidebar when settings are opened from sidebar on mobile
             }
         });
 
         // Close settings modal
-        closeSettingsModal.addEventListener("click", () => settingsModal.classList.add("hidden"));
+        closeSettingsModal.addEventListener("click", () => settingsPanel.classList.add("hidden"));
 
         // Handle AI model selection (for demonstration, logs to console)
         modelSelect.addEventListener("change", (e) => {
@@ -1467,11 +1460,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Insert into Settings Modal
-  const settingsModal = document.getElementById("settingsModal");
-  settingsModal.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", autoScrollWrapper);
-  settingsModal.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", clearHistory);
-  settingsModal.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", resetSettings);
-  settingsModal.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", fontSizeSelector);
+  const settingsPanel = document.getElementById("settingsPanel");
+  settingsPanel.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", autoScrollWrapper);
+  settingsPanel.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", clearHistory);
+  settingsPanel.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", resetSettings);
+  settingsPanel.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", fontSizeSelector);
 
   // Load saved preferences
   const savedFontSize = localStorage.getItem("chatFontSize") || "text-sm";
