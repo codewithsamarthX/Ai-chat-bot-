@@ -594,26 +594,7 @@ pre code {
         </div>
     </footer>
 
-    <div id="settingsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-11/12 max-w-md">
-            <h2 class="text-xl font-bold mb-4 text-black">Settings</h2>
-            <div class="mb-4">
-                <label for="modelSelect" class="block text-sm font-medium text-gray-700">Select AI Model:</label>
-                <select id="modelSelect" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white text-black">
-                    <option value="default">Default Model</option>
-                    <option value="creative">Creative Model</option>
-                    <option value="factual">Factual Model</option>
-                </select>
-            </div>
-            <div class="mb-4">
-                <label for="responseSpeed" class="block text-sm font-medium text-gray-700">Response Speed:</label>
-                <input type="range" id="responseSpeed" min="50" max="2000" value="500" class="mt-1 w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                <span id="responseSpeedValue" class="text-xs text-gray-500">500 ms</span>
-            </div>
-            <div class="flex justify-end">
-                <button id="closeSettingsModal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Close</button>
-            </div>
-        </div>
+    
     </div>
 
     <script>
@@ -1322,6 +1303,109 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
+
+<!-- Redesigned Settings Panel Layout -->
+<div id="settingsPanel" class="fixed z-50 w-[300px] sm:w-[360px] right-4 top-20 bg-white border border-gray-300 rounded-lg shadow-lg p-4 space-y-4 hidden">
+
+
+
+  <h2 class="text-xl font-bold text-black">⚙️ Settings</h2>
+
+  <!-- AI Model Section -->
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">AI Model</label>
+    <select id="modelSelect" class="w-full pl-3 pr-10 py-2 border border-gray-300 text-sm rounded bg-white text-black">
+      <option value="default">Default Model</option>
+      <option value="creative">Creative Model</option>
+      <option value="factual">Factual Model</option>
+    </select>
+  </div>
+
+  <!-- Response Speed -->
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Response Speed</label>
+    <input type="range" id="responseSpeed" min="50" max="2000" value="500"
+           class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+    <span id="responseSpeedValue" class="text-xs text-gray-500 block mt-1">500 ms</span>
+  </div>
+
+  <!-- Appearance Section -->
+  <div>
+    <h3 class="font-semibold text-sm text-gray-800 mb-2">Appearance</h3>
+    <label for="fontSizeSelector" class="block text-sm font-medium text-gray-700 mb-1">Font Size</label>
+    <select id="fontSizeSelector" class="w-full p-2 border border-gray-300 text-sm rounded text-black">
+      <option value="text-xs">Small</option>
+      <option value="text-sm" selected>Medium</option>
+      <option value="text-base">Large</option>
+      <option value="text-lg">Extra Large</option>
+    </select>
+  </div>
+
+  <!-- Behavior Toggles -->
+  <div class="flex justify-between items-center">
+    <label class="text-sm font-medium text-gray-700">Auto Scroll</label>
+    <label class="inline-flex relative items-center cursor-pointer">
+      <input type="checkbox" class="sr-only peer" id="autoScrollSwitch">
+      <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-600 transition-all"></div>
+    </label>
+  </div>
+
+  <!-- Divider -->
+  <hr class="border-gray-300">
+
+  <!-- Action Buttons -->
+  <div class="space-y-2">
+    <button id="resetSettings" class="w-full px-3 py-2 rounded bg-red-600 text-white text-sm hover:bg-red-700">Reset All Settings</button>
+    <button id="clearHistory" class="w-full px-3 py-2 rounded bg-red-500 text-white text-sm hover:bg-red-600">Clear Chat History</button>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const chatWindow = document.getElementById("chatWindow");
+  const responseSpeed = document.getElementById("responseSpeed");
+  const responseSpeedValue = document.getElementById("responseSpeedValue");
+  const fontSizeSelector = document.getElementById("fontSizeSelector");
+  const autoScrollSwitch = document.getElementById("autoScrollSwitch");
+  const settingsBtn = document.getElementById("settingsBtn");
+  const settingsPanel = document.getElementById("settingsPanel");
+
+  responseSpeed.addEventListener("input", (e) => {
+    preferredResponseSpeed = parseInt(e.target.value);
+    responseSpeedValue.textContent = `${preferredResponseSpeed} ms`;
+  });
+
+  fontSizeSelector.addEventListener("change", () => {
+    chatWindow.classList.remove("text-xs", "text-sm", "text-base", "text-lg");
+    chatWindow.classList.add(fontSizeSelector.value);
+    localStorage.setItem("chatFontSize", fontSizeSelector.value);
+  });
+
+  autoScrollSwitch.checked = localStorage.getItem("autoScroll") === "true";
+  autoScrollSwitch.addEventListener("change", () => {
+    localStorage.setItem("autoScroll", autoScrollSwitch.checked);
+  });
+
+  document.getElementById("resetSettings").addEventListener("click", () => {
+    localStorage.clear();
+    location.reload();
+  });
+
+  document.getElementById("clearHistory").addEventListener("click", () => {
+    localStorage.removeItem("chatHistory");
+    location.reload();
+  });
+
+  const savedFontSize = localStorage.getItem("chatFontSize") || "text-sm";
+  chatWindow.classList.add(savedFontSize);
+  fontSizeSelector.value = savedFontSize;
+
+  settingsBtn.addEventListener("click", () => {
+    settingsPanel.classList.toggle("hidden");
+  });
+});
+</script>
+
 </body>
 </html>
 <!-- Enhanced Settings Script -->
@@ -1346,15 +1430,6 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("chatFontSize", fontSizeSelector.value);
   });
 
-  // Timestamp Toggle
-  const timestampToggle = document.createElement("button");
-  timestampToggle.className = "w-full mt-2 px-3 py-1 rounded text-sm bg-blue-600 text-white hover:bg-blue-700";
-  timestampToggle.textContent = "Toggle Message Timestamps";
-  timestampToggle.addEventListener("click", () => {
-    document.body.classList.toggle("show-timestamps");
-    localStorage.setItem("showTimestamps", document.body.classList.contains("show-timestamps"));
-  });
-
   // Reset Settings
   const resetSettings = document.createElement("button");
   resetSettings.className = "w-full mt-2 px-3 py-1 rounded text-sm bg-red-600 text-white hover:bg-red-700";
@@ -1373,31 +1448,35 @@ document.addEventListener("DOMContentLoaded", () => {
     location.reload();
   });
 
-  // Auto Scroll Toggle
-  const autoScrollToggle = document.createElement("button");
-  autoScrollToggle.className = "w-full mt-2 px-3 py-1 rounded text-sm bg-gray-600 text-white hover:bg-gray-700";
-  autoScrollToggle.textContent = "Toggle Auto Scroll";
-  autoScrollToggle.addEventListener("click", () => {
-    const current = localStorage.getItem("autoScroll") === "true";
-    localStorage.setItem("autoScroll", !current);
+  // Auto Scroll Toggle - switch
+  const autoScrollWrapper = document.createElement("div");
+  autoScrollWrapper.className = "w-full mt-2 flex items-center justify-between text-sm text-black";
+  autoScrollWrapper.innerHTML = `
+    <label class="font-medium">Auto Scroll</label>
+    <label class="inline-flex relative items-center cursor-pointer">
+      <input type="checkbox" value="" class="sr-only peer" id="autoScrollSwitch">
+      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600"></div>
+      <span class="ml-3 text-sm font-medium"></span>
+    </label>
+  `;
+
+  const autoScrollSwitch = autoScrollWrapper.querySelector("#autoScrollSwitch");
+  autoScrollSwitch.checked = localStorage.getItem("autoScroll") === "true";
+  autoScrollSwitch.addEventListener("change", () => {
+    localStorage.setItem("autoScroll", autoScrollSwitch.checked);
   });
 
   // Insert into Settings Modal
   const settingsModal = document.getElementById("settingsModal");
-  settingsModal.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", autoScrollToggle);
+  settingsModal.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", autoScrollWrapper);
   settingsModal.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", clearHistory);
   settingsModal.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", resetSettings);
-  settingsModal.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", timestampToggle);
   settingsModal.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", fontSizeSelector);
 
   // Load saved preferences
   const savedFontSize = localStorage.getItem("chatFontSize") || "text-sm";
   chatWindow.classList.add(savedFontSize);
   fontSizeSelector.value = savedFontSize;
-
-  if (localStorage.getItem("showTimestamps") === "true") {
-    document.body.classList.add("show-timestamps");
-  }
 });
 </script>
 
@@ -1405,8 +1484,9 @@ document.addEventListener("DOMContentLoaded", () => {
 body.show-timestamps .chat-message-container::after {
   content: attr(data-timestamp);
   display: block;
-  font-size: 10px;
-  color: #888;
-  margin-top: 2px;
+  font-size: 0.7rem;
+  color: gray;
+  margin-top: 0.25rem;
+  text-align: right;
 }
 </style>
