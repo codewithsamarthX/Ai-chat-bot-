@@ -1001,6 +1001,30 @@ pre code {
                 else if (message.toLowerCase().includes("quote of the day")) {
                     reply = "“Success is not final, failure is not fatal: It is the courage to continue that counts.” – Winston Churchill 💬";
                 }
+
+                else if (message.toLowerCase().includes("mental health tip")) {
+                  reply = "Take breaks during the day, get sunlight, and remember to stay connected with loved ones. 💛";
+                }
+                else if (message.toLowerCase().includes("roll a dice")) {
+                  const dice = Math.floor(Math.random() * 6) + 1;
+                  reply = `🎲 You rolled a ${dice}!`;
+                }
+                else if (message.toLowerCase().includes("flip a coin")) {
+                  const coin = Math.random() < 0.5 ? "Heads" : "Tails";
+                  reply = `🪙 It's ${coin}!`;
+                }
+                else if (message.toLowerCase().includes("fun activity") || message.toLowerCase().includes("what should I do for fun")) {
+                  reply = "Try taking a short walk, doing a quick doodle, or listening to your favorite music!";
+                }
+                else if (message.toLowerCase().includes("random number")) {
+                  const random = Math.floor(Math.random() * 100) + 1;
+                  reply = `Here’s a random number for you: ${random}`;
+                }
+                else if (message.toLowerCase().includes("what time is it")) {
+                  const now = new Date();
+                  reply = `It's currently ${now.toLocaleTimeString()}.`;
+                }
+
                 else if (message.toLowerCase().includes("word of the day")) {
                     reply = "Word of the Day: *Serendipity* — the occurrence of events by chance in a happy or beneficial way. 🌟";
                 }
