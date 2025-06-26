@@ -1216,14 +1216,14 @@ async function getWeatherData(city = "") {
     const aqiLabel = getAQILabel(aqiValue);
 
     return `📍 Current Weather in ${name}:\n\n` +
-      `Temperature: ${temp} °C\n` +
-      `Feels like: ${feels} °C (due to humidity)\n` +
-      `Conditions: ${condition}\n` +
+      `🌡️Temperature: ${temp} °C\n` +
+      `🥵Feels like: ${feels} °C (due to humidity)\n` +
+      `🌥️Conditions: ${condition}\n` +
       `Humidity: ${humidity}%\n` +
       `Pressure: ${pressure} hPa\n` +
-      `Wind: ${windSpeed} km/h from the ${windDir}\n` +
-      `Sunrise: ${sunrise}\n` +
-      `Sunset: ${sunset}\n\n` +
+      `💨 Wind: ${windSpeed} km/h from the ${windDir}\n` +
+      `🌄Sunrise: ${sunrise}\n` +
+      `🌇Sunset: ${sunset}\n\n` +
       `🌫️ Air Quality Index (AQI):\n` +
       `Current AQI: ${aqiValue} (${aqiLabel})`;
   } catch (error) {
