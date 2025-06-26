@@ -863,7 +863,7 @@ pre code {
                 else if (["how are you", "how are you doing"].some(q => message.toLowerCase().includes(q))) {
                     reply = "I'm doing great! Thanks for asking 😊. How can I assist you today?";
                 }
-                else if (message.toLowerCase().includes("what's your name")) {
+                else if (["what is your name","what your name"].includes(message.toLowerCase())) {
                     reply = "My name is Nexsera Ai! I'm here to be your helpful assistant.";
                 }
                 else if (message.toLowerCase().includes("tell me something")) {
@@ -1194,13 +1194,33 @@ async function getWeatherData(city = "") {
       const ipData = await ipRes.json();
       city = ipData.city;
     }
+
     const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`);
     const data = await res.json();
+
     if (data.cod !== 200) throw new Error(data.message);
-    return `📍 Weather in ${data.name}: ${data.weather[0].description}, 🌡️ ${data.main.temp}°C`;
+
+    const name = data.name;
+    const temp = data.main.temp.toFixed(1);
+    const feels = data.main.feels_like.toFixed(1);
+    const condition = data.weather[0].main;
+    const windSpeed = (data.wind.speed * 3.6).toFixed(1); // Convert m/s to km/h
+    const windDir = getWindDirection(data.wind.deg);
+
+    return `📍 Current Weather in ${name}:\n\n
+    🌡️ Temperature: ${temp} °C\n
+    🥵 Feels like: ${feels} °C\n
+    🌥️ Conditions: ${condition}\n
+    💨 Wind: ${windSpeed} km/h from the ${windDir}`;
   } catch (error) {
     return `❌ Could not get weather: ${error.message}`;
   }
+}
+
+function getWindDirection(deg) {
+  const directions = ["north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"];
+  const index = Math.round(deg / 45) % 8;
+  return directions[index];
 }
 
 
