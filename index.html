@@ -346,43 +346,55 @@ document.addEventListener("DOMContentLoaded", () => {
 
         /* Styles for the message actions container (buttons will be inside this) */
         .message-actions {
-            display: flex;
-            gap: 0.25rem; /* Space between buttons (equivalent to Tailwind's gap-1) */
-            opacity: 0; /* Hidden by default */
-            transition: opacity 0.2s ease-in-out;
-            margin-top: 0.25rem; /* Space above buttons (equivalent to Tailwind's mt-1) */
-            align-items: center; /* Vertically center the icons */
-        }
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  padding-right: 0.5rem;
+}
 
         /* Show actions on chat message container hover */
         .chat-message-container:hover .message-actions {
-            opacity: 1;
-        }
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  padding-right: 0.5rem;
+}
 
         /* Align actions for AI messages (left-aligned text) */
         .text-left .message-actions {
-            justify-content: flex-start;
-        }
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  padding-right: 0.5rem;
+}
 
         /* Align actions for user messages (right-aligned text) */
         .text-right .message-actions {
-            justify-content: flex-end;
-        }
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  padding-right: 0.5rem;
+}
 
         /* Common button styles */
         .delete-message-btn,
-        .copy-message-btn {
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            cursor: pointer;
-            border: none;
-            z-index: 10;
-        }
+.copy-message-btn {
+  border-radius: 0.25rem;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  cursor: pointer;
+  border: none;
+  z-index: 10;
+  transition: background-color 0.2s;
+}
 
         /* Specific colors for delete and copy buttons */
         .delete-message-btn {
@@ -415,7 +427,7 @@ pre code {
   position: relative;
 }
 .copy-code-btn {
-  position: absolute;
+  
   top: 0.5rem;
   right: 0.5rem;
   background-color: #3b82f6;
@@ -553,7 +565,7 @@ pre code {
   <!-- Upload Button -->
   <div class="w-fit bg-white border border-gray-300 rounded-md p-1.5 shadow-sm hover:border-gray-400 hover:shadow transition">
     <label for="file-upload" class="cursor-pointer hover:bg-gray-200 transition rounded-md p-1.5 block text-black" title="Upload File">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
         <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
       </svg>
     </label>
@@ -565,7 +577,7 @@ pre code {
   <!-- Record Button -->
   <div class="w-fit bg-white border border-gray-300 rounded-md p-1.5 shadow-sm hover:border-gray-400 hover:shadow transition">
     <button id="recordBtn" class="cursor-pointer hover:bg-gray-200 transition rounded-md p-1.5 block text-black" title="Start Recording">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
       </svg>
     </button>
@@ -671,19 +683,19 @@ pre code {
             msgContainer.className = type === "user" ? "text-right" : "text-left";
             msgContainer.innerHTML = `
                 <div class="chat-message-container">
-                    <div class="inline-block rounded-md px-3 py-1.5 break-words ${
+                    <div class="chat-text inline-block rounded-md px-3 py-1.5 break-words ${
                         type === "user" ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-white border border-gray-300 text-black"
                     } transition">
                         ${message}
                     </div>
                     <div class="message-actions flex gap-1 mt-1">
                         <button class="copy-message-btn" data-index="${messageIndex}" data-role="${type}" title="Copy message">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
                             </svg>
                         </button>
                         <button class="delete-message-btn" data-index="${messageIndex}" data-role="${type}" title="Delete message">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
                             </svg>
                         </button>
@@ -698,7 +710,10 @@ pre code {
             deleteButton.addEventListener('click', () => deleteMessage(currentChatId, messageIndex));
 
             const copyButton = msgContainer.querySelector('.copy-message-btn');
-            copyButton.addEventListener('click', () => copyMessage(msgContainer.querySelector('.inline-block').textContent));
+            copyButton.addEventListener('click', async () => {
+  const text = msgContainer.querySelector('.chat-text')?.textContent || '';
+  await copyMessage(text);
+});
 
 
             return msgContainer.querySelector('.inline-block'); // Return the inner div for potential streaming
@@ -753,7 +768,7 @@ pre code {
             const words = fullReply.split(" ");
             messageDiv.textContent = ""; // Clear existing content for streaming
             for (let i = 0; i < words.length; i++) {
-                messageDiv.textContent += (i > 0 ? " " : "") + words[i];
+                messageDiv.innerHTML += (i > 0 ? " " : "") + words[i];
                 chatWindow.scrollTop = chatWindow.scrollHeight;
                 chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' });
                 // Adjust speed based on preferred response speed and total words
@@ -863,7 +878,7 @@ pre code {
                 else if (["how are you", "how are you doing"].some(q => message.toLowerCase().includes(q))) {
                     reply = "I'm doing great! Thanks for asking 😊. How can I assist you today?";
                 }
-                else if (["what is your name","what your name"].includes(message.toLowerCase())) {
+                else if (message.toLowerCase().includes("what's your name")) {
                     reply = "My name is Nexsera Ai! I'm here to be your helpful assistant.";
                 }
                 else if (message.toLowerCase().includes("tell me something")) {
@@ -879,7 +894,11 @@ pre code {
 
                 // Create the AI message div and stream the reply into it
                 const aiMessageDiv = createChatEntry("", "ai", aiMessageIndex); // Render with its index
-                await streamReply(aiMessageDiv, reply); // Pass the inner div directly
+                if (message.toLowerCase().includes("weather")) {
+  aiMessageDiv.innerHTML = reply;
+} else {
+  await streamReply(aiMessageDiv, reply);
+} // Pass the inner div directly
 
                 saveChatHistory(); // Save updated history
             }, 1000); // Simulate network delay
@@ -994,8 +1013,7 @@ pre code {
         async function copyMessage(text) {
             try {
                 await navigator.clipboard.writeText(text);
-                // Optionally, add visual feedback (e.g., a temporary "Copied!" tooltip)
-                console.log('Message copied to clipboard:', text);
+                alert('Copied to clipboard!');
             }
             catch (err) {
                 console.error('Failed to copy message: ', err);
@@ -1208,24 +1226,44 @@ async function getWeatherData(city = "") {
     const condition = weather.weather[0].main;
     const humidity = weather.main.humidity;
     const pressure = weather.main.pressure;
-    const windSpeed = (weather.wind.speed * 3.6).toFixed(1); // m/s to km/h
+    const windSpeed = (weather.wind.speed * 3.6).toFixed(1);
     const windDir = getWindDirection(weather.wind.deg);
     const sunrise = formatTime(weather.sys.sunrise, weather.timezone);
     const sunset = formatTime(weather.sys.sunset, weather.timezone);
-    const aqiValue = aqi.list[0].main.aqi;
+    const aqiDetails = aqi.list[0];
+    const aqiValue = aqiDetails.main.aqi;
     const aqiLabel = getAQILabel(aqiValue);
+    const pm25 = aqiDetails.components.pm2_5;
+    const pm10 = aqiDetails.components.pm10;
+    const co = aqiDetails.components.co;
+    const no2 = aqiDetails.components.no2;
+    const o3 = aqiDetails.components.o3;
 
-    return `📍 Current Weather in ${name}:\n\n` +
-      `🌡️Temperature: ${temp} °C\n` +
-      `🥵Feels like: ${feels} °C (due to humidity)\n` +
-      `🌥️Conditions: ${condition}\n` +
-      `Humidity: ${humidity}%\n` +
-      `Pressure: ${pressure} hPa\n` +
-      `💨 Wind: ${windSpeed} km/h from the ${windDir}\n` +
-      `🌄Sunrise: ${sunrise}\n` +
-      `🌇Sunset: ${sunset}\n\n` +
-      `🌫️ Air Quality Index (AQI):\n` +
-      `Current AQI: ${aqiValue} (${aqiLabel})`;
+    return `
+<div class="w-full px-2 sm:px-0 flex justify-center">
+  <div class="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-md space-y-2 w-full max-w-md">
+    <h3 class="text-lg font-semibold">📍 Current Weather in ${name}</h3>
+    <div class="space-y-1 text-sm">
+      <p>🌡️ <strong>Temperature:</strong> ${temp} °C</p>
+      <p>🥵 <strong>Feels like:</strong> ${feels} °C (due to humidity)</p>
+      <p>🌥️ <strong>Conditions:</strong> ${condition}</p>
+      <p>💧 <strong>Humidity:</strong> ${humidity}%</p>
+      <p>📊 <strong>Pressure:</strong> ${pressure} hPa</p>
+      <p>💨 <strong>Wind:</strong> ${windSpeed} km/h from the ${windDir}</p>
+      <p>🌅 <strong>Sunrise:</strong> ${sunrise}</p>
+      <p>🌇 <strong>Sunset:</strong> ${sunset}</p>
+    </div>
+    <div class="mt-4 border-t pt-3 text-sm space-y-1">
+      <h4 class="font-semibold">🌫️ Air Quality Index (AQI)</h4>
+      <p>📍 <strong>Overall AQI:</strong> ${aqiValue} (${aqiLabel})</p>
+      <p>🌬️ <strong>PM2.5:</strong> ${pm25} µg/m³</p>
+      <p>🌬️ <strong>PM10:</strong> ${pm10} µg/m³</p>
+      <p>🧪 <strong>CO:</strong> ${co} µg/m³</p>
+      <p>🧪 <strong>NO₂:</strong> ${no2} µg/m³</p>
+      <p>🧪 <strong>O₃:</strong> ${o3} µg/m³</p>
+    </div>
+  </div>
+</div>`;
   } catch (error) {
     return `❌ Could not get weather: ${error.message}`;
   }
@@ -1238,13 +1276,16 @@ function getWindDirection(deg) {
 
 function formatTime(unix, timezoneOffset) {
   const date = new Date((unix + timezoneOffset) * 1000);
-  return date.toUTCString().match(/\d{2}:\d{2}/)[0] + " " + (date.getUTCHours() < 12 ? "AM" : "PM");
+  let hours = date.getUTCHours();
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12 || 12;
+  return `${hours}:${minutes} ${ampm}`;
 }
 
 function getAQILabel(aqi) {
   return ["Good", "Fair", "Moderate", "Poor", "Very Poor"][aqi - 1];
 }
-
 
 
 // --- Initializations ---
@@ -1514,6 +1555,42 @@ document.addEventListener("DOMContentLoaded", () => {
   chatWindow.classList.add(savedFontSize);
   fontSizeSelector.value = savedFontSize;
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  function setupMessageActions() {
+    const chatMessages = document.querySelectorAll(".chat-message-container");
+
+    chatMessages.forEach(container => {
+      const actions = container.querySelector(".message-actions");
+
+      if (!actions) return;
+
+      // Initially hide the buttons
+      actions.style.display = "none";
+
+      container.addEventListener("click", () => {
+        actions.style.display = "flex";
+
+        // Auto-hide after 3 seconds
+        clearTimeout(container._hideTimeout); // Clear any previous timeout
+        container._hideTimeout = setTimeout(() => {
+          actions.style.display = "none";
+        }, 3000);
+      });
+    });
+  }
+
+  // Run on initial messages
+  setupMessageActions();
+
+  // Re-run setup after each new message is added
+  const observer = new MutationObserver(setupMessageActions);
+  observer.observe(document.getElementById("chatWindow"), {
+    childList: true,
+    subtree: true
+  });
+});
+
 </script>
 
 <style>
