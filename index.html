@@ -1195,23 +1195,37 @@ async function getWeatherData(city = "") {
       city = ipData.city;
     }
 
-    const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`);
-    const data = await res.json();
+    const weatherRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`);
+    const weather = await weatherRes.json();
+    if (weather.cod !== 200) throw new Error(weather.message);
 
-    if (data.cod !== 200) throw new Error(data.message);
+    const aqiRes = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${weather.coord.lat}&lon=${weather.coord.lon}&appid=${apiKey}`);
+    const aqi = await aqiRes.json();
 
-    const name = data.name;
-    const temp = data.main.temp.toFixed(1);
-    const feels = data.main.feels_like.toFixed(1);
-    const condition = data.weather[0].main;
-    const windSpeed = (data.wind.speed * 3.6).toFixed(1); // Convert m/s to km/h
-    const windDir = getWindDirection(data.wind.deg);
+    const name = weather.name;
+    const temp = weather.main.temp.toFixed(1);
+    const feels = weather.main.feels_like.toFixed(1);
+    const condition = weather.weather[0].main;
+    const humidity = weather.main.humidity;
+    const pressure = weather.main.pressure;
+    const windSpeed = (weather.wind.speed * 3.6).toFixed(1); // m/s to km/h
+    const windDir = getWindDirection(weather.wind.deg);
+    const sunrise = formatTime(weather.sys.sunrise, weather.timezone);
+    const sunset = formatTime(weather.sys.sunset, weather.timezone);
+    const aqiValue = aqi.list[0].main.aqi;
+    const aqiLabel = getAQILabel(aqiValue);
 
-    return `📍 Current Weather in ${name}:\n\n
-    🌡️ Temperature: ${temp} °C\n
-    🥵 Feels like: ${feels} °C\n
-    🌥️ Conditions: ${condition}\n
-    💨 Wind: ${windSpeed} km/h from the ${windDir}`;
+    return `📍 Current Weather in ${name}:\n\n` +
+      `Temperature: ${temp} °C\n` +
+      `Feels like: ${feels} °C (due to humidity)\n` +
+      `Conditions: ${condition}\n` +
+      `Humidity: ${humidity}%\n` +
+      `Pressure: ${pressure} hPa\n` +
+      `Wind: ${windSpeed} km/h from the ${windDir}\n` +
+      `Sunrise: ${sunrise}\n` +
+      `Sunset: ${sunset}\n\n` +
+      `🌫️ Air Quality Index (AQI):\n` +
+      `Current AQI: ${aqiValue} (${aqiLabel})`;
   } catch (error) {
     return `❌ Could not get weather: ${error.message}`;
   }
@@ -1219,9 +1233,18 @@ async function getWeatherData(city = "") {
 
 function getWindDirection(deg) {
   const directions = ["north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"];
-  const index = Math.round(deg / 45) % 8;
-  return directions[index];
+  return directions[Math.round(deg / 45) % 8];
 }
+
+function formatTime(unix, timezoneOffset) {
+  const date = new Date((unix + timezoneOffset) * 1000);
+  return date.toUTCString().match(/\d{2}:\d{2}/)[0] + " " + (date.getUTCHours() < 12 ? "AM" : "PM");
+}
+
+function getAQILabel(aqi) {
+  return ["Good", "Fair", "Moderate", "Poor", "Very Poor"][aqi - 1];
+}
+
 
 
 // --- Initializations ---
