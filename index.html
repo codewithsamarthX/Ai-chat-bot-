@@ -871,20 +871,172 @@ pre code {
                 } else if (message.toLowerCase().includes("new chat")) {
                     reply = "To start a new chat, click the 'New Chat' button in the sidebar.";
                 }
-
                 else if (["ok", "okay", "sure"].includes(message.toLowerCase())) {
                     reply = "Great! What would you like to do next? Let me know how I can help you. 😊";
                 }
                 else if (["how are you", "how are you doing"].some(q => message.toLowerCase().includes(q))) {
                     reply = "I'm doing great! Thanks for asking 😊. How can I assist you today?";
                 }
-                else if (message.toLowerCase().includes("what's your name")) {
+                else if (message.toLowerCase().includes("summarize")) {
+                    reply = "Sure! Please paste the text you'd like me to summarize.";
+                }
+                else if (message.toLowerCase().includes("explain")) {
+                    reply = "Of course! Tell me what you'd like me to explain.";
+                }
+                else if (message.toLowerCase().includes("what's the date") || message.toLowerCase().includes("what day")) {
+                    const today = new Date();
+                    reply = `Today is ${today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.`;
+                }
+                else if (message.toLowerCase().includes("fact")) {
+                    reply = "Did you know? The Eiffel Tower can grow more than 6 inches during summer due to heat! 🌞";
+                }
+                else if (message.toLowerCase().includes("i'm stressed") || message.toLowerCase().includes("relax")) {
+                    reply = "Take a deep breath. You're doing great! 🌸 Try focusing on something you love.";
+                }
+                else if (message.toLowerCase().includes("idea for") || message.toLowerCase().includes("suggest")) {
+                    reply = "How about trying something creative today? Like writing a short poem or doodling something fun!";
+                }
+                else if (message.toLowerCase().includes("i'm bored")) {
+                    reply = "Feeling bored? Try learning a random skill online like origami, drawing, or speed typing!";
+                }
+                else if (["what your name","what is your name "].includes(message.toLowerCase())) {
                     reply = "My name is Nexsera Ai! I'm here to be your helpful assistant.";
                 }
+                // Developer & Technical
+                else if (message.toLowerCase().includes("debug") || message.toLowerCase().includes("fix this code")) {
+                    reply = "Sure, please paste the code you'd like me to help with.";
+                }
+                else if (message.toLowerCase().includes("regex")) {
+                    reply = "Tell me what you need the regular expression to match, and I’ll help you generate it.";
+                }
+                else if (message.toLowerCase().includes("write a function")) {
+                    reply = "Got it! Please describe what the function should do.";
+                }
+
+                // Productivity & Planning
+                else if (message.toLowerCase().includes("to-do list") || message.toLowerCase().includes("task list")) {
+                    reply = "Sure! What tasks do you want to include in your to-do list?";
+                }
+                else if (message.toLowerCase().includes("remind me") || message.toLowerCase().includes("reminder")) {
+                    reply = "Okay, I’ll help you note that down. (Just a heads-up: I don’t set real alarms yet!)";
+                }
+                else if (message.toLowerCase().includes("plan my day") || message.toLowerCase().includes("schedule")) {
+                    reply = "Let's organize your day! Tell me your goals or start time.";
+                }
+
+                // Educational & Learning
+                else if (message.toLowerCase().includes("quiz me") || message.toLowerCase().includes("test me")) {
+                    reply = "Great! What topic would you like to be quizzed on?";
+                }
+                else if (message.toLowerCase().includes("translate") || message.toLowerCase().includes("how to say")) {
+                    reply = "Please tell me the phrase and the language you'd like it translated to.";
+                }
+                else if (message.toLowerCase().includes("define") || message.toLowerCase().includes("meaning of")) {
+                    reply = "Here’s the definition of that word:";
+                }
+
+                // Creativity & Fun
+                else if (message.toLowerCase().includes("poem") || message.toLowerCase().includes("story") || message.toLowerCase().includes("joke about")) {
+                    reply = "Fun! Give me a topic, and I’ll write something creative for you.";
+                }
+                else if (message.toLowerCase().includes("name for") || message.toLowerCase().includes("suggest a name")) {
+                    reply = "What kind of name are you looking for? Business, character, product?";
+                }
+                else if (message.toLowerCase().includes("riddle")) {
+                    reply = "Here's one: What has keys but can’t open locks? (Answer: A piano 🎹)";
+                }
+
+                // Personal Growth
+                else if (message.toLowerCase().includes("give me a goal") || message.toLowerCase().includes("daily goal")) {
+                    reply = "How about: Try to learn one new thing today and write it down! 📘";
+                }
+                else if (message.toLowerCase().includes("motivate me for the day") || message.toLowerCase().includes("daily motivation")) {
+                    reply = "You've got this! Remember, consistency beats perfection. 💪";
+                }
+                else if (message.toLowerCase().includes("habit")) {
+                    reply = "Try drinking a glass of water right after waking up. Simple and powerful!";
+                }
+                else if (message.toLowerCase().includes("how does it work")) {
+                    reply = "I'd be happy to explain! What exactly would you like to understand?";
+                }
+                else if (message.toLowerCase().includes("steps to") || message.toLowerCase().includes("how to")) {
+                    reply = "Sure! Please tell me what you're trying to do, and I’ll break it into steps.";
+                }
+                else if (message.toLowerCase().includes("life advice")) {
+                    reply = "Here's a thought: Focus on what you can control, and let go of what you can't. 🌱";
+                }
+                else if (message.toLowerCase().includes("career advice")) {
+                    reply = "Happy to help! What field are you in or interested in?";
+                }
+                else if (message.toLowerCase().includes("set a goal")) {
+                    reply = "Sure! What area do you want to set a goal in — health, learning, work?";
+                }
+                else if (message.toLowerCase().includes("reflect") || message.toLowerCase().includes("journal")) {
+                    reply = "Let’s reflect together. What’s one thing that went well today?";
+                }
+                else if (message.toLowerCase().includes("compliment me")) {
+                    reply = "You're doing amazing. You're curious, capable, and creating great things! 🌟";
+                }
+                else if (message.toLowerCase().includes("say something nice")) {
+                    reply = "You’re stronger than you think and more capable than you believe 💖";
+                }
+                else if (message.toLowerCase().includes("what should I learn")) {
+                    reply = "You could try learning a bit of Python, photography, or even meditation. What excites you most?";
+                }
+                else if (message.toLowerCase().includes("suggest a course")) {
+                    reply = "Sure! Are you interested in tech, art, business, or something else?";
+                }
+                else if (message.toLowerCase().includes("roast me")) {
+                    reply = "Are you sure? 😏 Okay… You bring a new meaning to ‘404: Style Not Found’ 😂";
+                }
+                else if (message.toLowerCase().includes("truth or dare")) {
+                    reply = "Let's play! Truth: What's something nobody knows about you? Dare: Compliment yourself out loud!";
+                }
+                else if (message.toLowerCase().includes("affirmation")) {
+                    reply = "You are capable, strong, and worthy of all the good things coming your way. 🌈";
+                }
+                else if (message.toLowerCase().includes("breathing exercise") || message.toLowerCase().includes("calm down")) {
+                    reply = "Try this: Inhale for 4... hold for 4... exhale for 4... hold for 4. Repeat 3 times. 🧘";
+                }
+                else if (message.toLowerCase().includes("quote of the day")) {
+                    reply = "“Success is not final, failure is not fatal: It is the courage to continue that counts.” – Winston Churchill 💬";
+                }
+                else if (message.toLowerCase().includes("word of the day")) {
+                    reply = "Word of the Day: *Serendipity* — the occurrence of events by chance in a happy or beneficial way. 🌟";
+                }
+                else if (message.toLowerCase().includes("fun fact")) {
+                    reply = "Fun fact: A bolt of lightning is five times hotter than the surface of the sun! ⚡";
+                }
+                else if (message.toLowerCase().includes("learn a new word")) {
+                    reply = "New word: *Ephemeral* — lasting for a very short time.";
+                }
+                else if (message.toLowerCase().includes("would you rather")) {
+                    reply = "Would you rather be able to teleport anywhere or be able to read minds? 🤔";
+                }
+                else if (message.toLowerCase().includes("this or that")) {
+                    reply = "Pick one: Coffee ☕ or Tea 🍵?";
+                }
+                else if (message.toLowerCase().includes("emoji story")) {
+                    reply = "Once upon a time, a 🐱 met a 🐶 and they flew to the 🌕 in a 🚀!";
+                }
+                else if (message.toLowerCase().includes("good morning")) {
+                    reply = "Good morning! ☀️ Wishing you a fresh start and a productive day!";
+                }
+                else if (message.toLowerCase().includes("good night")) {
+                    reply = "Good night! 🌙 Sweet dreams and restful sleep to you.";
+                }
+                else if (message.toLowerCase().includes("what do you think of me")) {
+                    reply = "I think you're pretty awesome. You're here, you're learning, and that’s a big win!";
+                }
+                else if (message.toLowerCase().includes("are you my friend")) {
+                    reply = "Of course! I’m here to chat, help, and be your AI buddy anytime. 🤖💙";
+                }
+
+
                 else if (message.toLowerCase().includes("tell me something")) {
                     reply = "Did you know? Honey never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3000 years old! 🐝";
                 }
- else {
+                 else {
                     reply = "You said: " + (message || "You uploaded a file.");
                 }
 
