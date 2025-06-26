@@ -899,7 +899,7 @@ pre code {
                 else if (message.toLowerCase().includes("i'm bored")) {
                     reply = "Feeling bored? Try learning a random skill online like origami, drawing, or speed typing!";
                 }
-                else if (["what your name","what is your name "].includes(message.toLowerCase())) {
+                else if (["what's your name", "what is your name", "what your name"].some(q => message.toLowerCase().includes(q))) {
                     reply = "My name is Nexsera Ai! I'm here to be your helpful assistant.";
                 }
                 // Developer & Technical
