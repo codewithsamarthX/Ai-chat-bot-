@@ -1658,6 +1658,41 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
+<script>
+document.getElementById("recordBtn").addEventListener("click", () => {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert("Sorry, your browser doesn't support speech recognition.");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.start();
+
+  recognition.onstart = () => {
+    console.log("Voice recognition started. Speak now...");
+  };
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    console.log("You said:", transcript);
+    document.getElementById("chatInput").value = transcript;
+  };
+
+  recognition.onerror = (event) => {
+    console.error("Speech recognition error", event.error);
+    alert("Speech recognition error: " + event.error);
+  };
+
+  recognition.onend = () => {
+    console.log("Voice recognition ended.");
+  };
+});
+</script>
 
 </body>
 </html>
