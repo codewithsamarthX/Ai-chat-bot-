@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Nexsera Ai Chat UI</title>
+    <title>Nexsera Chat UI</title>
     <script src="https://cdn.tailwindcss.com"></script>
 <script>
 // --- User Management Logic ---
@@ -457,7 +457,7 @@ pre code {
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
                     </svg>
                 </button>
-                <span id="headerTitle" class="font-semibold text-base text-gray-800 tracking-wide">Nexsera Ai</span>
+                <span id="headerTitle" class="font-semibold text-base text-gray-800 tracking-wide">Nexsera</span>
             </div>
             <div class="flex items-center space-x-2">
                 <button id="themeToggle" title="Toggle Theme" class="p-2 rounded-full hover:bg-gray-100">
@@ -509,7 +509,7 @@ pre code {
         <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2">
                 <img width="48" height="48" src="https://img.icons8.com/pulsar-line/48/nfc-n.png" alt="nfc-n" />
-                <span class="font-bold text-base text-gray-900">Nexsera Ai</span>
+                <span class="font-bold text-base text-gray-900">Nexsera</span>
             </div>
             <button id="closeSidebar" aria-label="Close sidebar" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50 sm:hidden">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -553,7 +553,7 @@ pre code {
 
     <main class="flex-grow overflow-y-auto px-4 chat-scrollbar">
         <div id="chatWindow" class="max-w-4xl mx-auto space-y-3 py-4">
-            <p id="introText" class="text-center text-gray-600 text-sm">Hello! I'm Nexsera Ai, your personal assistant. How can I help you today?</p>
+            <p id="introText" class="text-center text-gray-600 text-sm">Welcome back, Master. Nexsera is online and awaiting your command.</p>
         </div>
     </main>
 
@@ -585,7 +585,7 @@ pre code {
 </div>
 </div>
                 <div class="flex-grow flex items-center bg-white border border-gray-300 rounded-md px-3 py-2 shadow-sm hover:border-gray-400 hover:shadow transition">
-                    <input id="chatInput" type="text" placeholder="Message Nexsera Ai..." class="flex-grow px-2 py-1 bg-transparent text-sm focus:outline-none placeholder-gray-400 text-black"/>
+                    <input id="chatInput" type="text" placeholder="Message Nexsera..." class="flex-grow px-2 py-1 bg-transparent text-sm focus:outline-none placeholder-gray-400 text-black"/>
                     <button id="sendBtn" title="Send" class="bg-black text-white p-2 rounded-md hover:bg-gray-800 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
@@ -594,7 +594,7 @@ pre code {
                 </div>
             </div>
             <p class="text-[10px] text-center text-gray-500">
-                Nexsera Ai may make mistakes. Consider checking important information. <a href="#" class="underline text-black">Terms</a> and <a href="#" class="underline text-black">Privacy</a>.
+                Nexsera may make mistakes. Consider checking important information. <a href="#" class="underline text-black">Terms</a> and <a href="#" class="underline text-black">Privacy</a>.
             </p>
         </div>
     </footer>
@@ -863,18 +863,18 @@ speakButton.addEventListener('click', () => {
                 let reply;
                 // Simple AI response logic based on user input
                 if (["hi", "hello"].includes(message.toLowerCase())) {
-                    reply = "Hey there! 👋 How can I help you today?";
+                    reply = "Welcome back, Master. How may I assist you today?";
                 }
                 else if (message.toLowerCase().includes("help")) {
-                    reply = "Sure! I'm here to help. What do you need assistance with?";
+                    reply = "Certainly, Master. I'm ready when you are.";
                 } else if (message.toLowerCase().includes("who are you")) {
-                    reply = "I'm Nexsera Ai, your intelligent assistant here to make your work easier!";
+                    reply = "I am Nexsera, Master. Optimized and at your service.";
                 } else if (message.toLowerCase().includes("features")) {
-                    reply = "Nexsera Ai can chat, summarize text, manage files, and more!";
+                    reply = "Nexsera can chat, summarize text, manage files, and more!";
                 } else if (message.toLowerCase().includes("thank you") || message.toLowerCase().includes("thanks")) {
-                    reply = "You're welcome! 😊";
+                    reply = "Always a pleasure, Master.";
                 } else if (message.toLowerCase().includes("goodbye") || message.toLowerCase().includes("bye")) {
-                    reply = "Goodbye! Come back anytime you need help.";
+                    reply = "Farewell, Master. I’ll be right here when you return.";
                 }
                 else if (message.toLowerCase().includes("make a password")) {
                   const characters = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -882,7 +882,7 @@ speakButton.addEventListener('click', () => {
                   for (let i = 0; i < 12; i++) {
                      password += characters.charAt(Math.floor(Math.random() * characters.length));
                 }
-                   reply = `Here is your 12-digit strong password: \`${password}\` 🔐`;
+                    reply = `As you requested, Master, here is a secure 12-digit password: \`${password}\` 🔐`;
                 }
                 else if (message.toLowerCase().includes("joke")) {
                    reply = "Sure! Why don’t scientists trust atoms? Because they make up everything! 😄";
@@ -899,7 +899,7 @@ speakButton.addEventListener('click', () => {
                    reply = "You are capable of amazing things. Believe in yourself and go for it! 💪";
                 }
                 else if (message.toLowerCase().includes("who made you")) {
-                  reply = "I was created by Samarth Nagpure, designed to be your smart companion!";
+                  reply = "Master Samarth Nagpure designed me to serve you with excellence.";
                 }
                 else if (message.toLowerCase().includes("what can you do")) {
                   reply = "I can chat, generate passwords, tell jokes, show quotes, summarize text, and more!";
@@ -940,7 +940,7 @@ speakButton.addEventListener('click', () => {
                     reply = "Feeling bored? Try learning a random skill online like origami, drawing, or speed typing!";
                 }
                 else if (["what's your name", "what is your name", "what your name"].some(q => message.toLowerCase().includes(q))) {
-                    reply = "My name is Nexsera Ai! I'm here to be your helpful assistant.";
+                    reply = "You may call me Nexsera, Master. I'm your loyal assistant.";
                 }
                 // Developer & Technical
                 else if (message.toLowerCase().includes("debug") || message.toLowerCase().includes("fix this code")) {
@@ -1124,12 +1124,12 @@ speakButton.addEventListener('click', () => {
          * Starts a new chat session, clearing the chat window and resetting currentChatId.
          */
         function startNewChat() {
-            chatWindow.innerHTML = `<p id="introText" class="text-center text-gray-600 text-sm">Hello! I'm Nexsera Ai, your personal assistant. How can I help you today?</p>`;
+            chatWindow.innerHTML = `<p id="introText" class="text-center text-gray-600 text-sm">Hello! I'm Nexsera, your personal assistant. How can I help you today?</p>`;
             currentChatId = null; // Reset current chat ID
             renderHistoryList(); // Re-render to ensure no chat is highlighted
             if (isMobile()) {
                 hideSidebar(); // Hide sidebar on mobile after starting new chat
-                headerTitle.textContent = "Nexsera Ai"; // Reset header title
+                headerTitle.textContent = "Nexsera"; // Reset header title
             }
         }
 
@@ -1327,7 +1327,7 @@ speakButton.addEventListener('click', () => {
             document.body.classList.remove("sidebar-open");
             sidebarOverlay.classList.add("hidden"); // Hide overlay
             if (!currentChatId) {
-                headerTitle.textContent = "Nexsera Ai"; // Reset header title if no chat is active
+                headerTitle.textContent = "Nexsera"; // Reset header title if no chat is active
             } else {
                 const currentChat = chatHistory.find(chat => chat.id === currentChatId);
                 if (currentChat) {
@@ -1529,7 +1529,7 @@ function getAQILabel(aqi) {
                     const p = document.createElement("p");
                     p.id = "introText";
                     p.className = "text-center text-gray-600 text-sm";
-                    p.textContent = "Hello! I'm Nexsera Ai, your personal assistant. How can I help you today?";
+                    p.textContent = "Hello! I'm Nexsera, your personal assistant. How can I help you today?";
                     chatWindow.appendChild(p);
                 }
             } else {
@@ -1549,8 +1549,8 @@ function getAQILabel(aqi) {
         // Update header title based on sidebar state on resize
         window.addEventListener('resize', () => {
             if (!isMobile() && sidebar.classList.contains("-translate-x-full")) {
-                // If resized to desktop and sidebar is hidden, ensure header title is "Nexsera Ai"
-                headerTitle.textContent = "Nexsera Ai";
+                // If resized to desktop and sidebar is hidden, ensure header title is "Nexsera"
+                headerTitle.textContent = "Nexsera";
                 sidebarOverlay.classList.add("hidden"); // Ensure overlay is hidden on desktop
             } else if (isMobile() && !sidebar.classList.contains("-translate-x-full")) {
                 // If resized to mobile and sidebar is open, change title to "Menu"
