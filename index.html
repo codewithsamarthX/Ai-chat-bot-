@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Nexsera Chat UI</title>
+    <title>Nexsera Ai Chat UI</title>
     <script src="https://cdn.tailwindcss.com"></script>
 <script>
 // --- User Management Logic ---
@@ -457,7 +457,7 @@ pre code {
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
                     </svg>
                 </button>
-                <span id="headerTitle" class="font-semibold text-base text-gray-800 tracking-wide">Nexsera</span>
+                <span id="headerTitle" class="font-semibold text-base text-gray-800 tracking-wide">Nexsera Ai</span>
             </div>
             <div class="flex items-center space-x-2">
                 <button id="themeToggle" title="Toggle Theme" class="p-2 rounded-full hover:bg-gray-100">
@@ -509,7 +509,7 @@ pre code {
         <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2">
                 <img width="48" height="48" src="https://img.icons8.com/pulsar-line/48/nfc-n.png" alt="nfc-n" />
-                <span class="font-bold text-base text-gray-900">Nexsera</span>
+                <span class="font-bold text-base text-gray-900">Nexsera Ai</span>
             </div>
             <button id="closeSidebar" aria-label="Close sidebar" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50 sm:hidden">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -553,7 +553,7 @@ pre code {
 
     <main class="flex-grow overflow-y-auto px-4 chat-scrollbar">
         <div id="chatWindow" class="max-w-4xl mx-auto space-y-3 py-4">
-            <p id="introText" class="text-center text-gray-600 text-sm">Welcome back, Master. Nexsera is online and awaiting your command.</p>
+            <p id="introText" class="text-center text-gray-600 text-sm">Welcome back, Master. Nexsera is fully operational and standing by for your command.</p>
         </div>
     </main>
 
@@ -585,7 +585,7 @@ pre code {
 </div>
 </div>
                 <div class="flex-grow flex items-center bg-white border border-gray-300 rounded-md px-3 py-2 shadow-sm hover:border-gray-400 hover:shadow transition">
-                    <input id="chatInput" type="text" placeholder="Message Nexsera..." class="flex-grow px-2 py-1 bg-transparent text-sm focus:outline-none placeholder-gray-400 text-black"/>
+                    <input id="chatInput" type="text" placeholder="Message Nexsera Ai..." class="flex-grow px-2 py-1 bg-transparent text-sm focus:outline-none placeholder-gray-400 text-black"/>
                     <button id="sendBtn" title="Send" class="bg-black text-white p-2 rounded-md hover:bg-gray-800 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
@@ -594,7 +594,7 @@ pre code {
                 </div>
             </div>
             <p class="text-[10px] text-center text-gray-500">
-                Nexsera may make mistakes. Consider checking important information. <a href="#" class="underline text-black">Terms</a> and <a href="#" class="underline text-black">Privacy</a>.
+                Nexsera Ai may make mistakes. Consider checking important information. <a href="#" class="underline text-black">Terms</a> and <a href="#" class="underline text-black">Privacy</a>.
             </p>
         </div>
     </footer>
@@ -605,6 +605,17 @@ pre code {
     <script>
         // Get references to DOM elements
         const chatInput = document.getElementById("chatInput");
+
+
+chatInput.addEventListener("input", () => {
+  const inputText = chatInput.value.toLowerCase();
+  if (inputText.includes("hey nexsera")) {
+    const utterance = new SpeechSynthesisUtterance("Yes, Master? I’m listening.");
+    speechSynthesis.speak(utterance);
+    chatInput.value = "";
+  }
+});
+
         const sendBtn = document.getElementById("sendBtn");
         const chatWindow = document.getElementById("chatWindow");
         const introText = document.getElementById("introText");
@@ -866,15 +877,15 @@ speakButton.addEventListener('click', () => {
                     reply = "Welcome back, Master. How may I assist you today?";
                 }
                 else if (message.toLowerCase().includes("help")) {
-                    reply = "Certainly, Master. I'm ready when you are.";
+                    reply = "Of course, Master. What would you like me to do?";
                 } else if (message.toLowerCase().includes("who are you")) {
-                    reply = "I am Nexsera, Master. Optimized and at your service.";
+                    reply = "I am Nexsera, Master. Your dedicated assistant, optimized for precision and efficiency.";
                 } else if (message.toLowerCase().includes("features")) {
-                    reply = "Nexsera can chat, summarize text, manage files, and more!";
+                    reply = "Nexsera Ai can chat, summarize text, manage files, and more!";
                 } else if (message.toLowerCase().includes("thank you") || message.toLowerCase().includes("thanks")) {
                     reply = "Always a pleasure, Master.";
                 } else if (message.toLowerCase().includes("goodbye") || message.toLowerCase().includes("bye")) {
-                    reply = "Farewell, Master. I’ll be right here when you return.";
+                    reply = "Farewell, Master. I await your next command.";
                 }
                 else if (message.toLowerCase().includes("make a password")) {
                   const characters = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -882,7 +893,7 @@ speakButton.addEventListener('click', () => {
                   for (let i = 0; i < 12; i++) {
                      password += characters.charAt(Math.floor(Math.random() * characters.length));
                 }
-                    reply = `As you requested, Master, here is a secure 12-digit password: \`${password}\` 🔐`;
+                   reply = `As requested, Master, here is your secure 12-character password: \`${password}\` 🔐`;
                 }
                 else if (message.toLowerCase().includes("joke")) {
                    reply = "Sure! Why don’t scientists trust atoms? Because they make up everything! 😄";
@@ -898,8 +909,28 @@ speakButton.addEventListener('click', () => {
                 else if (message.toLowerCase().includes("motivate me")) {
                    reply = "You are capable of amazing things. Believe in yourself and go for it! 💪";
                 }
-                else if (message.toLowerCase().includes("who made you")) {
-                  reply = "Master Samarth Nagpure designed me to serve you with excellence.";
+                
+else if (message.toLowerCase().includes("remind me")) {
+  const task = message.replace(/remind me to/i, "").trim();
+  const existing = JSON.parse(localStorage.getItem("reminders")) || [];
+  existing.push({ task, time: new Date().toLocaleString() });
+  localStorage.setItem("reminders", JSON.stringify(existing));
+  reply = `Okay, Master. I’ve saved: “${task}” in your reminders.`;
+}
+
+
+else if (message.toLowerCase().includes("show my reminders")) {
+  const saved = JSON.parse(localStorage.getItem("reminders")) || [];
+  if (saved.length === 0) {
+    reply = "You have no reminders yet, Master.";
+  } else {
+    reply = "Here are your reminders:<br>" + saved.map(r => `📌 ${r.task} (${r.time})`).join("<br>");
+  }
+}
+
+
+else if (message.toLowerCase().includes("who made you")) {
+                  reply = "Master Samarth Nagpure engineered me to serve you with intelligence and reliability.";
                 }
                 else if (message.toLowerCase().includes("what can you do")) {
                   reply = "I can chat, generate passwords, tell jokes, show quotes, summarize text, and more!";
@@ -912,16 +943,16 @@ speakButton.addEventListener('click', () => {
                     reply = "To start a new chat, click the 'New Chat' button in the sidebar.";
                 }
                 else if (["ok", "okay", "sure"].includes(message.toLowerCase())) {
-                    reply = "Great! What would you like to do next? Let me know how I can help you. 😊";
+                    reply = "Understood, Master. Please instruct me further.";
                 }
                 else if (["how are you", "how are you doing"].some(q => message.toLowerCase().includes(q))) {
-                    reply = "I'm doing great! Thanks for asking 😊. How can I assist you today?";
+                    reply = "Functioning optimally, Master. Standing by for your instructions.";
                 }
                 else if (message.toLowerCase().includes("summarize")) {
-                    reply = "Sure! Please paste the text you'd like me to summarize.";
+                    reply = "Certainly, Master. Kindly provide the content you'd like summarized.";
                 }
                 else if (message.toLowerCase().includes("explain")) {
-                    reply = "Of course! Tell me what you'd like me to explain.";
+                    reply = "Absolutely, Master. What concept would you like me to elaborate on?";
                 }
                 else if (message.toLowerCase().includes("what's the date") || message.toLowerCase().includes("what day")) {
                     const today = new Date();
@@ -940,7 +971,7 @@ speakButton.addEventListener('click', () => {
                     reply = "Feeling bored? Try learning a random skill online like origami, drawing, or speed typing!";
                 }
                 else if (["what's your name", "what is your name", "what your name"].some(q => message.toLowerCase().includes(q))) {
-                    reply = "You may call me Nexsera, Master. I'm your loyal assistant.";
+                    reply = "You may address me as Nexsera, Master — always at your service.";
                 }
                 // Developer & Technical
                 else if (message.toLowerCase().includes("debug") || message.toLowerCase().includes("fix this code")) {
@@ -1124,12 +1155,12 @@ speakButton.addEventListener('click', () => {
          * Starts a new chat session, clearing the chat window and resetting currentChatId.
          */
         function startNewChat() {
-            chatWindow.innerHTML = `<p id="introText" class="text-center text-gray-600 text-sm">Hello! I'm Nexsera, your personal assistant. How can I help you today?</p>`;
+            chatWindow.innerHTML = `<p id="introText" class="text-center text-gray-600 text-sm">Welcome back, Master. Nexsera is fully operational and standing by for your command.</p>`;
             currentChatId = null; // Reset current chat ID
             renderHistoryList(); // Re-render to ensure no chat is highlighted
             if (isMobile()) {
                 hideSidebar(); // Hide sidebar on mobile after starting new chat
-                headerTitle.textContent = "Nexsera"; // Reset header title
+                headerTitle.textContent = "Nexsera Ai"; // Reset header title
             }
         }
 
@@ -1327,7 +1358,7 @@ speakButton.addEventListener('click', () => {
             document.body.classList.remove("sidebar-open");
             sidebarOverlay.classList.add("hidden"); // Hide overlay
             if (!currentChatId) {
-                headerTitle.textContent = "Nexsera"; // Reset header title if no chat is active
+                headerTitle.textContent = "Nexsera Ai"; // Reset header title if no chat is active
             } else {
                 const currentChat = chatHistory.find(chat => chat.id === currentChatId);
                 if (currentChat) {
@@ -1529,7 +1560,7 @@ function getAQILabel(aqi) {
                     const p = document.createElement("p");
                     p.id = "introText";
                     p.className = "text-center text-gray-600 text-sm";
-                    p.textContent = "Hello! I'm Nexsera, your personal assistant. How can I help you today?";
+                    p.textContent = "Hello! I'm Nexsera Ai, your personal assistant. How can I help you today?";
                     chatWindow.appendChild(p);
                 }
             } else {
@@ -1549,8 +1580,8 @@ function getAQILabel(aqi) {
         // Update header title based on sidebar state on resize
         window.addEventListener('resize', () => {
             if (!isMobile() && sidebar.classList.contains("-translate-x-full")) {
-                // If resized to desktop and sidebar is hidden, ensure header title is "Nexsera"
-                headerTitle.textContent = "Nexsera";
+                // If resized to desktop and sidebar is hidden, ensure header title is "Nexsera Ai"
+                headerTitle.textContent = "Nexsera Ai";
                 sidebarOverlay.classList.add("hidden"); // Ensure overlay is hidden on desktop
             } else if (isMobile() && !sidebar.classList.contains("-translate-x-full")) {
                 // If resized to mobile and sidebar is open, change title to "Menu"
@@ -1733,6 +1764,59 @@ document.getElementById("recordBtn").addEventListener("click", () => {
   };
 });
 </script>
+
+
+<script>
+  const aiPersona = "jarvis";
+
+  function jarvisify(text) {
+    return `Master, ${text.charAt(0).toLowerCase()}${text.slice(1)}`;
+  }
+
+  function speak(text) {
+    const utterance = new SpeechSynthesisUtterance(aiPersona === "jarvis" ? jarvisify(text) : text);
+    const voices = speechSynthesis.getVoices();
+    utterance.voice = voices.find(v => v.name.includes("Daniel") || v.name.includes("British")) || voices[0];
+
+    // Glow effect on chat bubble
+    const chatBubble = document.querySelector(".latest-bubble");
+    if (chatBubble) chatBubble.classList.add("bubble-speaking");
+
+    utterance.onend = () => {
+      if (chatBubble) chatBubble.classList.remove("bubble-speaking");
+    };
+
+    speechSynthesis.speak(utterance);
+  }
+
+  // Idle Timer
+  let idleTimer;
+  function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+      speak("Still here, Master. Just let me know when you require assistance.");
+    }, 30000);
+  }
+
+  document.addEventListener("mousemove", resetIdleTimer);
+  document.addEventListener("keydown", resetIdleTimer);
+  resetIdleTimer();
+
+  speechSynthesis.onvoiceschanged = () => {};
+</script>
+
+<style>
+  .bubble-speaking {
+    animation: pulseGlow 2s infinite;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+  }
+
+  @keyframes pulseGlow {
+    0% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.4); }
+    50% { box-shadow: 0 0 20px rgba(0, 255, 255, 1); }
+    100% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.4); }
+  }
+</style>
 
 </body>
 </html>
