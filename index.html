@@ -826,6 +826,38 @@ speakButton.addEventListener('click', () => {
                 await new Promise(resolve => setTimeout(resolve, preferredResponseSpeed / words.length));
             }
         }
+async function searchInternet(query) {
+  const apiKey = "73967311c3d6e5b10408e05bb90e25d8e984f2fc7a3b028fc233d13beb8b9a7b";
+  const url = `https://serpapi.com/search.json?q=${encodeURIComponent(query)}&api_key=${apiKey}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.shopping_results && data.shopping_results.length > 0) {
+      const results = data.shopping_results.slice(0, 3); // Top 3 results
+      return `
+        <div class="bg-white border border-gray-300 rounded-lg p-4 shadow-md text-left space-y-3">
+          <h3 class="text-base font-semibold text-gray-800 mb-2">🛒 Top Results for “${query}”</h3>
+          ${results.map(item => `
+            <div class="border-t pt-2">
+              <div class="font-medium text-gray-900">${item.title}</div>
+              <div class="text-sm text-gray-700">${item.extracted_price ? `₹${item.extracted_price}` : item.price}</div>
+              ${item.thumbnail ? `<img src="${item.thumbnail}" alt="${item.title}" class="w-32 h-auto mt-2 rounded shadow-sm">` : ''}
+              <a href="${item.link}" target="_blank" class="inline-block mt-2 text-blue-600 hover:underline text-sm">View Product</a>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    } else {
+      return `🔍 No product results found for “${query}”, Master.`;
+    }
+
+  } catch (error) {
+    console.error("Search Error:", error);
+    return `❌ Sorry, Master. I encountered an error while searching for “${query}”. Please try again later.`;
+  }
+}
 
         /**
          * Handles sending a message, displaying user input, simulating AI response,
@@ -927,7 +959,23 @@ else if (message.toLowerCase().includes("show my reminders")) {
     reply = "Here are your reminders:<br>" + saved.map(r => `📌 ${r.task} (${r.time})`).join("<br>");
   }
 }
+else if (
+  message.toLowerCase().startsWith("search") ||
+  message.toLowerCase().includes("price of") ||
+  message.toLowerCase().includes("image of") ||
+  message.toLowerCase().includes("find") ||
+  message.toLowerCase().includes("news")
+) {
+  const searchQuery = message
+    .replace("search", "")
+    .replace("find", "")
+    .replace("price of", "")
+    .replace("image of", "")
+    .replace("news", "")
+    .trim();
 
+  reply = await searchInternet(searchQuery);
+}
 
 else if (message.toLowerCase().includes("who made you")) {
                   reply = "Master Samarth Nagpure engineered me to serve you with intelligence and reliability.";
@@ -1448,7 +1496,89 @@ else if (message.toLowerCase().includes("who made you")) {
             preferredResponseSpeed = parseInt(e.target.value);
             responseSpeedValue.textContent = `${preferredResponseSpeed} ms`;
         });
-
+async function searchInternet(query) {
+  try {
+    const apiKey = "dad4e60c8df2386e297b9ce2022f98aa3fb98b1b37a4dad49d158190a775c4ec";
+    const encodedQuery = encodeURIComponent(query);
+    const response = await fetch(`https://serpapi.com/search.json?q=${encodedQuery}&api_key=${apiKey}`);
+    const data = await response.json();
+    
+    // Check if we have direct answer (like for prices)
+    if (data.answer_box && data.answer_box.answer) {
+      return `🔍 Search result for "${query}":<br><strong>${data.answer_box.answer}</strong>`;
+    }
+    
+    // Check for price results
+    if (data.shopping_results && data.shopping_results.length > 0) {
+      const priceResult = data.shopping_results[0];
+      return `
+<div class="w-full px-2 sm:px-0 flex justify-center">
+  <div class="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-md space-y-2 w-full max-w-md">
+    <h3 class="text-lg font-semibold">💰 Price for "${query}"</h3>
+    <div class="space-y-1 text-sm">
+      <p>🏷️ <strong>Title:</strong> ${priceResult.title}</p>
+      <p>💵 <strong>Price:</strong> ${priceResult.price}</p>
+      ${priceResult.source ? `<p>🛒 <strong>Source:</strong> ${priceResult.source}</p>` : ''}
+      ${priceResult.link ? `<p>🔗 <a href="${priceResult.link}" target="_blank" class="text-blue-600 dark:text-blue-400">View Product</a></p>` : ''}
+    </div>
+  </div>
+</div>`;
+    }
+    
+    // Check for image results
+    if (data.images_results && data.images_results.length > 0) {
+      const imageResult = data.images_results[0];
+      return `
+<div class="w-full px-2 sm:px-0 flex justify-center">
+  <div class="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-md space-y-2 w-full max-w-md">
+    <h3 class="text-lg font-semibold">🖼️ Image for "${query}"</h3>
+    <img src="${imageResult.thumbnail}" alt="${query}" class="rounded-md max-h-60 mx-auto">
+    ${imageResult.source ? `<p class="text-sm mt-2">📷 <strong>Source:</strong> ${imageResult.source}</p>` : ''}
+    ${imageResult.link ? `<p class="text-sm">🔗 <a href="${imageResult.link}" target="_blank" class="text-blue-600 dark:text-blue-400">View Image</a></p>` : ''}
+  </div>
+</div>`;
+    }
+    
+    // Check for news results
+    if (data.news_results && data.news_results.length > 0) {
+      const newsResult = data.news_results[0];
+      return `
+<div class="w-full px-2 sm:px-0 flex justify-center">
+  <div class="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-md space-y-2 w-full max-w-md">
+    <h3 class="text-lg font-semibold">📰 News about "${query}"</h3>
+    <div class="space-y-1 text-sm">
+      <p>📝 <strong>Title:</strong> ${newsResult.title}</p>
+      ${newsResult.source ? `<p>🏢 <strong>Source:</strong> ${newsResult.source}</p>` : ''}
+      ${newsResult.date ? `<p>📅 <strong>Date:</strong> ${newsResult.date}</p>` : ''}
+      ${newsResult.link ? `<p>🔗 <a href="${newsResult.link}" target="_blank" class="text-blue-600 dark:text-blue-400">Read Article</a></p>` : ''}
+    </div>
+  </div>
+</div>`;
+    }
+    
+    // Default organic results
+    if (data.organic_results && data.organic_results.length > 0) {
+      const result = data.organic_results[0];
+      return `
+<div class="w-full px-2 sm:px-0 flex justify-center">
+  <div class="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-md space-y-2 w-full max-w-md">
+    <h3 class="text-lg font-semibold">🔍 Search result for "${query}"</h3>
+    <div class="space-y-1 text-sm">
+      <p>📌 <strong>${result.title}</strong></p>
+      <p>${result.snippet || 'No description available'}</p>
+      ${result.link ? `<p>🔗 <a href="${result.link}" target="_blank" class="text-blue-600 dark:text-blue-400">Visit Site</a></p>` : ''}
+    </div>
+  </div>
+</div>`;
+    }
+    
+    return `🔍 I couldn't find any results for "${query}". Please try a different search term.`;
+    
+  } catch (error) {
+    console.error("Search error:", error);
+    return `❌ Sorry, Master. I encountered an error while searching for "${query}". Please try again later.`;
+  }
+}
         
 
 async function getWeatherData(city = "") {
