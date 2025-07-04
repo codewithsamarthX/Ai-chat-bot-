@@ -832,6 +832,7 @@ speakButton.addEventListener('click', () => {
          * and managing chat history.
          */
         
+
 async function searchInternet(query) {
   try {
     if (!query || query.trim() === "") {
@@ -840,7 +841,7 @@ async function searchInternet(query) {
 
     const apiKey = "73967311c3d6e5b10408e05bb90e25d8e984f2fc7a3b028fc233d13beb8b9a7b";
     const encodedQuery = encodeURIComponent(query);
-    const proxyUrl = `https://corsproxy.io/?https://serpapi.com/search.json?q=${encodedQuery}&api_key=${apiKey}`;
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://serpapi.com/search.json?q=${encodedQuery}&api_key=${apiKey}`)}`;
 
     console.log("🔍 Searching:", proxyUrl);
 
