@@ -120,122 +120,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Override saveChatHistory globally
   saveChatHistory = saveChatHistoryForUser;
 
-  // Init user list
-  renderUserList();
-  if (currentUser) loadUserChatHistory(currentUser);
+ 
 });
-const userBox = document.getElementById("userManagementBox");
-const closeUserBox = document.getElementById("closeUserBox");
-
-const addUserBtn = document.getElementById("addUserBtn");
-const removeUserBtn = document.getElementById("removeUserBtn");
-const addUserInput = document.getElementById("addUserInput");
-const userSelect = document.getElementById("userSelect");
-
-let users = JSON.parse(localStorage.getItem("userList")) || [];
-let currentUser = localStorage.getItem("currentUser") || null;
-
-function renderUserList() {
-  userSelect.innerHTML = '<option disabled>Select User</option>';
-  users.forEach(user => {
-    const option = document.createElement("option");
-    option.value = user;
-    option.textContent = user;
-    if (user === currentUser) option.selected = true;
-    userSelect.appendChild(option);
-  });
-}
-
-function saveUsers() {
-  localStorage.setItem("userList", JSON.stringify(users));
-}
-
-function getUserChatKey(username) {
-  return `chatHistory_${username}`;
-}
-
-function loadUserChatHistory(username) {
-  const saved = localStorage.getItem(getUserChatKey(username));
-  if (saved) chatHistory = JSON.parse(saved);
-  else chatHistory = [];
-
-  currentChatId = null;
-  renderHistoryList();
-  startNewChat();
-}
-
-function saveChatHistoryForUser() {
-  if (currentUser) {
-    localStorage.setItem(getUserChatKey(currentUser), JSON.stringify(chatHistory));
-  }
-}
-
-function switchUser(username) {
-  updateLoggedInUserUI();
-  currentUser = username;
-  localStorage.setItem("currentUser", username);
-  loadUserChatHistory(username);
-}
-
-// Toggle box
-userButton.addEventListener("click", () => {
-  const isVisible = !userBox.classList.contains("hidden");
-  if (isVisible) {
-    userBox.classList.add("opacity-0", "scale-95");
-    setTimeout(() => userBox.classList.add("hidden"), 200);
-  } else {
-    userBox.classList.remove("hidden");
-    setTimeout(() => userBox.classList.remove("opacity-0", "scale-95"), 10);
-  }
-});
-
-// Close button
-closeUserBox.addEventListener("click", () => {
-  userBox.classList.add("opacity-0", "scale-95");
-  setTimeout(() => userBox.classList.add("hidden"), 200);
-});
-
-// Add user
-addUserBtn.addEventListener("click", () => {
-  const name = addUserInput.value.trim();
-  if (name && !users.includes(name)) {
-    users.push(name);
-    saveUsers();
-    addUserInput.value = "";
-    renderUserList();
-  }
-});
-
-// Remove user
-removeUserBtn.addEventListener("click", () => {
-  const selected = userSelect.value;
-  if (selected && users.includes(selected)) {
-    users = users.filter(u => u !== selected);
-    saveUsers();
-    localStorage.removeItem(getUserChatKey(selected));
-    if (selected === currentUser) {
-      currentUser = null;
-      localStorage.removeItem("currentUser");
-      chatHistory = [];
-      currentChatId = null;
-      renderHistoryList();
-      startNewChat();
-    }
-    renderUserList();
-  }
-});
-
-// Change user
-userSelect.addEventListener("change", () => {
-  const selected = userSelect.value;
-  if (selected) {
-    switchUser(selected);
-  }
-});
-
-// Override saveChatHistory globally
-saveChatHistory = saveChatHistoryForUser;
-
 // Init on DOM load
 document.addEventListener("DOMContentLoaded", () => {
   renderUserList();
@@ -831,59 +717,118 @@ speakButton.addEventListener('click', () => {
          * Handles sending a message, displaying user input, simulating AI response,
          * and managing chat history.
          */
-        
-
-async function searchInternet(query) {
-  try {
-    if (!query || query.trim() === "") {
-      return "🔍 Please provide a search query.";
-    }
-
-    const apiKey = "73967311c3d6e5b10408e05bb90e25d8e984f2fc7a3b028fc233d13beb8b9a7b";
-    const encodedQuery = encodeURIComponent(query);
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://serpapi.com/search.json?q=${encodedQuery}&api_key=${apiKey}`)}`;
-
-    console.log("🔍 Searching:", proxyUrl);
-
-    const response = await fetch(proxyUrl);
-    const data = await response.json();
-
-    if (data.error) {
-      console.error("API Error:", data.error);
-      return `❌ Search error: ${data.error}`;
-    }
-
-    if (data.shopping_results?.length > 0) {
-      const results = data.shopping_results.slice(0, 3);
-      return `
-        <div class="bg-white border border-gray-300 rounded-lg p-4 shadow-md space-y-2">
-          <h3 class="text-base font-semibold text-gray-800">🛒 Top Results for “${query}”</h3>
-          ${results.map(item => `
-            <div class="border-t pt-2">
-              <div class="font-medium text-gray-900">${item.title}</div>
-              <div class="text-sm text-gray-700">${item.extracted_price ? `₹${item.extracted_price}` : item.price}</div>
-              ${item.thumbnail ? `<img src="${item.thumbnail}" class="w-24 mt-2 rounded shadow">` : ''}
-              <a href="${item.link}" target="_blank" class="block text-blue-600 hover:underline mt-1 text-sm">View</a>
-            </div>
-          `).join("")}
-        </div>
-      `;
-    }
-
-    return `🔍 No results found for “${query}”, Master.`;
-
-  } catch (error) {
-    console.error("❌ Search Failed:", error);
-    return `❌ Search failed, Master. (${error.message})`;
-  }
-}
-
-
-
-
-async function sendMessage() {
+        async function sendMessage() {
             const message = chatInput.value.trim();
             if (!message && filesToSend.length === 0) return; // Don't send empty messages
+
+
+// Smart Action Commands (Open App + AI Chat Reply)
+if (message.toLowerCase().startsWith("open whatsapp")) {
+  const aiMessageIndex = chatHistory.find(chat => chat.id === currentChatId)?.messages.length || 0;
+  const reply = "Opening WhatsApp Web for you, Master.";
+  window.open("https://web.whatsapp.com", "_blank");
+
+  if (currentChatId) {
+    const currentChat = chatHistory.find(chat => chat.id === currentChatId);
+    currentChat.messages.push({ role: "ai", content: reply });
+    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+    streamReply(aiDiv, reply);
+    saveChatHistory();
+  }
+  return;
+}
+
+if (message.toLowerCase().startsWith("play ")) {
+  const song = message.replace(/play /i, "").replace(/ on spotify/i, "").replace(/ on youtube/i, "").trim();
+  const query = encodeURIComponent(song);
+  let platform = "Spotify";
+  let url = `https://open.spotify.com/search/${query}`;
+  if (message.toLowerCase().includes("on youtube")) {
+    platform = "YouTube";
+    url = `https://www.youtube.com/results?search_query=${query}`;
+  }
+  const reply = `Playing *${song}* on ${platform}.`;
+  window.open(url, "_blank");
+
+  const aiMessageIndex = chatHistory.find(chat => chat.id === currentChatId)?.messages.length || 0;
+  if (currentChatId) {
+    const currentChat = chatHistory.find(chat => chat.id === currentChatId);
+    currentChat.messages.push({ role: "ai", content: reply });
+    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+    streamReply(aiDiv, reply);
+    saveChatHistory();
+  }
+  return;
+}
+
+if (message.toLowerCase().startsWith("search ")) {
+  const queryText = message.replace(/search /i, "").trim();
+  const query = encodeURIComponent(queryText);
+  const reply = `Searching Google for *${queryText}*.`;
+  window.open(`https://www.google.com/search?q=${query}`, "_blank");
+
+  const aiMessageIndex = chatHistory.find(chat => chat.id === currentChatId)?.messages.length || 0;
+  if (currentChatId) {
+    const currentChat = chatHistory.find(chat => chat.id === currentChatId);
+    currentChat.messages.push({ role: "ai", content: reply });
+    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+    streamReply(aiDiv, reply);
+    saveChatHistory();
+  }
+  return;
+}
+
+if (message.toLowerCase().startsWith("open youtube")) {
+  const reply = "Opening YouTube, Master.";
+  window.open("https://www.youtube.com", "_blank");
+
+  const aiMessageIndex = chatHistory.find(chat => chat.id === currentChatId)?.messages.length || 0;
+  if (currentChatId) {
+    const currentChat = chatHistory.find(chat => chat.id === currentChatId);
+    currentChat.messages.push({ role: "ai", content: reply });
+    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+    streamReply(aiDiv, reply);
+    saveChatHistory();
+  }
+  return;
+}
+
+if (message.toLowerCase().startsWith("open gmail")) {
+  const reply = "Opening Gmail, Master.";
+  window.open("https://mail.google.com", "_blank");
+
+  const aiMessageIndex = chatHistory.find(chat => chat.id === currentChatId)?.messages.length || 0;
+  if (currentChatId) {
+    const currentChat = chatHistory.find(chat => chat.id === currentChatId);
+    currentChat.messages.push({ role: "ai", content: reply });
+    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+    streamReply(aiDiv, reply);
+    saveChatHistory();
+  }
+  return;
+}
+
+if (message.toLowerCase().startsWith("search images of ")) {
+  const queryText = message.replace(/search images of /i, "").trim();
+  const query = encodeURIComponent(queryText);
+  const reply = `Searching Google Images for *${queryText}*.`;
+  window.open(`https://www.google.com/search?tbm=isch&q=${query}`, "_blank");
+
+  const aiMessageIndex = chatHistory.find(chat => chat.id === currentChatId)?.messages.length || 0;
+  if (currentChatId) {
+    const currentChat = chatHistory.find(chat => chat.id === currentChatId);
+    currentChat.messages.push({ role: "ai", content: reply });
+    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+    streamReply(aiDiv, reply);
+    saveChatHistory();
+  }
+  return;
+}
+
+// (Continue with the rest of sendMessage logic...)
+
+
+
 
             // Remove intro text if it exists
             if (introText) {
@@ -977,23 +922,7 @@ else if (message.toLowerCase().includes("show my reminders")) {
     reply = "Here are your reminders:<br>" + saved.map(r => `📌 ${r.task} (${r.time})`).join("<br>");
   }
 }
-else if (
-  message.toLowerCase().startsWith("search") ||
-  message.toLowerCase().includes("price of") ||
-  message.toLowerCase().includes("image of") ||
-  message.toLowerCase().includes("find") ||
-  message.toLowerCase().includes("news")
-) {
-  const searchQuery = message
-    .replace("search", "")
-    .replace("find", "")
-    .replace("price of", "")
-    .replace("image of", "")
-    .replace("news", "")
-    .trim();
 
-  reply = await searchInternet(searchQuery);
-}
 
 else if (message.toLowerCase().includes("who made you")) {
                   reply = "Master Samarth Nagpure engineered me to serve you with intelligence and reliability.";
@@ -1514,89 +1443,7 @@ else if (message.toLowerCase().includes("who made you")) {
             preferredResponseSpeed = parseInt(e.target.value);
             responseSpeedValue.textContent = `${preferredResponseSpeed} ms`;
         });
-async function searchInternet(query) {
-  try {
-    const apiKey = "dad4e60c8df2386e297b9ce2022f98aa3fb98b1b37a4dad49d158190a775c4ec";
-    const encodedQuery = encodeURIComponent(query);
-    const response = await fetch(`https://serpapi.com/search.json?q=${encodedQuery}&api_key=${apiKey}`);
-    const data = await response.json();
-    
-    // Check if we have direct answer (like for prices)
-    if (data.answer_box && data.answer_box.answer) {
-      return `🔍 Search result for "${query}":<br><strong>${data.answer_box.answer}</strong>`;
-    }
-    
-    // Check for price results
-    if (data.shopping_results && data.shopping_results.length > 0) {
-      const priceResult = data.shopping_results[0];
-      return `
-<div class="w-full px-2 sm:px-0 flex justify-center">
-  <div class="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-md space-y-2 w-full max-w-md">
-    <h3 class="text-lg font-semibold">💰 Price for "${query}"</h3>
-    <div class="space-y-1 text-sm">
-      <p>🏷️ <strong>Title:</strong> ${priceResult.title}</p>
-      <p>💵 <strong>Price:</strong> ${priceResult.price}</p>
-      ${priceResult.source ? `<p>🛒 <strong>Source:</strong> ${priceResult.source}</p>` : ''}
-      ${priceResult.link ? `<p>🔗 <a href="${priceResult.link}" target="_blank" class="text-blue-600 dark:text-blue-400">View Product</a></p>` : ''}
-    </div>
-  </div>
-</div>`;
-    }
-    
-    // Check for image results
-    if (data.images_results && data.images_results.length > 0) {
-      const imageResult = data.images_results[0];
-      return `
-<div class="w-full px-2 sm:px-0 flex justify-center">
-  <div class="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-md space-y-2 w-full max-w-md">
-    <h3 class="text-lg font-semibold">🖼️ Image for "${query}"</h3>
-    <img src="${imageResult.thumbnail}" alt="${query}" class="rounded-md max-h-60 mx-auto">
-    ${imageResult.source ? `<p class="text-sm mt-2">📷 <strong>Source:</strong> ${imageResult.source}</p>` : ''}
-    ${imageResult.link ? `<p class="text-sm">🔗 <a href="${imageResult.link}" target="_blank" class="text-blue-600 dark:text-blue-400">View Image</a></p>` : ''}
-  </div>
-</div>`;
-    }
-    
-    // Check for news results
-    if (data.news_results && data.news_results.length > 0) {
-      const newsResult = data.news_results[0];
-      return `
-<div class="w-full px-2 sm:px-0 flex justify-center">
-  <div class="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-md space-y-2 w-full max-w-md">
-    <h3 class="text-lg font-semibold">📰 News about "${query}"</h3>
-    <div class="space-y-1 text-sm">
-      <p>📝 <strong>Title:</strong> ${newsResult.title}</p>
-      ${newsResult.source ? `<p>🏢 <strong>Source:</strong> ${newsResult.source}</p>` : ''}
-      ${newsResult.date ? `<p>📅 <strong>Date:</strong> ${newsResult.date}</p>` : ''}
-      ${newsResult.link ? `<p>🔗 <a href="${newsResult.link}" target="_blank" class="text-blue-600 dark:text-blue-400">Read Article</a></p>` : ''}
-    </div>
-  </div>
-</div>`;
-    }
-    
-    // Default organic results
-    if (data.organic_results && data.organic_results.length > 0) {
-      const result = data.organic_results[0];
-      return `
-<div class="w-full px-2 sm:px-0 flex justify-center">
-  <div class="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-md space-y-2 w-full max-w-md">
-    <h3 class="text-lg font-semibold">🔍 Search result for "${query}"</h3>
-    <div class="space-y-1 text-sm">
-      <p>📌 <strong>${result.title}</strong></p>
-      <p>${result.snippet || 'No description available'}</p>
-      ${result.link ? `<p>🔗 <a href="${result.link}" target="_blank" class="text-blue-600 dark:text-blue-400">Visit Site</a></p>` : ''}
-    </div>
-  </div>
-</div>`;
-    }
-    
-    return `🔍 I couldn't find any results for "${query}". Please try a different search term.`;
-    
-  } catch (error) {
-    console.error("Search error:", error);
-    return `❌ Sorry, Master. I encountered an error while searching for "${query}". Please try again later.`;
-  }
-}
+
         
 
 async function getWeatherData(city = "") {
