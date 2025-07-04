@@ -833,82 +833,51 @@ speakButton.addEventListener('click', () => {
          */
         
 async function searchInternet(query) {
-  const apiKey = "73967311c3d6e5b10408e05bb90e25d8e984f2fc7a3b028fc233d13beb8b9a7b";
-  const url = `https://serpapi.com/search.json?q=${encodeURIComponent(query)}&api_key=${apiKey}`;
-
   try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!query || query.trim() === "") {
+      return "🔍 Please provide a search query.";
+    }
+
+    const apiKey = "73967311c3d6e5b10408e05bb90e25d8e984f2fc7a3b028fc233d13beb8b9a7b";
+    const encodedQuery = encodeURIComponent(query);
+    const proxyUrl = `https://corsproxy.io/?https://serpapi.com/search.json?q=${encodedQuery}&api_key=${apiKey}`;
+
+    console.log("🔍 Searching:", proxyUrl);
+
+    const response = await fetch(proxyUrl);
     const data = await response.json();
 
-    if (data.shopping_results && data.shopping_results.length > 0) {
+    if (data.error) {
+      console.error("API Error:", data.error);
+      return `❌ Search error: ${data.error}`;
+    }
+
+    if (data.shopping_results?.length > 0) {
       const results = data.shopping_results.slice(0, 3);
       return `
-        <div class="bg-white border border-gray-300 rounded-lg p-4 shadow-md text-left space-y-3">
-          <h3 class="text-base font-semibold text-gray-800 mb-2">🛒 Top Results for “${query}”</h3>
+        <div class="bg-white border border-gray-300 rounded-lg p-4 shadow-md space-y-2">
+          <h3 class="text-base font-semibold text-gray-800">🛒 Top Results for “${query}”</h3>
           ${results.map(item => `
             <div class="border-t pt-2">
               <div class="font-medium text-gray-900">${item.title}</div>
               <div class="text-sm text-gray-700">${item.extracted_price ? `₹${item.extracted_price}` : item.price}</div>
-              ${item.thumbnail ? `<img src="${item.thumbnail}" alt="${item.title}" class="w-32 h-auto mt-2 rounded shadow-sm">` : ''}
-              <a href="${item.link}" target="_blank" class="inline-block mt-2 text-blue-600 hover:underline text-sm">View Product</a>
+              ${item.thumbnail ? `<img src="${item.thumbnail}" class="w-24 mt-2 rounded shadow">` : ''}
+              <a href="${item.link}" target="_blank" class="block text-blue-600 hover:underline mt-1 text-sm">View</a>
             </div>
-          `).join('')}
+          `).join("")}
         </div>
       `;
-    } else {
-      return `🔍 No product results found for “${query}”, Master.`;
     }
+
+    return `🔍 No results found for “${query}”, Master.`;
+
   } catch (error) {
-    console.error("Search Error:", error);
-    return `❌ Sorry, Master. I encountered an error while searching for “${query}”. Please try again later.`;
+    console.error("❌ Search Failed:", error);
+    return `❌ Search failed, Master. (${error.message})`;
   }
 }
 
 
-
-async function searchInternet(query) {
-  const apiKey = "73967311c3d6e5b10408e05bb90e25d8e984f2fc7a3b028fc233d13beb8b9a7b";
-  const url = `https://corsproxy.io/?https://serpapi.com/search.json?q=${encodeURIComponent(query)}&api_key=${apiKey}`;
-
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Request failed: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (data.shopping_results && data.shopping_results.length > 0) {
-      const results = data.shopping_results.slice(0, 3);
-      return `
-        <div class="bg-white border border-gray-300 rounded-lg p-4 shadow-md text-left space-y-3">
-          <h3 class="text-base font-semibold text-gray-800 mb-2">🛒 Top Results for “${query}”</h3>
-          ${results.map(item => `
-            <div class="border-t pt-2">
-              <div class="font-medium text-gray-900">${item.title}</div>
-              <div class="text-sm text-gray-700">${item.extracted_price ? `₹${item.extracted_price}` : item.price}</div>
-              ${item.thumbnail ? `<img src="${item.thumbnail}" alt="${item.title}" class="w-32 h-auto mt-2 rounded shadow-sm">` : ''}
-              <a href="${item.link}" target="_blank" class="inline-block mt-2 text-blue-600 hover:underline text-sm">View Product</a>
-            </div>
-          `).join('')}
-        </div>
-      `;
-    } else {
-      return `🔍 No product results found for “${query}”, Master.`;
-    }
-
-  } catch (error) {
-    console.error("Search Error:", error.message);
-    return `❌ Sorry, Master. Failed to search due to: ${error.message}`;
-  }
-}
 
 
 async function sendMessage() {
