@@ -831,11 +831,21 @@ async function searchInternet(query) {
   const url = `https://serpapi.com/search.json?q=${encodeURIComponent(query)}&api_key=${apiKey}`;
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Request failed: ${response.status}`);
+    }
+
     const data = await response.json();
 
     if (data.shopping_results && data.shopping_results.length > 0) {
-      const results = data.shopping_results.slice(0, 3); // Top 3 results
+      const results = data.shopping_results.slice(0, 3);
       return `
         <div class="bg-white border border-gray-300 rounded-lg p-4 shadow-md text-left space-y-3">
           <h3 class="text-base font-semibold text-gray-800 mb-2">🛒 Top Results for “${query}”</h3>
@@ -854,10 +864,11 @@ async function searchInternet(query) {
     }
 
   } catch (error) {
-    console.error("Search Error:", error);
-    return `❌ Sorry, Master. I encountered an error while searching for “${query}”. Please try again later.`;
+    console.error("Search Error:", error.message);
+    return `❌ Sorry, Master. Failed to search due to: ${error.message}`;
   }
 }
+
 
         /**
          * Handles sending a message, displaying user input, simulating AI response,
