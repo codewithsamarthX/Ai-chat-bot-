@@ -820,17 +820,23 @@ if (message.toLowerCase().startsWith("play") && message.toLowerCase().includes("
 }
 
 if (message.toLowerCase().startsWith("play ")) {
-  const song = message.replace(/play /i, "").replace(/ on spotify/i, "").replace(/ on youtube/i, "").trim();
+  const song = message.replace(/play /i, "")
+                      .replace(/ on youtube/i, "")
+                      .replace(/ on spotify/i, "")
+                      .trim();
   const query = encodeURIComponent(song);
-  let platform = "Spotify";
-  let url = `https://open.spotify.com/search/${query}`;
-  if (message.toLowerCase().includes("on youtube")) {
-    platform = "YouTube";
-    url = `https://www.youtube.com/results?search_query=${query}`;
+  let platform = "YouTube";
+  let url = `https://www.youtube.com/results?search_query=${query}`;
+  
+  if (message.toLowerCase().includes("on spotify")) {
+    platform = "Spotify";
+    url = `https://open.spotify.com/search/${query}`;
   }
+
   smartReplyAndOpen(`Playing *${song}* on ${platform}.`, url);
   return;
 }
+
 
 if (message.toLowerCase().startsWith("search images of ")) {
   const queryText = message.replace(/search images of /i, "").trim();
@@ -1804,9 +1810,9 @@ document.getElementById("recordBtn").addEventListener("click", () => {
     //}, 30000);
   //}
 
-  document.addEventListener("mousemove", resetIdleTimer);
-  document.addEventListener("keydown", resetIdleTimer);
-  resetIdleTimer();
+  //document.addEventListener("mousemove", resetIdleTimer);
+ // document.addEventListener("keydown", resetIdleTimer);
+ // resetIdleTimer();
 
   speechSynthesis.onvoiceschanged = () => {};
 </script>
