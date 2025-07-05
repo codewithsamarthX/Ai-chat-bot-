@@ -731,14 +731,26 @@ speakButton.addEventListener('click', () => {
 
 // Smart Action Commands (Open App + AI Chat Reply)
 function smartReplyAndOpen(reply, url) {
-  const aiMessageIndex = chatHistory.find(chat => chat.id === currentChatId)?.messages.length || 0;
-  if (currentChatId) {
-    const currentChat = chatHistory.find(chat => chat.id === currentChatId);
-    currentChat.messages.push({ role: "ai", content: reply });
-    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
-    streamReply(aiDiv, reply);
-    saveChatHistory();
+  // Create new chat if none exists
+  if (!currentChatId) {
+    currentChatId = generateChatId();
+    const newChat = {
+      id: currentChatId,
+      title: reply.substring(0, 30) + (reply.length > 30 ? "..." : ""),
+      messages: []
+    };
+    chatHistory.unshift(newChat);
+    renderHistoryList();
   }
+
+  const currentChat = chatHistory.find(chat => chat.id === currentChatId);
+  const aiMessageIndex = currentChat.messages.length;
+  currentChat.messages.push({ role: "ai", content: reply });
+
+  const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+  streamReply(aiDiv, reply);
+  saveChatHistory();
+
   window.open(url, "_blank");
 }
 
