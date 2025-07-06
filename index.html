@@ -4,341 +4,128 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Nexsera Ai Chat UI</title>
-    <link rel="icon" type="image/png" href="https://img.icons8.com/pulsar-line/55/nfc-n.png" />
-
     <script src="https://cdn.tailwindcss.com"></script>
-<script>
-// --- User Management Logic ---
-document.addEventListener("DOMContentLoaded", () => {
-  const userButton = document.getElementById("userBtn");
-  const userBox = document.getElementById("userManagementBox");
-  const closeUserBox = document.getElementById("closeUserBox");
-  const addUserBtn = document.getElementById("addUserBtn");
-  const removeUserBtn = document.getElementById("removeUserBtn");
-  const addUserInput = document.getElementById("addUserInput");
-  const userSelect = document.getElementById("userSelect");
-
-  let users = JSON.parse(localStorage.getItem("userList")) || [];
-  let currentUser = localStorage.getItem("currentUser") || null;
-
-  function renderUserList() {
-    userSelect.innerHTML = '<option disabled>Select User</option>';
-    users.forEach(user => {
-      const option = document.createElement("option");
-      option.value = user;
-      option.textContent = user;
-      if (user === currentUser) option.selected = true;
-      userSelect.appendChild(option);
-    });
-  }
-
-  function saveUsers() {
-    localStorage.setItem("userList", JSON.stringify(users));
-  }
-
-  function getUserChatKey(username) {
-    return `chatHistory_${username}`;
-  }
-
-  function loadUserChatHistory(username) {
-    const saved = localStorage.getItem(getUserChatKey(username));
-    if (saved) chatHistory = JSON.parse(saved);
-    else chatHistory = [];
-
-    currentChatId = null;
-    renderHistoryList();
-    startNewChat();
-  }
-
-  function saveChatHistoryForUser() {
-    if (currentUser) {
-      localStorage.setItem(getUserChatKey(currentUser), JSON.stringify(chatHistory));
-    }
-  }
-
-  function switchUser(username) {
-  updateLoggedInUserUI();
-    currentUser = username;
-    localStorage.setItem("currentUser", username);
-    loadUserChatHistory(username);
-  }
-
-  // Toggle box
-  userButton.addEventListener("click", () => {
-    const isVisible = !userBox.classList.contains("hidden");
-    if (isVisible) {
-      userBox.classList.add("opacity-0", "scale-95");
-      setTimeout(() => userBox.classList.add("hidden"), 200);
-    } else {
-      userBox.classList.remove("hidden");
-      setTimeout(() => userBox.classList.remove("opacity-0", "scale-95"), 10);
-    }
-  });
-
-  // Close button
-  closeUserBox.addEventListener("click", () => {
-    userBox.classList.add("opacity-0", "scale-95");
-    setTimeout(() => userBox.classList.add("hidden"), 200);
-  });
-
-  // Add user
-  addUserBtn.addEventListener("click", () => {
-    const name = addUserInput.value.trim();
-    if (name && !users.includes(name)) {
-      users.push(name);
-      saveUsers();
-      addUserInput.value = "";
-      renderUserList();
-    }
-  });
-
-  // Remove user
-  removeUserBtn.addEventListener("click", () => {
-    const selected = userSelect.value;
-    if (selected && users.includes(selected)) {
-      users = users.filter(u => u !== selected);
-      saveUsers();
-      localStorage.removeItem(getUserChatKey(selected));
-      if (selected === currentUser) {
-        currentUser = null;
-        localStorage.removeItem("currentUser");
-        chatHistory = [];
-        currentChatId = null;
-        renderHistoryList();
-        startNewChat();
-      }
-      renderUserList();
-    }
-  });
-
-  // Change user
-  userSelect.addEventListener("change", () => {
-    const selected = userSelect.value;
-    if (selected) {
-      switchUser(selected);
-    }
-  });
-
-  // Override saveChatHistory globally
-  saveChatHistory = saveChatHistoryForUser;
-
- 
-});
-// Init on DOM load
-document.addEventListener("DOMContentLoaded", () => {
-  renderUserList();
-  if (currentUser) loadUserChatHistory(currentUser);
-});
-</script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Prism.js for syntax highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/normalize-whitespace/prism-normalize-whitespace.min.js"></script>
+
     <style>
-        /* Apply Inter font to the entire body */
         body {
             font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Custom scrollbar for chat window */
-        .chat-scrollbar::-webkit-scrollbar {
-            width: 8px;
-        }
+        /* Custom scrollbar */
+        .chat-scrollbar::-webkit-scrollbar { width: 8px; }
+        .chat-scrollbar::-webkit-scrollbar-track { background: #f0f0f0; border-radius: 10px; }
+        .chat-scrollbar::-webkit-scrollbar-thumb { background: #c0c0c0; border-radius: 10px; }
+        .chat-scrollbar::-webkit-scrollbar-thumb:hover { background: #a0a0a0; }
 
-        .chat-scrollbar::-webkit-scrollbar-track {
-            background: #f0f0f0; /* Light gray for track */
-            border-radius: 10px;
-        }
-
-        .chat-scrollbar::-webkit-scrollbar-thumb {
-            background: #c0c0c0; /* Gray for thumb */
-            border-radius: 10px;
-        }
-
-        .chat-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #a0a0a0; /* Darker gray on hover */
-        }
-
-        /* Dark mode scrollbar */
-        .dark .chat-scrollbar::-webkit-scrollbar-track {
-            background: #333;
-        }
-
-        .dark .chat-scrollbar::-webkit-scrollbar-thumb {
-            background: #666;
-        }
-
-        .dark .chat-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #888;
-        }
+        .dark .chat-scrollbar::-webkit-scrollbar-track { background: #333; }
+        .dark .chat-scrollbar::-webkit-scrollbar-thumb { background: #666; }
+        .dark .chat-scrollbar::-webkit-scrollbar-thumb:hover { background: #888; }
 
         /* Typing indicator animation */
-        .typing-indicator span {
-            animation: blink 1s infinite;
-        }
+        .typing-indicator span { animation: blink 1s infinite; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
 
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.2s;
+        /* Sidebar responsiveness */
+        @media (min-width: 641px) {
+            aside#sidebar { top: 4.5rem; height: calc(100% - 4.5rem); }
         }
-
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 1; }
-        }
-
-        /* Transition for sidebar */
-        .transition-transform {
-            transition: transform 0.3s ease-in-out;
-        }
-
-        /* Adjust sidebar position below header (desktop/tablet) */
-        @media (min-width: 641px) { /* sm breakpoint and up */
-            aside#sidebar {
-                top: 4.5rem; /* Approximate height of header + margin-top */
-                height: calc(100% - 4.5rem); /* Remaining height */
-            }
-        }
-
-        /* Mobile specific styles (max-width: 640px) */
         @media (max-width: 640px) {
-            header {
-                height: 4.5rem; /* Explicit height for the header to prevent overlap */
-            }
+            header { height: 4.5rem; }
             aside#sidebar {
-                width: 80%; /* Slightly less than full width to show some main content */
-                max-width: 300px; /* Cap width for larger mobile devices */
-                top: 4.5rem; /* Position sidebar directly below the header */
-                height: calc(100% - 4.5rem); /* Fill remaining vertical space */
-                border-right: none;
-                /* Adjust transform for mobile to slide in from left */
-                transform: translateX(-100%);
+                width: 80%; max-width: 300px; top: 4.5rem; height: calc(100% - 4.5rem);
+                border-right: none; transform: translateX(-100%);
             }
-            body.sidebar-open aside#sidebar {
-                transform: translateX(0);
-            }
-            body.sidebar-open {
-                overflow: hidden; /* Prevent scrolling on main content when sidebar is open */
-            }
-            body.sidebar-open .overlay {
-                display: block; /* Show overlay */
-            }
+            body.sidebar-open aside#sidebar { transform: translateX(0); }
+            body.sidebar-open { overflow: hidden; }
+            body.sidebar-open .overlay { display: block; }
         }
 
-        /* Style for chat message containers to allow positioning delete button */
-        .chat-message-container {
-            position: relative;
-            display: inline-block; /* Essential for aligning messages and actions */
-            max-width: 80%;
+        /* Chat message actions */
+        .chat-message-container { position: relative; display: inline-block; max-width: 80%; }
+        .message-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.25rem; padding-right: 0.5rem; }
+        .chat-message-container:hover .message-actions { display: flex; }
+        .text-left .message-actions { justify-content: flex-start; padding-left: 0.5rem; }
+
+        .delete-message-btn, .copy-message-btn, .speak-message-btn {
+            border-radius: 0.25rem; width: 24px; height: 24px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; cursor: pointer; border: none; z-index: 10;
+            transition: background-color 0.2s, transform 0.1s ease-out;
+        }
+        .delete-message-btn { background-color: #ef4444; color: white; }
+        .copy-message-btn { background-color: #3b82f6; color: white; }
+        .speak-message-btn { background-color: #10b981; color: white; } /* Green for speak */
+
+        .delete-message-btn:hover, .copy-message-btn:hover, .speak-message-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        /* Styles for the message actions container (buttons will be inside this) */
-        .message-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 0.25rem;
-  padding-right: 0.5rem;
-}
+        /* Code block styling */
+        pre code {
+            display: block; overflow-x: auto; padding: 1em; font-size: 0.85rem;
+            line-height: 1.5; border-radius: 0.375rem;
+            background-color: #2d2d2d; /* Dark background for code */
+            color: #f8f8f2; /* Light text for code */
+        }
+        .code-container { position: relative; }
+        .copy-code-btn {
+            position: absolute; top: 0.5rem; right: 0.5rem;
+            background-color: rgba(59, 130, 246, 0.8); color: white;
+            border: none; padding: 0.25rem 0.5rem; font-size: 0.75rem;
+            border-radius: 0.25rem; cursor: pointer; opacity: 0.8;
+            transition: opacity 0.2s, background-color 0.2s;
+        }
+        .copy-code-btn:hover { opacity: 1; background-color: #3b82f6; }
 
-        /* Show actions on chat message container hover */
-        .chat-message-container:hover .message-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 0.25rem;
-  padding-right: 0.5rem;
-}
-
-        /* Align actions for AI messages (left-aligned text) */
-        .text-left .message-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 0.25rem;
-  padding-right: 0.5rem;
-}
-
-        /* Align actions for user messages (right-aligned text) */
-        .text-right .message-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 0.25rem;
-  padding-right: 0.5rem;
-}
-
-        /* Common button styles */
-        .delete-message-btn,
-.copy-message-btn {
-  border-radius: 0.25rem;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  cursor: pointer;
-  border: none;
-  z-index: 10;
-  transition: background-color 0.2s;
-}
-
-        /* Specific colors for delete and copy buttons */
-        .delete-message-btn {
-            background-color: #ef4444; /* Red color */
-            color: white;
+        /* Bubble speaking effect */
+        .bubble-speaking {
+            animation: pulseGlow 2s infinite;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.4); }
+            50% { box-shadow: 0 0 20px rgba(0, 255, 255, 1); }
+            100% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.4); }
         }
 
-        .copy-message-btn {
-            background-color: #3b82f6; /* Blue color */
-            color: white;
+        /* Overlay for modals/sidebars */
+        .overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s ease;
         }
+        .overlay.hidden { opacity: 0; pointer-events: none; }
+
+        /* Transition for user management box and settings panel */
+        .transition-transform-opacity {
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+/* Fix: modern input focus style */
+.chat-input-container:focus-within {
+    border-color: #3b82f6; /* Blue border on focus */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); /* Subtle glow */
+}
+
+        
     </style>
-
-<!-- Prism.js for syntax highlighting -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/normalize-whitespace/prism-normalize-whitespace.min.js"></script>
-
-<style>
-pre code {
-  display: block;
-  overflow-x: auto;
-  padding: 1em;
-  font-size: 0.85rem;
-  line-height: 1.5;
-  border-radius: 0.375rem;
-}
-.code-container {
-  position: relative;
-}
-.copy-code-btn {
-  
-  top: 0.5rem;
-  right: 0.5rem;
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
-  border-radius: 0.25rem;
-  cursor: pointer;
-  opacity: 0.8;
-}
-.copy-code-btn:hover {
-  opacity: 1;
-}
-</style>
-
-</head>
 <body class="bg-gray-100 text-gray-800 h-screen flex flex-col text-sm relative">
 
+    <!-- Dimmed overlay for mobile sidebar -->
     <div id="sidebarOverlay" class="overlay fixed inset-0 bg-black bg-opacity-50 z-10 hidden sm:hidden"></div>
 
     <header class="z-30 sticky top-0 px-2 sm:px-4 mt-2">
         <div class="w-full shadow-md rounded-lg px-4 py-2 flex items-center justify-between bg-white border border-gray-200 max-w-[98%] mx-auto">
+            <!-- Left: Sidebar Toggle + Title -->
             <div class="flex items-center space-x-2">
                 <button id="toggleSidebar" aria-label="Toggle sidebar" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -347,101 +134,117 @@ pre code {
                 </button>
                 <span id="headerTitle" class="font-semibold text-base text-gray-800 tracking-wide">Nexsera Ai</span>
             </div>
+
+            <!-- Right: Action Buttons -->
             <div class="flex items-center space-x-2">
-                <button id="themeToggle" title="Toggle Theme" class="p-2 rounded-full hover:bg-gray-100">
+                <!-- Theme toggle -->
+                <button id="themeToggle" title="Toggle Theme" class="p-2 rounded-full hover:bg-gray-100 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 19.5V21M4.22 4.22l1.06 1.06M17.72 17.72l1.06 1.06M3 12h1.5M19.5 12H21M4.22 19.78l1.06-1.06M17.72 6.28l1.06-1.06M12 6.75A5.25 5.25 0 1 1 6.75 12 5.26 5.26 0 0 1 12 6.75z" />
                     </svg>
                 </button>
-                <button id="settingsBtn" title="Settings" class="p-2 rounded-full hover:bg-gray-100">
+
+                <!-- Settings -->
+                <button id="settingsBtn" title="Settings" class="p-2 rounded-full hover:bg-gray-100 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.827 3.31-2.37 2.37a1.724 1.724 0 0 0-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.827-2.37-2.37a1.724 1.724 0 0 0-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.827-3.31 2.37-2.37a1.724 1.724 0 0 0 2.573-1.066z" />
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
                     </svg>
                 </button>
-                <div id="userBtn" class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600">S</div>
+
+                <!-- User icon -->
+                <div id="userBtn" class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 hover:bg-gray-300 transition">S</div>
             </div>
         </div>
     </header>
-<div id="userManagementBox" class="absolute right-4 top-[4.5rem] bg-white border border-gray-200 rounded-md shadow-lg p-4 w-64 hidden z-40 transition-all duration-300 transform opacity-0 scale-95">
-  <div class="flex justify-between items-center mb-3">
-    <h3 class="text-sm font-semibold text-gray-700">Manage Users</h3>
-    <button id="closeUserBox" title="Close" class="text-gray-500 hover:text-black">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-  </div>
-  <div class="space-y-2">
-    <input type="text" placeholder="Add user name" id="addUserInput" class="w-full px-2 py-1 border border-gray-300 rounded text-sm">
-    <button id="addUserBtn" class="w-full text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm flex items-center justify-center gap-2">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-      </svg>
-      Add User
-    </button>
-    <select id="userSelect" class="w-full px-2 py-1 border border-gray-300 rounded text-sm">
-      <option selected disabled>Select User</option>
-    </select>
-    <button id="removeUserBtn" class="w-full text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm flex items-center justify-center gap-2">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-      Remove User
-    </button>
-  </div>
-</div>
 
-
-    <aside id="sidebar" class="fixed left-0 w-64 bg-white border-r border-gray-200 shadow-md p-4 z-20 transform -translate-x-full transition-transform overflow-y-auto sm:top-0 sm:h-full">
-        <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2">
-                <img width="48" height="48" src="https://img.icons8.com/pulsar-line/48/nfc-n.png" alt="nfc-n" />
-                <span class="font-bold text-base text-gray-900">Nexsera Ai</span>
-            </div>
-            <button id="closeSidebar" aria-label="Close sidebar" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50 sm:hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+    <!-- User Management Box -->
+    <div id="userManagementBox" class="absolute right-4 top-[4.5rem] bg-white border border-gray-200 rounded-md shadow-lg p-4 w-64 hidden z-40 transition-transform-opacity opacity-0 scale-95 dark:bg-gray-800 dark:border-gray-700">
+        <div class="flex justify-between items-center mb-3">
+            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">Manage Users</h3>
+            <button id="closeUserBox" title="Close" class="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
         </div>
-
-        <h2 class="font-semibold text-sm mb-3 text-black">Menu</h2>
-
-        <button id="newChatBtn" class="w-full mb-3 flex items-center gap-2 px-3 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition text-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            New Chat
-        </button>
-
-        <input type="text" id="searchHistory" placeholder="Search History..." class="mb-2 w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 placeholder-gray-400 text-black"/>
-
-        <h2 class="font-semibold text-sm mb-2 mt-4 text-black">History</h2>
-        <ul id="historyList" class="text-sm text-gray-700 space-y-1">
-            </ul>
-
-        
-<div class="mt-6 pt-4 border-t border-gray-200">
-    <h2 class="font-semibold text-sm mb-2 text-black">User Info</h2>
-    <div class="text-sm text-gray-600 pl-1">
-        Logged in as: <span id="loggedInUser">Guest</span>
-    </div>
-</div>
-<div class="mt-6 pt-4 border-t border-gray-200">
-            <button id="sidebarSettingsBtn" class="flex items-center w-full px-2 py-1.5 rounded-md hover:bg-gray-200 transition text-left text-sm text-black">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.827 3.31-2.37 2.37a1.724 1.724 0 0 0-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.827-2.37-2.37a1.724 1.724 0 0 0-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.827-3.31 2.37-2.37a1.724 1.724 0 0 0 2.573-1.066z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+        <div class="space-y-2">
+            <input type="text" placeholder="Add user name" id="addUserInput" class="w-full px-2 py-1 border border-gray-300 rounded text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-400"/>
+            <button id="addUserBtn" class="w-full text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
-                Settings
+                Add User
+            </button>
+            <select id="userSelect" class="w-full px-2 py-1 border border-gray-300 rounded text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                <option selected disabled>Select User</option>
+            </select>
+            <button id="removeUserBtn" class="w-full text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Remove User
             </button>
         </div>
-    </aside>
+    </div>
+
+   <!-- Sidebar -->
+<aside id="sidebar" class="fixed left-0 top-0 w-64 h-full bg-white border-r border-gray-200 shadow-md p-4 z-30 transform -translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-5">
+    <div class="flex items-center gap-2">
+      <img src="https://img.icons8.com/pulsar-line/48/nfc-n.png" alt="nfc-n" class="w-8 h-8" />
+      <span class="text-base font-bold text-gray-900">Nexsera Ai</span>
+    </div>
+    <button id="closeSidebar" aria-label="Close sidebar" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Menu -->
+  <h2 class="text-sm font-semibold text-black mb-3">Menu</h2>
+  <button id="newChatBtn" class="w-full mb-3 flex items-center gap-2 px-3 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition text-sm">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+    </svg>
+    New Chat
+  </button>
+
+  <!-- Search -->
+  <input type="text" id="searchHistory" placeholder="Search History..." class="mb-3 w-full px-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-400 text-black focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+  <!-- History -->
+  <h2 class="text-sm font-semibold text-black mb-2 mt-4">History</h2>
+  <ul id="historyList" class="space-y-1 text-sm text-gray-700">
+    <!-- Dynamic history list items will appear here -->
+  </ul>
+
+  <!-- User Info -->
+  <div class="mt-6 pt-4 border-t border-gray-200">
+    <h2 class="text-sm font-semibold text-black mb-2">User Info</h2>
+    <div class="text-sm text-gray-600 pl-1">
+      Logged in as: <span id="loggedInUser" class="font-medium text-gray-900">Guest</span>
+    </div>
+  </div>
+
+  <!-- Settings Button -->
+  <div class="mt-6 pt-4 border-t border-gray-200">
+    <button id="sidebarSettingsBtn" class="flex items-center w-full px-3 py-2 rounded-md hover:bg-gray-100 transition text-left text-sm text-black">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.827 3.31-2.37 2.37a1.724 1.724 0 0 0-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.827-2.37-2.37a1.724 1.724 0 0 0-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.827-3.31 2.37-2.37a1.724 1.724 0 0 0 2.573-1.066z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+      </svg>
+      Settings
+    </button>
+  </div>
+</aside>
+
 
     <main class="flex-grow overflow-y-auto px-4 chat-scrollbar">
         <div id="chatWindow" class="max-w-4xl mx-auto space-y-3 py-4">
-            <p id="introText" class="text-center text-gray-600 text-sm">Welcome back, Master. Nexsera is fully operational and standing by for your command.</p>
+            <p id="introText" class="text-center text-gray-600 text-sm dark:text-gray-400">Welcome back, Master. Nexsera is fully operational and standing by for your command.</p>
         </div>
     </main>
 
@@ -472,7 +275,7 @@ pre code {
   </div>
 </div>
 </div>
-                <div class="flex-grow flex items-center bg-white border border-gray-300 rounded-md px-3 py-2 shadow-sm hover:border-gray-400 hover:shadow transition">
+                <div class="flex-grow flex items-center bg-white border border-gray-300 rounded-md px-3 py-2 shadow-sm transition focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200">
                     <input id="chatInput" type="text" placeholder="Message Nexsera Ai..." class="flex-grow px-2 py-1 bg-transparent text-sm focus:outline-none placeholder-gray-400 text-black"/>
                     <button id="sendBtn" title="Send" class="bg-black text-white p-2 rounded-md hover:bg-gray-800 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -494,29 +297,87 @@ pre code {
         </div>
     </footer>
 
-    
+
+   <!-- Settings Panel -->
+<div id="settingsPanel" class="fixed z-50 w-[300px] sm:w-[360px] right-4 top-20 bg-[#ffffff] border border-[#e5e7eb] rounded-lg shadow-lg p-4 space-y-4 hidden transition-transform-opacity opacity-0 scale-95 dark:bg-gray-800 dark:border-gray-700">
+    <div class="flex justify-between items-center mb-3">
+        <h2 class="text-xl font-bold text-[#374151] dark:text-gray-200">⚙️ Settings</h2>
+        <button id="closeSettingsModal" title="Close" class="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
     </div>
 
+    <!-- Settings Panel Container -->
+    <div class="bg-[#ffffff] border border-[#e5e7eb] rounded-md shadow-lg p-4 text-sm dark:bg-gray-800 dark:border-gray-700">
+
+        <!-- AI Model -->
+        <div>
+            <label class="block text-sm font-medium text-[#374151] mb-1 dark:text-gray-300">AI Model</label>
+            <select id="modelSelect" class="w-full pl-3 pr-10 py-2 border border-[#e5e7eb] text-sm rounded bg-[#ffffff] text-black dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                <option value="default">Default Model</option>
+                <option value="creative">Creative Model</option>
+                <option value="factual">Factual Model</option>
+            </select>
+        </div>
+
+        <!-- Response Speed -->
+        <div class="mt-4">
+            <label class="block text-sm font-medium text-[#374151] mb-1 dark:text-gray-300">Response Speed</label>
+            <input type="range" id="responseSpeed" min="50" max="2000" value="500"
+                   class="w-full h-2 bg-[#e5e7eb] rounded-lg appearance-none cursor-pointer dark:bg-gray-600">
+            <span id="responseSpeedValue" class="text-xs text-gray-500 block mt-1 dark:text-gray-400">500 ms</span>
+        </div>
+
+        <!-- Appearance Section -->
+        <div class="mt-4">
+            <h3 class="font-semibold text-sm text-[#1f2937] mb-2 dark:text-gray-200">Appearance</h3>
+            <label for="fontSizeSelector" class="block text-sm font-medium text-[#374151] mb-1 dark:text-gray-300">Font Size</label>
+            <select id="fontSizeSelector" class="w-full p-2 border border-[#e5e7eb] text-sm rounded text-black dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                <option value="text-xs">Small</option>
+                <option value="text-sm" selected>Medium</option>
+                <option value="text-base">Large</option>
+                <option value="text-lg">Extra Large</option>
+            </select>
+        </div>
+
+        <!-- Behavior Toggles -->
+        <div class="flex justify-between items-center mt-4">
+            <label class="text-sm font-medium text-[#374151] dark:text-gray-300">Auto Scroll</label>
+            <label class="inline-flex relative items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" id="autoScrollSwitch">
+                <div class="w-11 h-6 bg-[#e5e7eb] rounded-full peer peer-checked:bg-[#2563eb] transition-all dark:bg-gray-600 dark:peer-checked:bg-[#2563eb]"></div>
+            </label>
+        </div>
+
+        <!-- Divider -->
+        <hr class="my-4 border-[#e5e7eb] dark:border-gray-700">
+        
+        <!-- Action Buttons -->
+        <div class="space-y-2">
+            <button id="resetSettings" class="w-full px-3 py-2 rounded bg-[#dc2626] text-white text-sm hover:bg-[#b91c1c]">Reset All Settings</button>
+            <button id="clearHistory" class="w-full px-3 py-2 rounded bg-[#dc2626] text-white text-sm hover:bg-[#b91c1c]">Clear Chat History</button>
+        </div>
+    </div>
+</div>
+
+
+
     <script>
-        // Get references to DOM elements
+
+        // --- DOM Element References ---
+const toggleSidebar = document.getElementById("toggleSidebar");
+const closeSidebar = document.getElementById("closeSidebar");
+const sidebar = document.getElementById("sidebar");
+const sidebarOverlay = document.getElementById("sidebarOverlay");
+
+        // --- DOM Element References ---
         const chatInput = document.getElementById("chatInput");
-
-
-chatInput.addEventListener("input", () => {
-  const inputText = chatInput.value.toLowerCase();
-  if (inputText.includes("hey nexsera")) {
-    const utterance = new SpeechSynthesisUtterance("Yes, Master? I’m listening.");
-    speechSynthesis.speak(utterance);
-    chatInput.value = "";
-  }
-});
-
         const sendBtn = document.getElementById("sendBtn");
         const chatWindow = document.getElementById("chatWindow");
         const introText = document.getElementById("introText");
-        const toggleSidebar = document.getElementById("toggleSidebar");
-        const closeSidebar = document.getElementById("closeSidebar"); // New close button for sidebar
-        const sidebar = document.getElementById("sidebar");
+       
         const historyList = document.getElementById("historyList");
         const searchHistory = document.getElementById("searchHistory");
         const fileUpload = document.getElementById("file-upload");
@@ -530,86 +391,164 @@ chatInput.addEventListener("input", () => {
         const modelSelect = document.getElementById("modelSelect");
         const responseSpeed = document.getElementById("responseSpeed");
         const responseSpeedValue = document.getElementById("responseSpeedValue");
-        const sidebarOverlay = document.getElementById("sidebarOverlay"); // New overlay element
-        const headerTitle = document.getElementById("headerTitle"); // Header title element
+        
+        const headerTitle = document.getElementById("headerTitle");
+        const recordBtn = document.getElementById("recordBtn");
 
-        // State variables
+
+      // --- Sidebar Toggle (Works on all screen sizes) ---
+function toggleSidebarFn() {
+    isSidebarOpen = !isSidebarOpen;
+    if (isSidebarOpen) {
+        sidebar.classList.remove('-translate-x-full');
+        if (window.innerWidth <= 640) sidebarOverlay.classList.remove('hidden');
+    } else {
+        sidebar.classList.add('-translate-x-full');
+        if (window.innerWidth <= 640) sidebarOverlay.classList.add('hidden');
+    }
+}
+
+
+// Force close sidebar (used by overlay and close button)
+function closeSidebarFn() {
+    isSidebarOpen = false;
+    sidebar.classList.add('-translate-x-full');
+    if (window.innerWidth <= 640) sidebarOverlay.classList.add('hidden');
+}
+
+
+
+
+// Attach events
+toggleSidebar.addEventListener("click", toggleSidebarFn);
+closeSidebar.addEventListener("click", closeSidebarFn);
+sidebarOverlay.addEventListener("click", closeSidebarFn);
+
+
+
+        // User Management Elements
+        const userButton = document.getElementById("userBtn");
+        const userBox = document.getElementById("userManagementBox");
+        const closeUserBox = document.getElementById("closeUserBox");
+        const addUserBtn = document.getElementById("addUserBtn");
+        const removeUserBtn = document.getElementById("removeUserBtn");
+        const addUserInput = document.getElementById("addUserInput");
+        const userSelect = document.getElementById("userSelect");
+        const loggedInUserSpan = document.getElementById("loggedInUser");
+
+        // --- State Variables ---
         let filesToSend = [];
         let chatHistory = []; // Stores all chat sessions
         let currentChatId = null; // ID of the currently active chat session
         let isTyping = false; // Flag to manage typing indicator state
-        let preferredResponseSpeed = 500; // Default AI response speed in milliseconds
+        let preferredResponseSpeed = parseInt(localStorage.getItem("preferredResponseSpeed") || "500");
+        let autoScrollEnabled = localStorage.getItem("autoScroll") === "true";
+        let users = JSON.parse(localStorage.getItem("userList")) || [];
+        let currentUser = localStorage.getItem("currentUser") || null;
 
         // --- Utility Functions ---
 
         /**
          * Checks if the current viewport width is considered mobile.
-         * Corresponds to Tailwind's 'sm' breakpoint.
          * @returns {boolean} True if mobile, false otherwise.
          */
-        function isMobile() {
-            return window.innerWidth <= 640;
-        }
+        const isMobile = () => window.innerWidth <= 640;
 
         /**
-         * Saves the current chat history to localStorage.
+         * Saves the current chat history to localStorage for the current user.
          */
-        function saveChatHistory() {
-            localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
-        }
-
-        /**
-         * Loads chat history from localStorage and renders the history list.
-         */
-        function loadChatHistory() {
-            const storedHistory = localStorage.getItem("chatHistory");
-            if (storedHistory) {
-                chatHistory = JSON.parse(storedHistory);
-                renderHistoryList();
+        function saveChatHistoryForUser() {
+            if (currentUser) {
+                localStorage.setItem(`chatHistory_${currentUser}`, JSON.stringify(chatHistory));
             }
         }
 
         /**
-         * Generates a unique ID for a new chat session using a timestamp.
+         * Loads chat history from localStorage for the current user.
+         */
+        function loadUserChatHistory(username) {
+            const saved = localStorage.getItem(`chatHistory_${username}`);
+            chatHistory = saved ? JSON.parse(saved) : [];
+            currentChatId = null; // Reset current chat ID when switching users
+            renderHistoryList();
+            startNewChat(); // Start a fresh chat window for the new user
+        }
+
+        /**
+         * Switches the active user and loads their chat history.
+         * @param {string} username - The username to switch to.
+         */
+        function switchUser(username) {
+            currentUser = username;
+            localStorage.setItem("currentUser", username);
+            updateLoggedInUserUI();
+            loadUserChatHistory(username);
+            hideUserManagementBox(); // Hide box after switching
+        }
+
+        /**
+         * Updates the UI to show the currently logged-in user.
+         */
+        function updateLoggedInUserUI() {
+            loggedInUserSpan.textContent = currentUser || "Guest";
+            userButton.textContent = currentUser ? currentUser.charAt(0).toUpperCase() : "S";
+        }
+
+        /**
+         * Renders the list of users in the user management dropdown.
+         */
+        function renderUserList() {
+            userSelect.innerHTML = '<option value="" disabled selected>Select User</option>';
+            users.forEach(user => {
+                const option = document.createElement("option");
+                option.value = user;
+                option.textContent = user;
+                if (user === currentUser) option.selected = true;
+                userSelect.appendChild(option);
+            });
+        }
+
+        /**
+         * Saves the list of users to localStorage.
+         */
+        function saveUsers() {
+            localStorage.setItem("userList", JSON.stringify(users));
+        }
+
+        /**
+         * Generates a unique ID for a new chat session.
          * @returns {string} A unique chat ID.
          */
-        function generateChatId() {
-            return Date.now().toString();
-        }
+        const generateChatId = () => Date.now().toString();
 
         /**
          * Creates and appends a chat message to the chat window.
          * @param {string} message - The content of the message.
          * @param {'user'|'ai'} type - The type of message ('user' or 'ai').
          * @param {number} messageIndex - The index of the message within the current chat's messages array.
-         * @returns {HTMLElement} The outer div element containing the message and its delete button.
+         * @returns {HTMLElement} The inner div element containing the message text.
          */
         function createChatEntry(message, type, messageIndex) {
             const msgContainer = document.createElement("div");
-            msgContainer.className = type === "user" ? "text-right" : "text-left";
+            msgContainer.className = `flex ${type === "user" ? "justify-end" : "justify-start"} mb-3`;
             msgContainer.innerHTML = `
-                <div class="chat-message-container">
-                    <div class="chat-text inline-block rounded-md px-3 py-1.5 break-words ${
-                        type === "user" ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-white border border-gray-300 text-black"
-                    } transition">
+                <div class="chat-message-container group">
+                    <div class="chat-text inline-block rounded-lg px-4 py-2 break-words max-w-full ${
+                        type === "user" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-gray-100"
+                    } shadow-md">
                         ${message}
                     </div>
-                    <div class="message-actions flex gap-1 mt-1">
+                    <div class="message-actions flex gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <button class="copy-message-btn" data-index="${messageIndex}" data-role="${type}" title="Copy message">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
                             </svg>
                         </button>
-<button class="speak-message-btn" data-index="${messageIndex}" data-role="${type}" title="Speak message">
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-       stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-    <path stroke-linecap="round" stroke-linejoin="round"
-          d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 
-             1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 
-             12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
-  </svg>
-</button>
-
+                        <button class="speak-message-btn" data-index="${messageIndex}" data-role="${type}" title="Speak message">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+                            </svg>
+                        </button>
                         <button class="delete-message-btn" data-index="${messageIndex}" data-role="${type}" title="Delete message">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
@@ -619,75 +558,46 @@ chatInput.addEventListener("input", () => {
                 </div>
             `;
             chatWindow.appendChild(msgContainer);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-                chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' }); // Scroll to the bottom
+            if (autoScrollEnabled) {
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+                chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
 
+            const messageTextDiv = msgContainer.querySelector('.chat-text');
             const deleteButton = msgContainer.querySelector('.delete-message-btn');
+            const copyButton = msgContainer.querySelector('.copy-message-btn');
+            const speakButton = msgContainer.querySelector('.speak-message-btn');
+
             deleteButton.addEventListener('click', () => deleteMessage(currentChatId, messageIndex));
+            copyButton.addEventListener('click', () => copyMessage(messageTextDiv.textContent));
+            speakButton.addEventListener('click', () => speakMessage(messageTextDiv.textContent, messageTextDiv));
 
-            
-const copyButton = msgContainer.querySelector('.copy-message-btn');
-copyButton.addEventListener('click', async () => {
-  const text = msgContainer.querySelector('.chat-text')?.textContent || '';
-  let toCopy = text;
-
-  const match = text.match(/`([^`]+)`/); // Match content in backticks
-  if (match) {
-    toCopy = match[1];
-  }
-
-  try {
-    await navigator.clipboard.writeText(toCopy);
-    alert('Copied to clipboard!');
-  } catch (err) {
-    console.error('Copy failed:', err);
-  }
-});
-
-const speakButton = msgContainer.querySelector('.speak-message-btn');
-speakButton.addEventListener('click', () => {
-  if ('speechSynthesis' in window) {
-    if (speechSynthesis.speaking) {
-      speechSynthesis.cancel(); // Stop speech
-    } else {
-      const text = msgContainer.querySelector('.chat-text')?.textContent || '';
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      speechSynthesis.speak(utterance);
-    }
-  } else {
-    alert("Text-to-speech not supported.");
-  }
-});
-
-
-
-            return msgContainer.querySelector('.inline-block'); // Return the inner div for potential streaming
+            return messageTextDiv;
         }
 
-        // --- Typing Indicator ---
-
         /**
-         * Displays a typing indicator in the chat window.
+         * Displays a typing indicator.
          */
         function showTypingIndicator() {
-            if (isTyping) return; // Prevent multiple typing indicators
+            if (isTyping) return;
             isTyping = true;
             const typingDiv = document.createElement("div");
             typingDiv.id = "typingIndicator";
-            typingDiv.className = "text-left mt-2";
+            typingDiv.className = "flex justify-start mb-3";
             typingDiv.innerHTML = `
-                <div class="inline-block bg-white border border-gray-300 text-black rounded-md px-3 py-1.5">
+                <div class="inline-block bg-gray-200 text-gray-900 rounded-lg px-4 py-2 shadow-md dark:bg-gray-700 dark:text-gray-100">
                     <span class="typing-indicator"><span>.</span><span>.</span><span>.</span></span>
                 </div>
             `;
             chatWindow.appendChild(typingDiv);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
+            if (autoScrollEnabled) {
+                chatWindow.scrollTop = chatWindow.scrollHeight;
                 chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
         }
 
         /**
-         * Hides the typing indicator from the chat window.
+         * Hides the typing indicator.
          */
         function hideTypingIndicator() {
             const typingDiv = document.getElementById("typingIndicator");
@@ -697,29 +607,67 @@ speakButton.addEventListener('click', () => {
             }
         }
 
-        // --- Chat Management ---
-
         /**
          * Simulates streaming of a reply into a message div.
          * @param {HTMLElement} messageDiv - The div element to stream the text into.
          * @param {string} fullReply - The complete reply text to stream.
          */
         async function streamReply(messageDiv, fullReply) {
-            // Ensure the messageDiv exists and is an element
             if (!messageDiv || !messageDiv.tagName) {
                 console.error("Invalid messageDiv provided for streaming:", messageDiv);
                 return;
             }
 
             const words = fullReply.split(" ");
-            messageDiv.textContent = ""; // Clear existing content for streaming
+            messageDiv.textContent = "";
             for (let i = 0; i < words.length; i++) {
                 messageDiv.innerHTML += (i > 0 ? " " : "") + words[i];
-                chatWindow.scrollTop = chatWindow.scrollHeight;
-                chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                // Adjust speed based on preferred response speed and total words
+                if (autoScrollEnabled) {
+                    chatWindow.scrollTop = chatWindow.scrollHeight;
+                    chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
                 await new Promise(resolve => setTimeout(resolve, preferredResponseSpeed / words.length));
             }
+            Prism.highlightAllUnder(messageDiv.parentElement); // Highlight code after streaming
+        }
+
+        /**
+         * Handles smart actions like opening URLs based on user commands.
+         * @param {string} reply - The AI's reply.
+         * @param {string} url - The URL to open.
+         */
+        function smartReplyAndOpen(reply, url) {
+            if (!currentChatId) {
+                currentChatId = generateChatId();
+                const newChat = {
+                    id: currentChatId,
+                    title: reply.substring(0, 30) + (reply.length > 30 ? "..." : ""),
+                    messages: []
+                };
+                chatHistory.unshift(newChat);
+                renderHistoryList();
+            }
+
+            const currentChat = chatHistory.find(chat => chat.id === currentChatId);
+            const aiMessageIndex = currentChat.messages.length;
+            currentChat.messages.push({ role: "ai", content: reply });
+
+            const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+            streamReply(aiDiv, reply);
+            saveChatHistoryForUser();
+
+            window.open(url, "_blank");
+        }
+
+        /**
+         * Simulates fetching weather data.
+         * @param {string} city - The city for which to get weather.
+         * @returns {Promise<string>} A promise resolving to weather information.
+         */
+        async function getWeatherData(city) {
+            const defaultCity = "your current location";
+            const cityName = city || defaultCity;
+            return `The weather in ${cityName} is currently sunny with a temperature of 25°C.`;
         }
 
         /**
@@ -728,572 +676,211 @@ speakButton.addEventListener('click', () => {
          */
         async function sendMessage() {
             const message = chatInput.value.trim();
-            if (!message && filesToSend.length === 0) return; // Don't send empty messages
+            if (!message && filesToSend.length === 0) return;
 
-
-// Smart Action Commands (Open App + AI Chat Reply)
-function smartReplyAndOpen(reply, url) {
-  // Create new chat if none exists
-  if (!currentChatId) {
-    currentChatId = generateChatId();
-    const newChat = {
-      id: currentChatId,
-      title: reply.substring(0, 30) + (reply.length > 30 ? "..." : ""),
-      messages: []
-    };
-    chatHistory.unshift(newChat);
-    renderHistoryList();
-  }
-
-  const currentChat = chatHistory.find(chat => chat.id === currentChatId);
-  const aiMessageIndex = currentChat.messages.length;
-  currentChat.messages.push({ role: "ai", content: reply });
-
-  const aiDiv = createChatEntry("", "ai", aiMessageIndex);
-  streamReply(aiDiv, reply);
-  saveChatHistory();
-
-  window.open(url, "_blank");
-}
-
-if (message.toLowerCase().startsWith("open whatsapp")) {
-  smartReplyAndOpen("Opening WhatsApp Web for you, Master.", "https://web.whatsapp.com");
-  return;
-}
-
-if (message.toLowerCase().startsWith("open instagram")) {
-  smartReplyAndOpen("Opening Instagram, Master.", "https://www.instagram.com");
-  return;
-}
-
-if (message.toLowerCase().startsWith("open github")) {
-  smartReplyAndOpen("Opening GitHub, Master.", "https://github.com/");
-  return;
-}
-
-if (message.toLowerCase().startsWith("open flipkart")) {
-  smartReplyAndOpen("Opening Flipkart, Master.", "https://www.flipkart.com/");
-  return;
-}
-
-if (message.toLowerCase().startsWith("open amazon")) {
-  smartReplyAndOpen("Opening Amazon, Master.", "https://www.amazon.in/");
-  return;
-}
-
-if (message.toLowerCase().startsWith("open facebook")) {
-  smartReplyAndOpen("Opening Facebook, Master.", "https://www.facebook.com");
-  return;
-}
-
-if (message.toLowerCase().startsWith("open twitter") || message.toLowerCase().startsWith("open x")) {
-  smartReplyAndOpen("Opening Twitter, Master.", "https://twitter.com");
-  return;
-}
-
-if (message.toLowerCase().startsWith("open linkedin")) {
-  smartReplyAndOpen("Opening LinkedIn, Master.", "https://www.linkedin.com");
-  return;
-}
-
-if (message.toLowerCase().startsWith("open netflix")) {
-  smartReplyAndOpen("Opening Netflix, Master.", "https://www.netflix.com");
-  return;
-}
-
-if (message.toLowerCase().startsWith("open portfolio")) {
-  smartReplyAndOpen("Opening your portfolio, Master.", "https://samarthnagpure-byte.github.io/portfolio/");
-  return;
-}
-if (message.toLowerCase().startsWith("open my portfolio")) {
-  smartReplyAndOpen("Opening your portfolio, Master.", "https://samarthnagpure-byte.github.io/portfolio/");
-  return;
-}
-
-if (message.toLowerCase().startsWith("open spotify")) {
-  smartReplyAndOpen("Opening Spotify for you, Master.", "https://open.spotify.com");
-  return;
-}
-
-if (message.toLowerCase().startsWith("open youtube music")) {
-  smartReplyAndOpen("Opening YouTube Music, Master.", "https://music.youtube.com");
-  return;
-}
-
-if (message.toLowerCase().startsWith("play trailer of ")) {
-  const query = encodeURIComponent(message.replace(/play trailer of /i, "").trim() + " trailer");
-  smartReplyAndOpen("Searching YouTube for trailer, Master.", `https://www.youtube.com/results?search_query=${query}`);
-  return;
-}
-
-if (message.toLowerCase().startsWith("play") && message.toLowerCase().includes("on netflix")) {
-  const title = message.replace(/play /i, "").replace(/ on netflix/i, "").trim();
-  const query = encodeURIComponent(title + " site:netflix.com");
-  smartReplyAndOpen(`Searching Netflix for *${title}*, Master.`, `https://www.google.com/search?q=${query}`);
-  return;
-}
-
-if (message.toLowerCase().startsWith("play ")) {
-  const song = message.replace(/play /i, "")
-                      .replace(/ on youtube/i, "")
-                      .replace(/ on spotify/i, "")
-                      .trim();
-  const query = encodeURIComponent(song);
-  let platform = "YouTube";
-  let url = `https://www.youtube.com/results?search_query=${query}`;
-  
-  if (message.toLowerCase().includes("on spotify")) {
-    platform = "Spotify";
-    url = `https://open.spotify.com/search/${query}`;
-  }
-
-  smartReplyAndOpen(`Playing *${song}* on ${platform}.`, url);
-  return;
-}
-
-
-if (message.toLowerCase().startsWith("search images of ")) {
-  const queryText = message.replace(/search images of /i, "").trim();
-  const query = encodeURIComponent(queryText);
-  smartReplyAndOpen(`Searching Google Images for *${queryText}*.`, `https://www.google.com/search?tbm=isch&q=${query}`);
-  return;
-}
-
-if (message.toLowerCase().startsWith("search news about ")) {
-  const query = encodeURIComponent(message.replace(/search news about /i, "").trim());
-  smartReplyAndOpen(`Searching Google News for *${query}*.`, `https://news.google.com/search?q=${query}`);
-  return;
-}
-
-if (message.toLowerCase().startsWith("search recipe for ")) {
-  const query = encodeURIComponent(message.replace(/search recipe for /i, "").trim());
-  smartReplyAndOpen(`Looking up recipes for *${query}*.`, `https://www.google.com/search?q=recipe+for+${query}`);
-  return;
-}
-
-if (message.toLowerCase().startsWith("search map of ")) {
-  const query = encodeURIComponent(message.replace(/search map of /i, "").trim());
-  smartReplyAndOpen(`Opening map of *${query}*.`, `https://www.google.com/maps/search/${query}`);
-  return;
-}
-
-if (message.toLowerCase().startsWith("search videos of ")) {
-  const query = encodeURIComponent(message.replace(/search videos of /i, "").trim());
-  smartReplyAndOpen(`Searching YouTube for *${query}*.`, `https://www.youtube.com/results?search_query=${query}`);
-  return;
-}
-
-if (message.toLowerCase().startsWith("search ")) {
-  const queryText = message.replace(/search /i, "").trim();
-  const query = encodeURIComponent(queryText);
-  smartReplyAndOpen(`Searching Google for *${queryText}*.`, `https://www.google.com/search?q=${query}`);
-  return;
-}
-
-if (message.toLowerCase().startsWith("navigate to ")) {
-  const place = message.replace(/navigate to /i, "").trim();
-  const encoded = encodeURIComponent(place);
-  smartReplyAndOpen(`Navigating to *${place}* on Google Maps...`, `https://www.google.com/maps/search/${encoded}`);
-  return;
-}
-
-
-if (message.toLowerCase().startsWith("open youtube")) {
-  smartReplyAndOpen("Opening YouTube, Master.", "https://www.youtube.com");
-  return;
-}
-
-if (message.toLowerCase().startsWith("open gmail")) {
-  smartReplyAndOpen("Opening Gmail, Master.", "https://mail.google.com");
-  return;
-}
-
-if (message.toLowerCase().startsWith("set timer for ")) {
-  const time = message.replace(/set timer for /i, "").trim();
-  smartReplyAndOpen(`Setting a timer for *${time}*...`, `https://www.google.com/search?q=timer+for+${encodeURIComponent(time)}`);
-  return;
-}
-
-if (message.toLowerCase().startsWith("translate ")) {
-  const match = message.match(/translate (.+) to (.+)/i);
-  if (match) {
-    const phrase = encodeURIComponent(match[1]);
-    const lang = encodeURIComponent(match[2]);
-    smartReplyAndOpen(`Translating *${match[1]}* to *${match[2]}*...`, `https://translate.google.com/?sl=auto&tl=${lang}&text=${phrase}&op=translate`);
-    return;
-  }
-}
-
-if (message.toLowerCase().startsWith("calculate ")) {
-  const expression = encodeURIComponent(message.replace(/calculate /i, "").trim());
-  smartReplyAndOpen(`Calculating *${expression}*...`, `https://www.google.com/search?q=${expression}`);
-  return;
-}
-
-if (message.toLowerCase().startsWith("define ")) {
-  const word = encodeURIComponent(message.replace(/define /i, "").trim());
-  smartReplyAndOpen(`Defining *${word}*...`, `https://www.google.com/search?q=define+${word}`);
-  return;
-}
-if (message.toLowerCase().startsWith("weather in ")) {
-  const city = message.replace(/weather in /i, "").trim();
-  const encodedCity = encodeURIComponent(city);
-  smartReplyAndOpen(`Fetching weather for *${city}*...`, `https://www.google.com/search?q=weather+in+${encodedCity}`);
-  return;
-}
-
-// (Continue with the rest of sendMessage logic...)
-
-
-
-            // Remove intro text if it exists
-            if (introText) {
-                introText.remove();
+            // Smart Action Commands
+            const lowerCaseMessage = message.toLowerCase();
+            if (lowerCaseMessage.startsWith("open whatsapp")) { smartReplyAndOpen("Opening WhatsApp Web for you, Master.", "https://web.whatsapp.com"); return; }
+            if (lowerCaseMessage.startsWith("open instagram")) { smartReplyAndOpen("Opening Instagram, Master.", "https://www.instagram.com"); return; }
+            if (lowerCaseMessage.startsWith("open github")) { smartReplyAndOpen("Opening GitHub, Master.", "https://github.com/"); return; }
+            if (lowerCaseMessage.startsWith("open flipkart")) { smartReplyAndOpen("Opening Flipkart, Master.", "https://www.flipkart.com/"); return; }
+            if (lowerCaseMessage.startsWith("open amazon")) { smartReplyAndOpen("Opening Amazon, Master.", "https://www.amazon.in/"); return; }
+            if (lowerCaseMessage.startsWith("open facebook")) { smartReplyAndOpen("Opening Facebook, Master.", "https://www.facebook.com"); return; }
+            if (lowerCaseMessage.startsWith("open twitter") || lowerCaseMessage.startsWith("open x")) { smartReplyAndOpen("Opening Twitter, Master.", "https://twitter.com"); return; }
+            if (lowerCaseMessage.startsWith("open linkedin")) { smartReplyAndOpen("Opening LinkedIn, Master.", "https://www.linkedin.com"); return; }
+            if (lowerCaseMessage.startsWith("open netflix")) { smartReplyAndOpen("Opening Netflix, Master.", "https://www.netflix.com"); return; }
+            if (lowerCaseMessage.startsWith("open portfolio") || lowerCaseMessage.startsWith("open my portfolio")) { smartReplyAndOpen("Opening your portfolio, Master.", "https://samarthnagpure-byte.github.io/portfolio/"); return; }
+            if (lowerCaseMessage.startsWith("open spotify")) { smartReplyAndOpen("Opening Spotify for you, Master.", "https://open.spotify.com"); return; }
+            if (lowerCaseMessage.startsWith("open youtube music")) { smartReplyAndOpen("Opening YouTube Music, Master.", "https://music.youtube.com"); return; }
+            if (lowerCaseMessage.startsWith("play trailer of ")) { const query = encodeURIComponent(message.replace(/play trailer of /i, "").trim() + " trailer"); smartReplyAndOpen("Searching YouTube for trailer, Master.", `https://www.youtube.com/results?search_query=${query}`); return; }
+            if (lowerCaseMessage.startsWith("play") && lowerCaseMessage.includes("on netflix")) { const title = message.replace(/play /i, "").replace(/ on netflix/i, "").trim(); const query = encodeURIComponent(title + " site:netflix.com"); smartReplyAndOpen(`Searching Netflix for *${title}*, Master.`, `https://www.google.com/search?q=${query}`); return; }
+            if (lowerCaseMessage.startsWith("play ")) {
+                const song = message.replace(/play /i, "").replace(/ on youtube/i, "").replace(/ on spotify/i, "").trim();
+                const query = encodeURIComponent(song);
+                let platform = "YouTube";
+                let url = `https://www.youtube.com/results?search_query=${query}`;
+                if (lowerCaseMessage.includes("on spotify")) { platform = "Spotify"; url = `https://open.spotify.com/search/${query}`; }
+                smartReplyAndOpen(`Playing *${song}* on ${platform}.`, url); return;
             }
+            if (lowerCaseMessage.startsWith("search images of ")) { const queryText = message.replace(/search images of /i, "").trim(); const query = encodeURIComponent(queryText); smartReplyAndOpen(`Searching Google Images for *${queryText}*.`, `https://www.google.com/search?tbm=isch&q=${query}`); return; }
+            if (lowerCaseMessage.startsWith("search news about ")) { const query = encodeURIComponent(message.replace(/search news about /i, "").trim()); smartReplyAndOpen(`Searching Google News for *${query}*.`, `https://news.google.com/search?q=${query}`); return; }
+            if (lowerCaseMessage.startsWith("search recipe for ")) { const query = encodeURIComponent(message.replace(/search recipe for /i, "").trim()); smartReplyAndOpen(`Looking up recipes for *${query}*.`, `https://www.google.com/search?q=recipe+for+${query}`); return; }
+            if (lowerCaseMessage.startsWith("search map of ")) { const query = encodeURIComponent(message.replace(/search map of /i, "").trim()); smartReplyAndOpen(`Opening map of *${query}*.`, `https://www.google.com/maps/search/${query}`); return; }
+            if (lowerCaseMessage.startsWith("search videos of ")) { const query = encodeURIComponent(message.replace(/search videos of /i, "").trim()); smartReplyAndOpen(`Searching YouTube for *${query}*.`, `https://www.youtube.com/results?search_query=${query}`); return; }
+            if (lowerCaseMessage.startsWith("search ")) { const queryText = message.replace(/search /i, "").trim(); const query = encodeURIComponent(queryText); smartReplyAndOpen(`Searching Google for *${queryText}*.`, `https://www.google.com/search?q=${query}`); return; }
+            if (lowerCaseMessage.startsWith("navigate to ")) { const place = message.replace(/navigate to /i, "").trim(); const encoded = encodeURIComponent(place); smartReplyAndOpen(`Navigating to *${place}* on Google Maps...`, `https://www.google.com/maps/search/${encoded}`); return; }
+            if (lowerCaseMessage.startsWith("open youtube")) { smartReplyAndOpen("Opening YouTube, Master.", "https://www.youtube.com"); return; }
+            if (lowerCaseMessage.startsWith("open gmail")) { smartReplyAndOpen("Opening Gmail, Master.", "https://mail.google.com"); return; }
+            if (lowerCaseMessage.startsWith("set timer for ")) { const time = message.replace(/set timer for /i, "").trim(); smartReplyAndOpen(`Setting a timer for *${time}*...`, `https://www.google.com/search?q=timer+for+${encodeURIComponent(time)}`); return; }
+            if (lowerCaseMessage.startsWith("translate ")) { const match = message.match(/translate (.+) to (.+)/i); if (match) { const phrase = encodeURIComponent(match[1]); const lang = encodeURIComponent(match[2]); smartReplyAndOpen(`Translating *${match[1]}* to *${match[2]}*...`, `https://translate.google.com/?sl=auto&tl=${lang}&text=${phrase}&op=translate`); return; } }
+            if (lowerCaseMessage.startsWith("calculate ")) { const expression = encodeURIComponent(message.replace(/calculate /i, "").trim()); smartReplyAndOpen(`Calculating *${expression}*...`, `https://www.google.com/search?q=${expression}`); return; }
+            if (lowerCaseMessage.startsWith("define ")) { const word = encodeURIComponent(message.replace(/define /i, "").trim()); smartReplyAndOpen(`Defining *${word}*...`, `https://www.google.com/search?q=define+${word}`); return; }
+            if (lowerCaseMessage.startsWith("weather in ")) { const city = message.replace(/weather in /i, "").trim(); const encodedCity = encodeURIComponent(city); smartReplyAndOpen(`Fetching weather for *${city}*...`, `https://www.google.com/search?q=weather+in+${encodedCity}`); return; }
 
-            // Prepare user message content, including file names
+            if (introText) introText.remove();
+
             let fileNames = filesToSend.map(file => `📁 ${file.name}`).join("<br>");
             const userMessageContent = `${message || ""}${fileNames ? "<br>" + fileNames : ""}`;
 
             let currentChat = chatHistory.find(chat => chat.id === currentChatId);
 
-            // Initialize a new chat session if not already in one
             if (!currentChatId) {
                 currentChatId = generateChatId();
                 currentChat = { id: currentChatId, title: message.substring(0, 30) + (message.length > 30 ? "..." : ""), messages: [] };
-                chatHistory.unshift(currentChat); // Add new chat session to the beginning
-                renderHistoryList(); // Update sidebar history
+                chatHistory.unshift(currentChat);
+                renderHistoryList();
             }
 
-            // Add user message to the current chat session's messages
-            const userMessageIndex = currentChat.messages.length; // Get index before pushing
+            const userMessageIndex = currentChat.messages.length;
             currentChat.messages.push({ role: "user", content: userMessageContent });
-            createChatEntry(userMessageContent, "user", userMessageIndex); // Render with its index
-            saveChatHistory(); // Save updated history
+            createChatEntry(userMessageContent, "user", userMessageIndex);
+            saveChatHistoryForUser();
 
-            // Clear input and file preview area
             chatInput.value = "";
             filesToSend = [];
             updateFilePreview();
 
-            showTypingIndicator(); // Show AI typing indicator
+            showTypingIndicator();
 
-            // Simulate AI response after a short delay
             setTimeout(async () => {
-                hideTypingIndicator(); // Hide typing indicator before streaming starts
+                hideTypingIndicator();
 
                 let reply;
-                // Simple AI response logic based on user input
-                if (["hi", "hello"].includes(message.toLowerCase())) {
-                    reply = "Welcome back, Master. How may I assist you today?";
-                }
-                else if (message.toLowerCase().includes("help")) {
-                    reply = "Of course, Master. What would you like me to do?";
-                } else if (message.toLowerCase().includes("who are you")) {
-                    reply = "I am Nexsera, Master. Your dedicated assistant, optimized for precision and efficiency.";
-                } else if (message.toLowerCase().includes("features")) {
-                    reply = "Nexsera Ai can chat, summarize text, manage files, and more!";
-                } else if (message.toLowerCase().includes("thank you") || message.toLowerCase().includes("thanks")) {
-                    reply = "Always a pleasure, Master.";
-                } else if (message.toLowerCase().includes("goodbye") || message.toLowerCase().includes("bye")) {
-                    reply = "Farewell, Master. I await your next command.";
-                }
-                else if (message.toLowerCase().includes("make a password")) {
-                  const characters = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                if (["hi", "hello"].includes(lowerCaseMessage)) { reply = "Welcome back, Master. How may I assist you today?"; }
+                else if (lowerCaseMessage.includes("help")) { reply = "Of course, Master. What would you like me to do?"; }
+                else if (lowerCaseMessage.includes("who are you")) { reply = "I am Nexsera, Master. Your dedicated assistant, optimized for precision and efficiency."; }
+                else if (lowerCaseMessage.includes("features")) { reply = "Nexsera Ai can chat, summarize text, manage files, and more!"; }
+                else if (lowerCaseMessage.includes("thank you") || lowerCaseMessage.includes("thanks")) { reply = "Always a pleasure, Master."; }
+                else if (lowerCaseMessage.includes("goodbye") || lowerCaseMessage.includes("bye")) { reply = "Farewell, Master. I await your next command."; }
+                else if (lowerCaseMessage.includes("make a password")) {
+                    const characters = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
                     let password = "";
-                  for (let i = 0; i < 12; i++) {
-                     password += characters.charAt(Math.floor(Math.random() * characters.length));
+                    for (let i = 0; i < 12; i++) { password += characters.charAt(Math.floor(Math.random() * characters.length)); }
+                    reply = `As requested, Master, here is your secure 12-character password: \`${password}\` 🔐`;
                 }
-                   reply = `As requested, Master, here is your secure 12-character password: \`${password}\` 🔐`;
+                else if (lowerCaseMessage.includes("joke")) { reply = "Sure! Why don’t scientists trust atoms? Because they make up everything! 😄"; }
+                else if (lowerCaseMessage.includes("quote")) { reply = "“The best way to get started is to quit talking and begin doing.” – Walt Disney ✨"; }
+                else if (lowerCaseMessage.includes("weather")) { reply = await getWeatherData(lowerCaseMessage.includes("weather in") ? lowerCaseMessage.split("in").pop().trim() : ""); }
+                else if (lowerCaseMessage.includes("motivate me")) { reply = "You are capable of amazing things. Believe in yourself and go for it! 💪"; }
+                else if (lowerCaseMessage.includes("remind me")) {
+                    const task = message.replace(/remind me to/i, "").trim();
+                    const existing = JSON.parse(localStorage.getItem("reminders") || "[]");
+                    existing.push({ task, time: new Date().toLocaleString() });
+                    localStorage.setItem("reminders", JSON.stringify(existing));
+                    reply = `Okay, Master. I’ve saved: “${task}” in your reminders.`;
                 }
-                else if (message.toLowerCase().includes("joke")) {
-                   reply = "Sure! Why don’t scientists trust atoms? Because they make up everything! 😄";
+                else if (lowerCaseMessage.includes("show my reminders")) {
+                    const saved = JSON.parse(localStorage.getItem("reminders") || "[]");
+                    if (saved.length === 0) { reply = "You have no reminders yet, Master."; }
+                    else { reply = "Here are your reminders:<br>" + saved.map(r => `📌 ${r.task} (${r.time})`).join("<br>"); }
                 }
-                else if (message.toLowerCase().includes("quote")) {
-                   reply = "“The best way to get started is to quit talking and begin doing.” – Walt Disney ✨";
-                }
-                else if (message.toLowerCase().includes("weather")) {
-                   reply = await getWeatherData(
-  message.toLowerCase().includes("weather in") ? message.split("in").pop().trim() : ""
-);
-                }
-                else if (message.toLowerCase().includes("motivate me")) {
-                   reply = "You are capable of amazing things. Believe in yourself and go for it! 💪";
-                }
-                
-else if (message.toLowerCase().includes("remind me")) {
-  const task = message.replace(/remind me to/i, "").trim();
-  const existing = JSON.parse(localStorage.getItem("reminders")) || [];
-  existing.push({ task, time: new Date().toLocaleString() });
-  localStorage.setItem("reminders", JSON.stringify(existing));
-  reply = `Okay, Master. I’ve saved: “${task}” in your reminders.`;
-}
+                else if (lowerCaseMessage.includes("who made you")) { reply = "Master Samarth Nagpure engineered me to serve you with intelligence and reliability."; }
+                else if (lowerCaseMessage.includes("what can you do")) { reply = "I can chat, generate passwords, tell jokes, show quotes, summarize text, and more!"; }
+                else if (lowerCaseMessage.includes("settings")) { reply = "You can access settings from the top right corner or the sidebar."; }
+                else if (lowerCaseMessage.includes("dark mode") || lowerCaseMessage.includes("light mode")) { reply = "You can toggle light/dark mode using the sun/moon icon in the header!"; }
+                else if (lowerCaseMessage.includes("new chat")) { reply = "To start a new chat, click the 'New Chat' button in the sidebar."; }
+                else if (["ok", "okay", "sure"].includes(lowerCaseMessage)) { reply = "Understood, Master. Please instruct me further."; }
+                else if (["how are you", "how are you doing"].some(q => lowerCaseMessage.includes(q))) { reply = "Functioning optimally, Master. Standing by for your instructions."; }
+                else if (lowerCaseMessage.includes("summarize")) { reply = "Certainly, Master. Kindly provide the content you'd like summarized."; }
+                else if (lowerCaseMessage.includes("explain")) { reply = "Absolutely, Master. What concept would you like me to elaborate on?"; }
+                else if (lowerCaseMessage.includes("what's the date") || lowerCaseMessage.includes("what day")) { const today = new Date(); reply = `Today is ${today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.`; }
+                else if (lowerCaseMessage.includes("fact")) { reply = "Did you know? The Eiffel Tower can grow more than 6 inches during summer due to heat! 🌞"; }
+                else if (lowerCaseMessage.includes("i'm stressed") || lowerCaseMessage.includes("relax")) { reply = "Take a deep breath. You're doing great! 🌸 Try focusing on something you love."; }
+                else if (lowerCaseMessage.includes("idea for") || lowerCaseMessage.includes("suggest")) { reply = "How about trying something creative today? Like writing a short poem or doodling something fun!"; }
+                else if (lowerCaseMessage.includes("i'm bored")) { reply = "Feeling bored? Try learning a random skill online like origami, drawing, or speed typing!"; }
+                else if (["what's your name", "what is your name", "what your name"].some(q => lowerCaseMessage.includes(q))) { reply = "You may address me as Nexsera, Master — always at your service."; }
+                else if (lowerCaseMessage.includes("debug") || lowerCaseMessage.includes("fix this code")) { reply = "Sure, please paste the code you'd like me to help with."; }
+                else if (lowerCaseMessage.includes("regex")) { reply = "Tell me what you need the regular expression to match, and I’ll help you generate it."; }
+                else if (lowerCaseMessage.includes("write a function")) { reply = "Got it! Please describe what the function should do."; }
+                else if (lowerCaseMessage.includes("to-do list") || lowerCaseMessage.includes("task list")) { reply = "Sure! What tasks do you want to include in your to-do list?"; }
+                else if (lowerCaseMessage.includes("remind me") || lowerCaseMessage.includes("reminder")) { reply = "Okay, I’ll help you note that down. (Just a heads-up: I don’t set real alarms yet!)"; }
+                else if (lowerCaseMessage.includes("plan my day") || lowerCaseMessage.includes("schedule")) { reply = "Let's organize your day! Tell me your goals or start time."; }
+                else if (lowerCaseMessage.includes("quiz me") || lowerCaseMessage.includes("test me")) { reply = "Great! What topic would you like to be quizzed on?"; }
+                else if (lowerCaseMessage.includes("translate") || lowerCaseMessage.includes("how to say")) { reply = "Please tell me the phrase and the language you'd like it translated to."; }
+                else if (lowerCaseMessage.includes("define") || lowerCaseMessage.includes("meaning of")) { reply = "Here’s the definition of that word:"; }
+                else if (lowerCaseMessage.includes("poem") || lowerCaseMessage.includes("story") || lowerCaseMessage.includes("joke about")) { reply = "Fun! Give me a topic, and I’ll write something creative for you."; }
+                else if (lowerCaseMessage.includes("name for") || lowerCaseMessage.includes("suggest a name")) { reply = "What kind of name are you looking for? Business, character, product?"; }
+                else if (lowerCaseMessage.includes("riddle")) { reply = "Here's one: What has keys but can’t open locks? (Answer: A piano 🎹)"; }
+                else if (lowerCaseMessage.includes("give me a goal") || lowerCaseMessage.includes("daily goal")) { reply = "How about: Try to learn one new thing today and write it down! 📘"; }
+                else if (lowerCaseMessage.includes("motivate me for the day") || lowerCaseMessage.includes("daily motivation")) { reply = "You've got this! Remember, consistency beats perfection. 💪"; }
+                else if (lowerCaseMessage.includes("habit")) { reply = "Try drinking a glass of water right after waking up. Simple and powerful!"; }
+                else if (lowerCaseMessage.includes("how does it work")) { reply = "I'd be happy to explain! What exactly would you like to understand?"; }
+                else if (lowerCaseMessage.includes("steps to") || lowerCaseMessage.includes("how to")) { reply = "Sure! Please tell me what you're trying to do, and I’ll break it into steps."; }
+                else if (lowerCaseMessage.includes("life advice")) { reply = "Here's a thought: Focus on what you can control, and let go of what you can't. 🌱"; }
+                else if (lowerCaseMessage.includes("career advice")) { reply = "Happy to help! What field are you in or interested in?"; }
+                else if (lowerCaseMessage.includes("set a goal")) { reply = "Sure! What area do you want to set a goal in — health, learning, work?"; }
+                else if (lowerCaseMessage.includes("reflect") || lowerCaseMessage.includes("journal")) { reply = "Let’s reflect together. What’s one thing that went well today?"; }
+                else if (lowerCaseMessage.includes("compliment me")) { reply = "You're doing amazing. You're curious, capable, and creating great things! 🌟"; }
+                else if (lowerCaseMessage.includes("say something nice")) { reply = "You’re stronger than you think and more capable than you believe 💖"; }
+                else if (lowerCaseMessage.includes("what should I learn")) { reply = "You could try learning a bit of Python, photography, or even meditation. What excites you most?"; }
+                else if (lowerCaseMessage.includes("suggest a course")) { reply = "Sure! Are you interested in tech, art, business, or something else?"; }
+                else if (lowerCaseMessage.includes("roast me")) { reply = "Are you sure? 😏 Okay… You bring a new meaning to ‘404: Style Not Found’ 😂"; }
+                else if (lowerCaseMessage.includes("truth or dare")) { reply = "Let's play! Truth: What's something nobody knows about you? Dare: Compliment yourself out loud!"; }
+                else if (lowerCaseMessage.includes("affirmation")) { reply = "You are capable, strong, and worthy of all the good things coming your way. 🌈"; }
+                else if (lowerCaseMessage.includes("breathing exercise") || lowerCaseMessage.includes("calm down")) { reply = "Try this: Inhale for 4... hold for 4... exhale for 4... hold for 4. Repeat 3 times. 🧘"; }
+                else if (lowerCaseMessage.includes("quote of the day")) { reply = "“Success is not final, failure is not fatal: It is the courage to continue that counts.” – Winston Churchill 💬"; }
+                else if (lowerCaseMessage.includes("mental health tip")) { reply = "Take breaks during the day, get sunlight, and remember to stay connected with loved ones. 💛"; }
+                else if (lowerCaseMessage.includes("roll a dice")) { const dice = Math.floor(Math.random() * 6) + 1; reply = `🎲 You rolled a ${dice}!`; }
+                else if (lowerCaseMessage.includes("flip a coin")) { const coin = Math.random() < 0.5 ? "Heads" : "Tails"; reply = `🪙 It's ${coin}!`; }
+                else if (lowerCaseMessage.includes("fun activity") || lowerCaseMessage.includes("what should I do for fun")) { reply = "Try taking a short walk, doing a quick doodle, or listening to your favorite music!"; }
+                else if (lowerCaseMessage.includes("random number")) { const random = Math.floor(Math.random() * 100) + 1; reply = `Here’s a random number for you: ${random}`; }
+                else if (lowerCaseMessage.includes("what time is it")) { const now = new Date(); reply = `It's currently ${now.toLocaleTimeString()}.`; }
+                else if (lowerCaseMessage.includes("word of the day")) { reply = "Word of the Day: *Serendipity* — the occurrence of events by chance in a happy or beneficial way. 🌟"; }
+                else if (lowerCaseMessage.includes("fun fact")) { reply = "Fun fact: A bolt of lightning is five times hotter than the surface of the sun! ⚡"; }
+                else if (lowerCaseMessage.includes("learn a new word")) { reply = "New word: *Ephemeral* — lasting for a very short time."; }
+                else if (lowerCaseMessage.includes("would you rather")) { reply = "Would you rather be able to teleport anywhere or be able to read minds? 🤔"; }
+                else if (lowerCaseMessage.includes("this or that")) { reply = "Pick one: Coffee ☕ or Tea 🍵?"; }
+                else if (lowerCaseMessage.includes("emoji story")) { reply = "Once upon a time, a 🐱 met a 🐶 and they flew to the 🌕 in a 🚀!"; }
+                else if (lowerCaseMessage.includes("good morning")) { reply = "Good morning! ☀️ Wishing you a fresh start and a productive day!"; }
+                else if (lowerCaseMessage.includes("good night")) { reply = "Good night! 🌙 Sweet dreams and restful sleep to you."; }
+                else if (lowerCaseMessage.includes("what do you think of me")) { reply = "I think you're pretty awesome. You're here, you're learning, and that’s a big win!"; }
+                else if (lowerCaseMessage.includes("are you my friend")) { reply = "Of course! I’m here to chat, help, and be your AI buddy anytime. 🤖💙"; }
+                else if (lowerCaseMessage.includes("tell me something")) { reply = "Did you know? Honey never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3000 years old! 🐝"; }
+                else { reply = "You said: " + (message || "You uploaded a file."); }
 
-
-else if (message.toLowerCase().includes("show my reminders")) {
-  const saved = JSON.parse(localStorage.getItem("reminders")) || [];
-  if (saved.length === 0) {
-    reply = "You have no reminders yet, Master.";
-  } else {
-    reply = "Here are your reminders:<br>" + saved.map(r => `📌 ${r.task} (${r.time})`).join("<br>");
-  }
-}
-
-
-else if (message.toLowerCase().includes("who made you")) {
-                  reply = "Master Samarth Nagpure engineered me to serve you with intelligence and reliability.";
-                }
-                else if (message.toLowerCase().includes("what can you do")) {
-                  reply = "I can chat, generate passwords, tell jokes, show quotes, summarize text, and more!";
-                }
-                  else if (message.toLowerCase().includes("settings")) {
-                    reply = "You can access settings from the top right corner or the sidebar.";
-                } else if (message.toLowerCase().includes("dark mode") || message.toLowerCase().includes("light mode")) {
-                    reply = "You can toggle light/dark mode using the sun/moon icon in the header!";
-                } else if (message.toLowerCase().includes("new chat")) {
-                    reply = "To start a new chat, click the 'New Chat' button in the sidebar.";
-                }
-                else if (["ok", "okay", "sure"].includes(message.toLowerCase())) {
-                    reply = "Understood, Master. Please instruct me further.";
-                }
-                else if (["how are you", "how are you doing"].some(q => message.toLowerCase().includes(q))) {
-                    reply = "Functioning optimally, Master. Standing by for your instructions.";
-                }
-                else if (message.toLowerCase().includes("summarize")) {
-                    reply = "Certainly, Master. Kindly provide the content you'd like summarized.";
-                }
-                else if (message.toLowerCase().includes("explain")) {
-                    reply = "Absolutely, Master. What concept would you like me to elaborate on?";
-                }
-                else if (message.toLowerCase().includes("what's the date") || message.toLowerCase().includes("what day")) {
-                    const today = new Date();
-                    reply = `Today is ${today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.`;
-                }
-                else if (message.toLowerCase().includes("fact")) {
-                    reply = "Did you know? The Eiffel Tower can grow more than 6 inches during summer due to heat! 🌞";
-                }
-                else if (message.toLowerCase().includes("i'm stressed") || message.toLowerCase().includes("relax")) {
-                    reply = "Take a deep breath. You're doing great! 🌸 Try focusing on something you love.";
-                }
-                else if (message.toLowerCase().includes("idea for") || message.toLowerCase().includes("suggest")) {
-                    reply = "How about trying something creative today? Like writing a short poem or doodling something fun!";
-                }
-                else if (message.toLowerCase().includes("i'm bored")) {
-                    reply = "Feeling bored? Try learning a random skill online like origami, drawing, or speed typing!";
-                }
-                else if (["what's your name", "what is your name", "what your name"].some(q => message.toLowerCase().includes(q))) {
-                    reply = "You may address me as Nexsera, Master — always at your service.";
-                }
-                // Developer & Technical
-                else if (message.toLowerCase().includes("debug") || message.toLowerCase().includes("fix this code")) {
-                    reply = "Sure, please paste the code you'd like me to help with.";
-                }
-                else if (message.toLowerCase().includes("regex")) {
-                    reply = "Tell me what you need the regular expression to match, and I’ll help you generate it.";
-                }
-                else if (message.toLowerCase().includes("write a function")) {
-                    reply = "Got it! Please describe what the function should do.";
-                }
-
-                // Productivity & Planning
-                else if (message.toLowerCase().includes("to-do list") || message.toLowerCase().includes("task list")) {
-                    reply = "Sure! What tasks do you want to include in your to-do list?";
-                }
-                else if (message.toLowerCase().includes("remind me") || message.toLowerCase().includes("reminder")) {
-                    reply = "Okay, I’ll help you note that down. (Just a heads-up: I don’t set real alarms yet!)";
-                }
-                else if (message.toLowerCase().includes("plan my day") || message.toLowerCase().includes("schedule")) {
-                    reply = "Let's organize your day! Tell me your goals or start time.";
-                }
-
-                // Educational & Learning
-                else if (message.toLowerCase().includes("quiz me") || message.toLowerCase().includes("test me")) {
-                    reply = "Great! What topic would you like to be quizzed on?";
-                }
-                else if (message.toLowerCase().includes("translate") || message.toLowerCase().includes("how to say")) {
-                    reply = "Please tell me the phrase and the language you'd like it translated to.";
-                }
-                else if (message.toLowerCase().includes("define") || message.toLowerCase().includes("meaning of")) {
-                    reply = "Here’s the definition of that word:";
-                }
-
-                // Creativity & Fun
-                else if (message.toLowerCase().includes("poem") || message.toLowerCase().includes("story") || message.toLowerCase().includes("joke about")) {
-                    reply = "Fun! Give me a topic, and I’ll write something creative for you.";
-                }
-                else if (message.toLowerCase().includes("name for") || message.toLowerCase().includes("suggest a name")) {
-                    reply = "What kind of name are you looking for? Business, character, product?";
-                }
-                else if (message.toLowerCase().includes("riddle")) {
-                    reply = "Here's one: What has keys but can’t open locks? (Answer: A piano 🎹)";
-                }
-
-                // Personal Growth
-                else if (message.toLowerCase().includes("give me a goal") || message.toLowerCase().includes("daily goal")) {
-                    reply = "How about: Try to learn one new thing today and write it down! 📘";
-                }
-                else if (message.toLowerCase().includes("motivate me for the day") || message.toLowerCase().includes("daily motivation")) {
-                    reply = "You've got this! Remember, consistency beats perfection. 💪";
-                }
-                else if (message.toLowerCase().includes("habit")) {
-                    reply = "Try drinking a glass of water right after waking up. Simple and powerful!";
-                }
-                else if (message.toLowerCase().includes("how does it work")) {
-                    reply = "I'd be happy to explain! What exactly would you like to understand?";
-                }
-                else if (message.toLowerCase().includes("steps to") || message.toLowerCase().includes("how to")) {
-                    reply = "Sure! Please tell me what you're trying to do, and I’ll break it into steps.";
-                }
-                else if (message.toLowerCase().includes("life advice")) {
-                    reply = "Here's a thought: Focus on what you can control, and let go of what you can't. 🌱";
-                }
-                else if (message.toLowerCase().includes("career advice")) {
-                    reply = "Happy to help! What field are you in or interested in?";
-                }
-                else if (message.toLowerCase().includes("set a goal")) {
-                    reply = "Sure! What area do you want to set a goal in — health, learning, work?";
-                }
-                else if (message.toLowerCase().includes("reflect") || message.toLowerCase().includes("journal")) {
-                    reply = "Let’s reflect together. What’s one thing that went well today?";
-                }
-                else if (message.toLowerCase().includes("compliment me")) {
-                    reply = "You're doing amazing. You're curious, capable, and creating great things! 🌟";
-                }
-                else if (message.toLowerCase().includes("say something nice")) {
-                    reply = "You’re stronger than you think and more capable than you believe 💖";
-                }
-                else if (message.toLowerCase().includes("what should I learn")) {
-                    reply = "You could try learning a bit of Python, photography, or even meditation. What excites you most?";
-                }
-                else if (message.toLowerCase().includes("suggest a course")) {
-                    reply = "Sure! Are you interested in tech, art, business, or something else?";
-                }
-                else if (message.toLowerCase().includes("roast me")) {
-                    reply = "Are you sure? 😏 Okay… You bring a new meaning to ‘404: Style Not Found’ 😂";
-                }
-                else if (message.toLowerCase().includes("truth or dare")) {
-                    reply = "Let's play! Truth: What's something nobody knows about you? Dare: Compliment yourself out loud!";
-                }
-                else if (message.toLowerCase().includes("affirmation")) {
-                    reply = "You are capable, strong, and worthy of all the good things coming your way. 🌈";
-                }
-                else if (message.toLowerCase().includes("breathing exercise") || message.toLowerCase().includes("calm down")) {
-                    reply = "Try this: Inhale for 4... hold for 4... exhale for 4... hold for 4. Repeat 3 times. 🧘";
-                }
-                else if (message.toLowerCase().includes("quote of the day")) {
-                    reply = "“Success is not final, failure is not fatal: It is the courage to continue that counts.” – Winston Churchill 💬";
-                }
-
-                else if (message.toLowerCase().includes("mental health tip")) {
-                  reply = "Take breaks during the day, get sunlight, and remember to stay connected with loved ones. 💛";
-                }
-                else if (message.toLowerCase().includes("roll a dice")) {
-                  const dice = Math.floor(Math.random() * 6) + 1;
-                  reply = `🎲 You rolled a ${dice}!`;
-                }
-                else if (message.toLowerCase().includes("flip a coin")) {
-                  const coin = Math.random() < 0.5 ? "Heads" : "Tails";
-                  reply = `🪙 It's ${coin}!`;
-                }
-                else if (message.toLowerCase().includes("fun activity") || message.toLowerCase().includes("what should I do for fun")) {
-                  reply = "Try taking a short walk, doing a quick doodle, or listening to your favorite music!";
-                }
-                else if (message.toLowerCase().includes("random number")) {
-                  const random = Math.floor(Math.random() * 100) + 1;
-                  reply = `Here’s a random number for you: ${random}`;
-                }
-                else if (message.toLowerCase().includes("what time is it")) {
-                  const now = new Date();
-                  reply = `It's currently ${now.toLocaleTimeString()}.`;
-                }
-
-                else if (message.toLowerCase().includes("word of the day")) {
-                    reply = "Word of the Day: *Serendipity* — the occurrence of events by chance in a happy or beneficial way. 🌟";
-                }
-                else if (message.toLowerCase().includes("fun fact")) {
-                    reply = "Fun fact: A bolt of lightning is five times hotter than the surface of the sun! ⚡";
-                }
-                else if (message.toLowerCase().includes("learn a new word")) {
-                    reply = "New word: *Ephemeral* — lasting for a very short time.";
-                }
-                else if (message.toLowerCase().includes("would you rather")) {
-                    reply = "Would you rather be able to teleport anywhere or be able to read minds? 🤔";
-                }
-                else if (message.toLowerCase().includes("this or that")) {
-                    reply = "Pick one: Coffee ☕ or Tea 🍵?";
-                }
-                else if (message.toLowerCase().includes("emoji story")) {
-                    reply = "Once upon a time, a 🐱 met a 🐶 and they flew to the 🌕 in a 🚀!";
-                }
-                else if (message.toLowerCase().includes("good morning")) {
-                    reply = "Good morning! ☀️ Wishing you a fresh start and a productive day!";
-                }
-                else if (message.toLowerCase().includes("good night")) {
-                    reply = "Good night! 🌙 Sweet dreams and restful sleep to you.";
-                }
-                else if (message.toLowerCase().includes("what do you think of me")) {
-                    reply = "I think you're pretty awesome. You're here, you're learning, and that’s a big win!";
-                }
-                else if (message.toLowerCase().includes("are you my friend")) {
-                    reply = "Of course! I’m here to chat, help, and be your AI buddy anytime. 🤖💙";
-                }
-
-
-                else if (message.toLowerCase().includes("tell me something")) {
-                    reply = "Did you know? Honey never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3000 years old! 🐝";
-                }
-                 else {
-                    reply = "You said: " + (message || "You uploaded a file.");
-                }
-
-                // Store AI response in chat history *before* rendering to get its index
                 const aiMessageIndex = currentChat.messages.length;
                 currentChat.messages.push({ role: "ai", content: reply });
 
-                // Create the AI message div and stream the reply into it
-                const aiMessageDiv = createChatEntry("", "ai", aiMessageIndex); // Render with its index
-                if (message.toLowerCase().includes("weather")) {
-  aiMessageDiv.innerHTML = reply;
-} else {
-  await streamReply(aiMessageDiv, reply);
-} // Pass the inner div directly
-
-                saveChatHistory(); // Save updated history
-            }, 1000); // Simulate network delay
+                const aiMessageDiv = createChatEntry("", "ai", aiMessageIndex);
+                if (lowerCaseMessage.includes("weather")) {
+                    aiMessageDiv.innerHTML = reply;
+                } else {
+                    await streamReply(aiMessageDiv, reply);
+                }
+                saveChatHistoryForUser();
+            }, 1000);
         }
 
         /**
-         * Starts a new chat session, clearing the chat window and resetting currentChatId.
+         * Starts a new chat session.
          */
         function startNewChat() {
-            chatWindow.innerHTML = `<p id="introText" class="text-center text-gray-600 text-sm">Welcome back, Master. Nexsera is fully operational and standing by for your command.</p>`;
-            currentChatId = null; // Reset current chat ID
-            renderHistoryList(); // Re-render to ensure no chat is highlighted
+            chatWindow.innerHTML = `<p id="introText" class="text-center text-gray-600 text-sm dark:text-gray-400">Welcome back, Master. Nexsera is fully operational and standing by for your command.</p>`;
+            currentChatId = null;
+            renderHistoryList();
             if (isMobile()) {
-                hideSidebar(); // Hide sidebar on mobile after starting new chat
-                headerTitle.textContent = "Nexsera Ai"; // Reset header title
+                hideSidebar();
+                headerTitle.textContent = "Nexsera Ai";
             }
         }
 
-        // --- History Management ---
-
         /**
-         * Renders the chat history list in the sidebar based on `chatHistory` array.
+         * Renders the chat history list in the sidebar.
          */
         function renderHistoryList() {
             historyList.innerHTML = '';
             chatHistory.forEach(chat => {
                 const historyItem = document.createElement("li");
-                historyItem.className = `flex justify-between items-center px-2 py-1.5 rounded-md hover:bg-gray-200 transition text-black ${chat.id === currentChatId ? 'bg-gray-200 font-semibold' : ''}`;
+                historyItem.className = `flex justify-between items-center px-2 py-1.5 rounded-md hover:bg-gray-200 transition text-black dark:text-gray-300 dark:hover:bg-gray-700 ${chat.id === currentChatId ? 'bg-gray-200 font-semibold dark:bg-gray-700' : ''}`;
 
                 const titleSpan = document.createElement("span");
                 titleSpan.textContent = chat.title;
-                titleSpan.classList.add('flex-grow', 'cursor-pointer', 'pr-2'); // Add pr-2 for spacing
+                titleSpan.classList.add('flex-grow', 'cursor-pointer', 'pr-2');
                 titleSpan.onclick = () => loadChat(chat.id);
                 historyItem.appendChild(titleSpan);
 
                 const deleteBtn = document.createElement("button");
-                deleteBtn.className = "text-red-500 hover:text-red-700 px-1 py-0.5 rounded-sm hover:bg-gray-300";
+                deleteBtn.className = "text-red-500 hover:text-red-700 px-1 py-0.5 rounded-sm hover:bg-gray-300 dark:hover:bg-gray-600";
                 deleteBtn.innerHTML = `
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
@@ -1302,7 +889,7 @@ else if (message.toLowerCase().includes("who made you")) {
                 deleteBtn.title = "Delete chat";
                 deleteBtn.dataset.chatId = chat.id;
                 deleteBtn.onclick = (e) => {
-                    e.stopPropagation(); // Prevent loading chat when deleting
+                    e.stopPropagation();
                     deleteChat(chat.id);
                 };
                 historyItem.appendChild(deleteBtn);
@@ -1311,41 +898,43 @@ else if (message.toLowerCase().includes("who made you")) {
         }
 
         /**
-         * Loads and displays a specific chat session from history into the chat window.
+         * Loads and displays a specific chat session.
          * @param {string} chatId - The ID of the chat session to load.
          */
         function loadChat(chatId) {
             const chat = chatHistory.find(c => c.id === chatId);
             if (chat) {
-                chatWindow.innerHTML = ''; // Clear current chat window
-                currentChatId = chatId; // Set the current chat ID
+                chatWindow.innerHTML = '';
+                currentChatId = chatId;
                 chat.messages.forEach((msg, index) => {
                     createChatEntry(msg.content, msg.role, index);
                 });
-                chatWindow.scrollTop = chatWindow.scrollHeight;
-                chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                renderHistoryList(); // Re-render history to highlight active chat
+                if (autoScrollEnabled) {
+                    chatWindow.scrollTop = chatWindow.scrollHeight;
+                    chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
+                renderHistoryList();
                 if (isMobile()) {
-                    hideSidebar(); // Hide sidebar on mobile after loading chat
-                    headerTitle.textContent = chat.title.substring(0, 20) + (chat.title.length > 20 ? "..." : ""); // Update header title
+                    hideSidebar();
+                    headerTitle.textContent = chat.title.substring(0, 20) + (chat.title.length > 20 ? "..." : "");
                 }
             }
         }
 
         /**
-         * Deletes a chat session from the history.
+         * Deletes a chat session from history.
          * @param {string} chatIdToDelete - The ID of the chat session to delete.
          */
         function deleteChat(chatIdToDelete) {
             const chatIndex = chatHistory.findIndex(chat => chat.id === chatIdToDelete);
             if (chatIndex > -1) {
-                chatHistory.splice(chatIndex, 1); // Remove chat from array
-                saveChatHistory(); // Save updated history
+                chatHistory.splice(chatIndex, 1);
+                saveChatHistoryForUser();
 
                 if (currentChatId === chatIdToDelete) {
-                    startNewChat(); // If current chat is deleted, start a new one
+                    startNewChat();
                 } else {
-                    renderHistoryList(); // Otherwise, just re-render the history
+                    renderHistoryList();
                 }
             }
         }
@@ -1358,9 +947,9 @@ else if (message.toLowerCase().includes("who made you")) {
         function deleteMessage(chatId, messageIndex) {
             const chat = chatHistory.find(c => c.id === chatId);
             if (chat && chat.messages.length > messageIndex) {
-                chat.messages.splice(messageIndex, 1); // Remove message
-                saveChatHistory(); // Save updated history
-                loadChat(chatId); // Reload current chat to reflect changes and update indices
+                chat.messages.splice(messageIndex, 1);
+                saveChatHistoryForUser();
+                loadChat(chatId);
             }
         }
 
@@ -1371,15 +960,48 @@ else if (message.toLowerCase().includes("who made you")) {
         async function copyMessage(text) {
             try {
                 await navigator.clipboard.writeText(text);
-                alert('Copied to clipboard!');
-            }
-            catch (err) {
+                // Provide visual feedback
+                const originalText = copyButton.textContent;
+                copyButton.textContent = "Copied!";
+                setTimeout(() => copyButton.textContent = originalText, 1500);
+            } catch (err) {
                 console.error('Failed to copy message: ', err);
             }
         }
 
         /**
-         * Filters the chat history displayed in the sidebar based on a search term.
+         * Speaks the given text using SpeechSynthesis.
+         * @param {string} text - The text to speak.
+         * @param {HTMLElement} messageDiv - The message div to apply glow effect to.
+         */
+        function speakMessage(text, messageDiv) {
+            if ('speechSynthesis' in window) {
+                if (speechSynthesis.speaking) {
+                    speechSynthesis.cancel();
+                }
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                const voices = speechSynthesis.getVoices();
+                utterance.voice = voices.find(v => v.name.includes("Daniel") || v.name.includes("British")) || voices[0];
+
+                messageDiv.classList.add("bubble-speaking");
+                utterance.onend = () => {
+                    messageDiv.classList.remove("bubble-speaking");
+                };
+                utterance.onerror = (event) => {
+                    console.error('SpeechSynthesisUtterance.onerror', event);
+                    messageDiv.classList.remove("bubble-speaking");
+                };
+
+                speechSynthesis.speak(utterance);
+            } else {
+                alert("Text-to-speech not supported in your browser.");
+            }
+        }
+
+        /**
+         * Filters the chat history displayed in the sidebar.
          */
         function filterHistory() {
             const searchTerm = searchHistory.value.toLowerCase();
@@ -1387,10 +1009,10 @@ else if (message.toLowerCase().includes("who made you")) {
                 chat.title.toLowerCase().includes(searchTerm) ||
                 chat.messages.some(msg => msg.content.toLowerCase().includes(searchTerm))
             );
-            historyList.innerHTML = ''; // Clear current list
+            historyList.innerHTML = '';
             filteredHistory.forEach(chat => {
                 const historyItem = document.createElement("li");
-                historyItem.className = `flex justify-between items-center px-2 py-1.5 rounded-md hover:bg-gray-200 cursor-pointer transition text-black ${chat.id === currentChatId ? 'bg-gray-200 font-semibold' : ''}`;
+                historyItem.className = `flex justify-between items-center px-2 py-1.5 rounded-md hover:bg-gray-200 cursor-pointer transition text-black dark:text-gray-300 dark:hover:bg-gray-700 ${chat.id === currentChatId ? 'bg-gray-200 font-semibold dark:bg-gray-700' : ''}`;
 
                 const titleSpan = document.createElement("span");
                 titleSpan.textContent = chat.title;
@@ -1399,7 +1021,7 @@ else if (message.toLowerCase().includes("who made you")) {
                 historyItem.appendChild(titleSpan);
 
                 const deleteBtn = document.createElement("button");
-                deleteBtn.className = "text-red-500 hover:text-red-700 px-1 py-0.5 rounded-sm hover:bg-gray-300";
+                deleteBtn.className = "text-red-500 hover:text-red-700 px-1 py-0.5 rounded-sm hover:bg-gray-300 dark:hover:bg-gray-600";
                 deleteBtn.innerHTML = `
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
@@ -1408,7 +1030,7 @@ else if (message.toLowerCase().includes("who made you")) {
                 deleteBtn.title = "Delete chat";
                 deleteBtn.dataset.chatId = chat.id;
                 deleteBtn.onclick = (e) => {
-                    e.stopPropagation(); // Prevent loading chat when deleting
+                    e.stopPropagation();
                     deleteChat(chat.id);
                 };
                 historyItem.appendChild(deleteBtn);
@@ -1416,551 +1038,361 @@ else if (message.toLowerCase().includes("who made you")) {
             });
         }
 
-        // --- File Handling ---
-
         /**
-         * Updates the file preview area based on the `filesToSend` array.
+         * Updates the file preview area.
          */
         function updateFilePreview() {
-            filePreview.innerHTML = ''; // Clear current preview
+            filePreview.innerHTML = '';
             filesToSend.forEach((file, index) => {
                 const fileDiv = document.createElement('div');
-                fileDiv.className = 'flex items-center bg-gray-100 border border-gray-300 rounded px-2 py-1 text-xs text-black';
+                fileDiv.className = 'flex items-center bg-gray-100 border border-gray-300 rounded px-2 py-1 text-xs text-black dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
                 fileDiv.innerHTML = `
                     📁 ${file.name}
-                    <button class="ml-2 text-red-500 hover:text-red-700" data-index="${index}">&times;</button>
+                    <button class="ml-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300" data-index="${index}">&times;</button>
                 `;
                 filePreview.appendChild(fileDiv);
             });
 
-            // Add event listeners to remove buttons
             filePreview.querySelectorAll('button').forEach(btn => {
                 btn.onclick = () => {
                     const i = parseInt(btn.dataset.index);
-                    filesToSend.splice(i, 1); // Remove file from array
-                    updateFilePreview(); // Re-render preview
+                    filesToSend.splice(i, 1);
+                    updateFilePreview();
                 };
             });
         }
 
-        // --- UI Toggles ---
-
         /**
-         * Toggles between light and dark mode, and saves the preference to localStorage.
+         * Toggles between light and dark mode.
          */
         function toggleDarkMode() {
             document.body.classList.toggle("dark");
-            if (document.body.classList.contains("dark")) {
-                localStorage.setItem("theme", "dark");
-                document.body.classList.remove("bg-gray-100", "text-gray-800");
-                document.body.classList.add("bg-gray-900", "text-gray-100");
-            } else {
-                localStorage.setItem("theme", "light");
-                document.body.classList.remove("bg-gray-900", "text-gray-100");
-                document.body.classList.add("bg-gray-100", "text-gray-800");
-            }
+            const isDarkMode = document.body.classList.contains("dark");
+            localStorage.setItem("theme", isDarkMode ? "dark" : "light");
+
+            document.body.classList.remove(isDarkMode ? "bg-gray-100" : "bg-gray-900", isDarkMode ? "text-gray-800" : "text-gray-100");
+            document.body.classList.add(isDarkMode ? "bg-gray-900" : "bg-gray-100", isDarkMode ? "text-gray-100" : "text-gray-800");
         }
 
         /**
-         * Hides the sidebar by adding a transform class.
+         * Hides the sidebar.
          */
         function hideSidebar() {
             sidebar.classList.add("-translate-x-full");
             document.body.classList.remove("sidebar-open");
-            sidebarOverlay.classList.add("hidden"); // Hide overlay
+            sidebarOverlay.classList.add("hidden");
             if (!currentChatId) {
-                headerTitle.textContent = "Nexsera Ai"; // Reset header title if no chat is active
+                headerTitle.textContent = "Nexsera Ai";
             } else {
                 const currentChat = chatHistory.find(chat => chat.id === currentChatId);
                 if (currentChat) {
-                     headerTitle.textContent = currentChat.title.substring(0, 20) + (currentChat.title.length > 20 ? "..." : "");
+                    headerTitle.textContent = currentChat.title.substring(0, 20) + (currentChat.title.length > 20 ? "..." : "");
                 }
             }
         }
 
         /**
-         * Shows the sidebar by removing a transform class.
+         * Shows the sidebar.
          */
         function showSidebar() {
             sidebar.classList.remove("-translate-x-full");
             document.body.classList.add("sidebar-open");
-            sidebarOverlay.classList.remove("hidden"); // Show overlay
+            sidebarOverlay.classList.remove("hidden");
             if (isMobile()) {
-                 headerTitle.textContent = "Menu"; // Change header title to "Menu" on mobile
+                headerTitle.textContent = "Menu";
             }
+        }
+
+        /**
+         * Shows a modal/panel with a transition.
+         * @param {HTMLElement} panel - The panel element to show.
+         */
+        function showPanel(panel) {
+            panel.classList.remove("hidden");
+            setTimeout(() => {
+                panel.classList.remove("opacity-0", "scale-95");
+            }, 10);
+        }
+
+        /**
+         * Hides a modal/panel with a transition.
+         * @param {HTMLElement} panel - The panel element to hide.
+         */
+        function hidePanel(panel) {
+            panel.classList.add("opacity-0", "scale-95");
+            setTimeout(() => {
+                panel.classList.add("hidden");
+            }, 300);
         }
 
         // --- Event Listeners ---
 
-        // Send message on button click
+        // Chat Input & Send Button
+        chatInput.addEventListener("input", () => {
+            if (chatInput.value.toLowerCase().includes("hey nexsera")) {
+                speakMessage("Yes, Master? I’m listening.", chatInput);
+                chatInput.value = "";
+            }
+        });
         sendBtn.addEventListener("click", sendMessage);
-
-        // Send message on Enter key press (without Shift)
         chatInput.addEventListener("keydown", e => {
             if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault(); // Prevent new line in input
+                e.preventDefault();
                 sendMessage();
             }
         });
 
-        // Toggle sidebar visibility
-        toggleSidebar.addEventListener("click", () => {
-            if (sidebar.classList.contains("-translate-x-full")) {
-                showSidebar();
-            } else {
-                hideSidebar();
-            }
-        });
-
-        // Close sidebar using the new close button
+        // Sidebar Toggles
+        toggleSidebar.addEventListener("click", showSidebar);
         closeSidebar.addEventListener("click", hideSidebar);
-
-        // Close sidebar if overlay is clicked on mobile
         sidebarOverlay.addEventListener("click", hideSidebar);
-
-        // Handle file selection
-        fileUpload.addEventListener("change", () => {
-            filesToSend.push(...Array.from(fileUpload.files));
-            updateFilePreview();
-            fileUpload.value = ""; // Clear file input
-        });
-
-        // Filter history on search input
-        searchHistory.addEventListener("input", filterHistory);
-
-        // Start a new chat session
-        newChatBtn.addEventListener("click", startNewChat);
-
-        // Toggle theme (light/dark mode)
-        themeToggle.addEventListener("click", toggleDarkMode);
-
-        // Open settings modal from header
-        settingsBtn.addEventListener("click", () => settingsPanel.classList.remove("hidden"));
-
-        // Open settings modal from sidebar and hide sidebar
-        sidebarSettingsBtn.addEventListener("click", () => {
-            settingsPanel.classList.remove("hidden");
-            if (isMobile()) {
-                hideSidebar(); // Hide sidebar when settings are opened from sidebar on mobile
-            }
-        });
-
-        // Close settings modal
-        closeSettingsModal.addEventListener("click", () => settingsPanel.classList.add("hidden"));
-
-        // Handle AI model selection (for demonstration, logs to console)
-        modelSelect.addEventListener("change", (e) => {
-            console.log("Selected AI Model:", e.target.value);
-            // In a real application, you would send this to your backend API
-        });
-
-        // Update response speed based on slider input
-        responseSpeed.addEventListener("input", (e) => {
-            preferredResponseSpeed = parseInt(e.target.value);
-            responseSpeedValue.textContent = `${preferredResponseSpeed} ms`;
-        });
-
-        
-// --- Initializations ---
-
-        // Execute on DOM content loaded
-        document.addEventListener("DOMContentLoaded", () => {
-            // Apply saved theme preference: Light mode first by default
-            const savedTheme = localStorage.getItem("theme");
-            if (savedTheme === "dark") {
-                document.body.classList.add("dark", "bg-gray-900", "text-gray-100");
-                document.body.classList.remove("bg-gray-100", "text-gray-800");
-            } else {
-                document.body.classList.remove("dark", "bg-gray-900", "text-gray-100");
-                document.body.classList.add("bg-gray-100", "text-gray-800");
-                localStorage.setItem("theme", "light"); // Explicitly set to light if not already
-            }
-
-            loadChatHistory(); // Load history on page load
-            // Set initial value for response speed display
-            responseSpeedValue.textContent = `${responseSpeed.value} ms`;
-
-            // Check if there's any chat history; if not, ensure intro text is visible
-            if (chatHistory.length === 0) {
-                if (!document.getElementById("introText")) {
-                    const p = document.createElement("p");
-                    p.id = "introText";
-                    p.className = "text-center text-gray-600 text-sm";
-                    p.textContent = "Hello! I'm Nexsera Ai, your personal assistant. How can I help you today?";
-                    chatWindow.appendChild(p);
-                }
-            } else {
-                // If history exists, load the most recent chat automatically
-                loadChat(chatHistory[0].id);
-            }
-        });
-
-        // Close sidebar when clicking on a chat history item on mobile
         historyList.addEventListener('click', (event) => {
-            // Check if the click was on the list item's text span and not the delete button
             if (event.target.tagName === 'SPAN' && event.target.closest('li') && isMobile()) {
                 hideSidebar();
             }
         });
 
-        // Update header title based on sidebar state on resize
-        window.addEventListener('resize', () => {
-            if (!isMobile() && sidebar.classList.contains("-translate-x-full")) {
-                // If resized to desktop and sidebar is hidden, ensure header title is "Nexsera Ai"
-                headerTitle.textContent = "Nexsera Ai";
-                sidebarOverlay.classList.add("hidden"); // Ensure overlay is hidden on desktop
-            } else if (isMobile() && !sidebar.classList.contains("-translate-x-full")) {
-                // If resized to mobile and sidebar is open, change title to "Menu"
-                headerTitle.textContent = "Menu";
-                sidebarOverlay.classList.remove("hidden"); // Ensure overlay is visible on mobile
+        // File Handling
+        fileUpload.addEventListener("change", () => {
+            filesToSend.push(...Array.from(fileUpload.files));
+            updateFilePreview();
+            fileUpload.value = "";
+        });
+
+        // History Management
+        searchHistory.addEventListener("input", filterHistory);
+        newChatBtn.addEventListener("click", startNewChat);
+
+        // Theme Toggle
+        themeToggle.addEventListener("click", toggleDarkMode);
+
+        // Settings Panel
+        settingsBtn.addEventListener("click", () => showPanel(settingsPanel));
+        sidebarSettingsBtn.addEventListener("click", () => {
+            showPanel(settingsPanel);
+            if (isMobile()) hideSidebar();
+        });
+        closeSettingsModal.addEventListener("click", () => hidePanel(settingsPanel));
+
+        // Settings Controls
+        modelSelect.addEventListener("change", (e) => {
+            console.log("Selected AI Model:", e.target.value);
+            // In a real application, send this to backend
+        });
+        responseSpeed.addEventListener("input", (e) => {
+            preferredResponseSpeed = parseInt(e.target.value);
+            responseSpeedValue.textContent = `${preferredResponseSpeed} ms`;
+            localStorage.setItem("preferredResponseSpeed", preferredResponseSpeed);
+        });
+        document.getElementById("fontSizeSelector").addEventListener("change", (e) => {
+            chatWindow.classList.remove("text-xs", "text-sm", "text-base", "text-lg");
+            chatWindow.classList.add(e.target.value);
+            localStorage.setItem("chatFontSize", e.target.value);
+        });
+        document.getElementById("autoScrollSwitch").addEventListener("change", (e) => {
+            autoScrollEnabled = e.target.checked;
+            localStorage.setItem("autoScroll", autoScrollEnabled);
+        });
+        document.getElementById("resetSettings").addEventListener("click", () => {
+            localStorage.clear();
+            location.reload();
+        });
+        document.getElementById("clearHistory").addEventListener("click", () => {
+            localStorage.removeItem(`chatHistory_${currentUser}`);
+            chatHistory = [];
+            startNewChat();
+        });
+
+        // User Management Box
+        userButton.addEventListener("click", () => {
+            if (userBox.classList.contains("hidden")) {
+                showPanel(userBox);
+            } else {
+                hidePanel(userBox);
+            }
+        });
+        closeUserBox.addEventListener("click", () => hidePanel(userBox));
+        addUserBtn.addEventListener("click", () => {
+            const name = addUserInput.value.trim();
+            if (name && !users.includes(name)) {
+                users.push(name);
+                saveUsers();
+                addUserInput.value = "";
+                renderUserList();
+                if (!currentUser) { // Automatically switch to new user if no one is logged in
+                    switchUser(name);
+                }
+            }
+        });
+        removeUserBtn.addEventListener("click", () => {
+            const selected = userSelect.value;
+            if (selected && users.includes(selected)) {
+                users = users.filter(u => u !== selected);
+                saveUsers();
+                localStorage.removeItem(`chatHistory_${selected}`);
+                if (selected === currentUser) {
+                    currentUser = null;
+                    localStorage.removeItem("currentUser");
+                    chatHistory = [];
+                    currentChatId = null;
+                    renderHistoryList();
+                    startNewChat();
+                }
+                renderUserList();
+                updateLoggedInUserUI();
+            }
+        });
+        userSelect.addEventListener("change", (e) => {
+            const selected = e.target.value;
+            if (selected) {
+                switchUser(selected);
             }
         });
 
+        // Speech Recognition
+        recordBtn.addEventListener("click", () => {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Sorry, your browser doesn't support speech recognition.");
+                return;
+            }
 
-function updateLoggedInUserUI() {
-    const loggedInUserSpan = document.getElementById("loggedInUser");
-    if (loggedInUserSpan) {
-        loggedInUserSpan.textContent = currentUser || "Guest";
-    }
-}
-document.addEventListener("DOMContentLoaded", () => {
-    updateLoggedInUserUI();
-});
+            const recognition = new SpeechRecognition();
+            recognition.lang = "en-US";
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
 
-</script>
+            recognition.start();
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll('pre code').forEach((block) => {
-    const wrapper = document.createElement("div");
-    wrapper.className = "code-container";
-    block.parentNode.insertBefore(wrapper, block);
-    wrapper.appendChild(block);
-
-    const copyButton = document.createElement("button");
-    copyButton.className = "copy-code-btn";
-    copyButton.textContent = "Copy";
-    wrapper.appendChild(copyButton);
-
-    copyButton.addEventListener("click", () => {
-      navigator.clipboard.writeText(block.textContent)
-        .then(() => {
-          copyButton.textContent = "Copied!";
-          setTimeout(() => copyButton.textContent = "Copy", 1500);
+            recognition.onstart = () => console.log("Voice recognition started. Speak now...");
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                chatInput.value = transcript;
+            };
+            recognition.onerror = (event) => console.error("Speech recognition error", event.error);
+            recognition.onend = () => console.log("Voice recognition ended.");
         });
-    });
-  });
-});
-</script>
 
+        // --- Initializations ---
+        document.addEventListener("DOMContentLoaded", () => {
+            // Apply saved theme
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme === "dark") {
+                document.body.classList.add("dark", "bg-gray-900", "text-gray-100");
+            } else {
+                document.body.classList.remove("dark", "bg-gray-900", "text-gray-100");
+                document.body.classList.add("bg-gray-100", "text-gray-800");
+            }
 
-<!-- Redesigned Settings Panel Layout -->
-<div id="settingsPanel" class="fixed z-50 w-[300px] sm:w-[360px] right-4 top-20 bg-white border border-gray-300 rounded-lg shadow-lg p-4 space-y-4 hidden">
+            // Load user management and chat history
+            renderUserList();
+            if (currentUser) {
+                loadUserChatHistory(currentUser);
+            } else if (users.length > 0) {
+                // If no current user but users exist, default to the first user
+                switchUser(users[0]);
+            } else {
+                // If no users exist, ensure intro text is visible
+                if (!document.getElementById("introText")) {
+                    const p = document.createElement("p");
+                    p.id = "introText";
+                    p.className = "text-center text-gray-600 text-sm dark:text-gray-400";
+                    p.textContent = "Hello! I'm Nexsera Ai, your personal assistant. How can I help you today?";
+                    chatWindow.appendChild(p);
+                }
+            }
+            updateLoggedInUserUI();
 
+            // Apply saved settings
+            responseSpeed.value = preferredResponseSpeed;
+            responseSpeedValue.textContent = `${preferredResponseSpeed} ms`;
 
+            const savedFontSize = localStorage.getItem("chatFontSize") || "text-sm";
+            chatWindow.classList.add(savedFontSize);
+            document.getElementById("fontSizeSelector").value = savedFontSize;
 
-  <h2 class="text-xl font-bold text-black">⚙️ Settings</h2>
+            document.getElementById("autoScrollSwitch").checked = autoScrollEnabled;
 
-  <!-- AI Model Section -->
-  <div>
-    <label class="block text-sm font-medium text-gray-700 mb-1">AI Model</label>
-    <select id="modelSelect" class="w-full pl-3 pr-10 py-2 border border-gray-300 text-sm rounded bg-white text-black">
-      <option value="default">Default Model</option>
-      <option value="creative">Creative Model</option>
-      <option value="factual">Factual Model</option>
-    </select>
-  </div>
+            // Code highlighting for existing messages
+            document.querySelectorAll('pre code').forEach(block => {
+                Prism.highlightElement(block);
+            });
+        });
 
-  <!-- Response Speed -->
-  <div>
-    <label class="block text-sm font-medium text-gray-700 mb-1">Response Speed</label>
-    <input type="range" id="responseSpeed" min="50" max="2000" value="500"
-           class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-    <span id="responseSpeedValue" class="text-xs text-gray-500 block mt-1">500 ms</span>
-  </div>
+        // Resize event listener for header title and overlay
+        window.addEventListener('resize', () => {
+            if (!isMobile() && sidebar.classList.contains("-translate-x-full")) {
+                headerTitle.textContent = "Nexsera Ai";
+                sidebarOverlay.classList.add("hidden");
+            } else if (isMobile() && !sidebar.classList.contains("-translate-x-full")) {
+                headerTitle.textContent = "Menu";
+                sidebarOverlay.classList.remove("hidden");
+            }
+        });
 
-  <!-- Appearance Section -->
-  <div>
-    <h3 class="font-semibold text-sm text-gray-800 mb-2">Appearance</h3>
-    <label for="fontSizeSelector" class="block text-sm font-medium text-gray-700 mb-1">Font Size</label>
-    <select id="fontSizeSelector" class="w-full p-2 border border-gray-300 text-sm rounded text-black">
-      <option value="text-xs">Small</option>
-      <option value="text-sm" selected>Medium</option>
-      <option value="text-base">Large</option>
-      <option value="text-lg">Extra Large</option>
-    </select>
-  </div>
+        // Code block copy button logic
+        document.addEventListener("DOMContentLoaded", () => {
+            const observer = new MutationObserver((mutationsList) => {
+                for (const mutation of mutationsList) {
+                    if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                        mutation.addedNodes.forEach(node => {
+                            if (node.nodeType === 1 && node.querySelector('pre code')) {
+                                node.querySelectorAll('pre code').forEach((block) => {
+                                    if (!block.closest('.code-container')) { // Prevent re-wrapping
+                                        const wrapper = document.createElement("div");
+                                        wrapper.className = "code-container relative";
+                                        block.parentNode.insertBefore(wrapper, block);
+                                        wrapper.appendChild(block);
 
-  <!-- Behavior Toggles -->
-  <div class="flex justify-between items-center">
-    <label class="text-sm font-medium text-gray-700">Auto Scroll</label>
-    <label class="inline-flex relative items-center cursor-pointer">
-      <input type="checkbox" class="sr-only peer" id="autoScrollSwitch">
-      <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-600 transition-all"></div>
-    </label>
-  </div>
+                                        const copyButton = document.createElement("button");
+                                        copyButton.className = "copy-code-btn absolute";
+                                        copyButton.textContent = "Copy";
+                                        wrapper.appendChild(copyButton);
 
-  <!-- Divider -->
-  <hr class="border-gray-300">
+                                        copyButton.addEventListener("click", () => {
+                                            navigator.clipboard.writeText(block.textContent)
+                                                .then(() => {
+                                                    copyButton.textContent = "Copied!";
+                                                    setTimeout(() => copyButton.textContent = "Copy", 1500);
+                                                })
+                                                .catch(err => console.error('Failed to copy code:', err));
+                                        });
+                                        Prism.highlightElement(block); // Ensure highlighting
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            });
 
-  <!-- Action Buttons -->
-  <div class="space-y-2">
-    <button id="resetSettings" class="w-full px-3 py-2 rounded bg-red-600 text-white text-sm hover:bg-red-700">Reset All Settings</button>
-    <button id="clearHistory" class="w-full px-3 py-2 rounded bg-red-500 text-white text-sm hover:bg-red-600">Clear Chat History</button>
-  </div>
-</div>
+            observer.observe(chatWindow, { childList: true, subtree: true });
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const chatWindow = document.getElementById("chatWindow");
-  const responseSpeed = document.getElementById("responseSpeed");
-  const responseSpeedValue = document.getElementById("responseSpeedValue");
-  const fontSizeSelector = document.getElementById("fontSizeSelector");
-  const autoScrollSwitch = document.getElementById("autoScrollSwitch");
-  const settingsBtn = document.getElementById("settingsBtn");
-  const settingsPanel = document.getElementById("settingsPanel");
+            // Initial setup for any existing code blocks on page load
+            document.querySelectorAll('pre code').forEach((block) => {
+                if (!block.closest('.code-container')) {
+                    const wrapper = document.createElement("div");
+                    wrapper.className = "code-container relative";
+                    block.parentNode.insertBefore(wrapper, block);
+                    wrapper.appendChild(block);
 
-  responseSpeed.addEventListener("input", (e) => {
-    preferredResponseSpeed = parseInt(e.target.value);
-    responseSpeedValue.textContent = `${preferredResponseSpeed} ms`;
-  });
+                    const copyButton = document.createElement("button");
+                    copyButton.className = "copy-code-btn absolute";
+                    copyButton.textContent = "Copy";
+                    wrapper.appendChild(copyButton);
 
-  fontSizeSelector.addEventListener("change", () => {
-    chatWindow.classList.remove("text-xs", "text-sm", "text-base", "text-lg");
-    chatWindow.classList.add(fontSizeSelector.value);
-    localStorage.setItem("chatFontSize", fontSizeSelector.value);
-  });
-
-  autoScrollSwitch.checked = localStorage.getItem("autoScroll") === "true";
-  autoScrollSwitch.addEventListener("change", () => {
-    localStorage.setItem("autoScroll", autoScrollSwitch.checked);
-  });
-
-  document.getElementById("resetSettings").addEventListener("click", () => {
-    localStorage.clear();
-    location.reload();
-  });
-
-  document.getElementById("clearHistory").addEventListener("click", () => {
-    localStorage.removeItem("chatHistory");
-    location.reload();
-  });
-
-  const savedFontSize = localStorage.getItem("chatFontSize") || "text-sm";
-  chatWindow.classList.add(savedFontSize);
-  fontSizeSelector.value = savedFontSize;
-
-  settingsBtn.addEventListener("click", () => {
-    settingsPanel.classList.toggle("hidden");
-  });
-});
-</script>
-<script>
-document.getElementById("recordBtn").addEventListener("click", () => {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    alert("Sorry, your browser doesn't support speech recognition.");
-    return;
-  }
-
-  const recognition = new SpeechRecognition();
-  recognition.lang = "en-US";
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-
-  recognition.start();
-
-  recognition.onstart = () => {
-    console.log("Voice recognition started. Speak now...");
-  };
-
-  recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    console.log("You said:", transcript);
-    document.getElementById("chatInput").value = transcript;
-  };
-
-  recognition.onerror = (event) => {
-    console.error("Speech recognition error", event.error);
-    alert("Speech recognition error: " + event.error);
-  };
-
-  recognition.onend = () => {
-    console.log("Voice recognition ended.");
-  };
-});
-</script>
-
-
-<script>
-  const aiPersona = "jarvis";
-
-  function jarvisify(text) {
-    return `Master, ${text.charAt(0).toLowerCase()}${text.slice(1)}`;
-  }
-
-  function speak(text) {
-    const utterance = new SpeechSynthesisUtterance(aiPersona === "jarvis" ? jarvisify(text) : text);
-    const voices = speechSynthesis.getVoices();
-    utterance.voice = voices.find(v => v.name.includes("Daniel") || v.name.includes("British")) || voices[0];
-
-    // Glow effect on chat bubble
-    const chatBubble = document.querySelector(".latest-bubble");
-    if (chatBubble) chatBubble.classList.add("bubble-speaking");
-
-    utterance.onend = () => {
-      if (chatBubble) chatBubble.classList.remove("bubble-speaking");
-    };
-
-    speechSynthesis.speak(utterance);
-  }
-
-  // Idle Timer
-  //let idleTimer;
-  //function resetIdleTimer() {
-   // clearTimeout(idleTimer);
-   // idleTimer = setTimeout(() => {
-    //  speak("Still here, Master. Just let me know when you require assistance.");
-    //}, 30000);
-  //}
-
-  //document.addEventListener("mousemove", resetIdleTimer);
- // document.addEventListener("keydown", resetIdleTimer);
- // resetIdleTimer();
-
-  speechSynthesis.onvoiceschanged = () => {};
-</script>
-
-<style>
-  .bubble-speaking {
-    animation: pulseGlow 2s infinite;
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
-  }
-
-  @keyframes pulseGlow {
-    0% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.4); }
-    50% { box-shadow: 0 0 20px rgba(0, 255, 255, 1); }
-    100% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.4); }
-  }
-</style>
-
+                    copyButton.addEventListener("click", () => {
+                        navigator.clipboard.writeText(block.textContent)
+                            .then(() => {
+                                copyButton.textContent = "Copied!";
+                                setTimeout(() => copyButton.textContent = "Copy", 1500);
+                            })
+                            .catch(err => console.error('Failed to copy code:', err));
+                    });
+                    Prism.highlightElement(block);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
-<!-- Enhanced Settings Script -->
-
-<!-- Enhanced Settings Script -->
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  // Font Size Selector
-  const chatWindow = document.getElementById("chatWindow");
-  const fontSizeSelector = document.createElement("select");
-  fontSizeSelector.className = "w-full mt-2 p-1 border border-gray-300 text-sm rounded text-black";
-  fontSizeSelector.innerHTML = `
-    <option value="text-xs">Small</option>
-    <option value="text-sm" selected>Medium</option>
-    <option value="text-base">Large</option>
-    <option value="text-lg">Extra Large</option>
-  `;
-  fontSizeSelector.addEventListener("change", () => {
-    chatWindow.classList.remove("text-xs", "text-sm", "text-base", "text-lg");
-    chatWindow.classList.add(fontSizeSelector.value);
-    localStorage.setItem("chatFontSize", fontSizeSelector.value);
-  });
-
-  // Reset Settings
-  const resetSettings = document.createElement("button");
-  resetSettings.className = "w-full mt-2 px-3 py-1 rounded text-sm bg-red-600 text-white hover:bg-red-700";
-  resetSettings.textContent = "Reset All Settings";
-  resetSettings.addEventListener("click", () => {
-    localStorage.clear();
-    location.reload();
-  });
-
-  // Clear All History
-  const clearHistory = document.createElement("button");
-  clearHistory.className = "w-full mt-2 px-3 py-1 rounded text-sm bg-red-500 text-white hover:bg-red-600";
-  clearHistory.textContent = "Clear All Chat History";
-  clearHistory.addEventListener("click", () => {
-    localStorage.removeItem("chatHistory");
-    location.reload();
-  });
-
-  // Auto Scroll Toggle - switch
-  const autoScrollWrapper = document.createElement("div");
-  autoScrollWrapper.className = "w-full mt-2 flex items-center justify-between text-sm text-black";
-  autoScrollWrapper.innerHTML = `
-    <label class="font-medium">Auto Scroll</label>
-    <label class="inline-flex relative items-center cursor-pointer">
-      <input type="checkbox" value="" class="sr-only peer" id="autoScrollSwitch">
-      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600"></div>
-      <span class="ml-3 text-sm font-medium"></span>
-    </label>
-  `;
-
-  const autoScrollSwitch = autoScrollWrapper.querySelector("#autoScrollSwitch");
-  autoScrollSwitch.checked = localStorage.getItem("autoScroll") === "true";
-  autoScrollSwitch.addEventListener("change", () => {
-    localStorage.setItem("autoScroll", autoScrollSwitch.checked);
-  });
-
-  // Insert into Settings Modal
-  const settingsPanel = document.getElementById("settingsPanel");
-  settingsPanel.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", autoScrollWrapper);
-  settingsPanel.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", clearHistory);
-  settingsPanel.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", resetSettings);
-  settingsPanel.querySelector(".flex.justify-end").insertAdjacentElement("beforebegin", fontSizeSelector);
-
-  // Load saved preferences
-  const savedFontSize = localStorage.getItem("chatFontSize") || "text-sm";
-  chatWindow.classList.add(savedFontSize);
-  fontSizeSelector.value = savedFontSize;
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  function setupMessageActions() {
-    const chatMessages = document.querySelectorAll(".chat-message-container");
-
-    chatMessages.forEach(container => {
-      const actions = container.querySelector(".message-actions");
-
-      if (!actions) return;
-
-      // Initially hide the buttons
-      actions.style.display = "none";
-
-      container.addEventListener("click", () => {
-        actions.style.display = "flex";
-
-        // Auto-hide after 3 seconds
-        clearTimeout(container._hideTimeout); // Clear any previous timeout
-        container._hideTimeout = setTimeout(() => {
-          actions.style.display = "none";
-        }, 3000);
-      });
-    });
-  }
-
-  // Run on initial messages
-  setupMessageActions();
-
-  // Re-run setup after each new message is added
-  const observer = new MutationObserver(setupMessageActions);
-  observer.observe(document.getElementById("chatWindow"), {
-    childList: true,
-    subtree: true
-  });
-});
-
-</script>
-
-<style>
-body.show-timestamps .chat-message-container::after {
-  content: attr(data-timestamp);
-  display: block;
-  font-size: 0.7rem;
-  color: gray;
-  margin-top: 0.25rem;
-  text-align: right;
-}
-</style>
