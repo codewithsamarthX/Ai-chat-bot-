@@ -530,7 +530,8 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
          */
         function createChatEntry(message, type, messageIndex) {
             const msgContainer = document.createElement("div");
-            msgContainer.className = `flex ${type === "user" ? "justify-end" : "justify-start"} mb-3`;
+           msgContainer.className = type === "user" ? "text-right pr-3 sm:pr-8" : "text-left pl-3 sm:pl-8";
+
             msgContainer.innerHTML = `
                 <div class="chat-message-container group">
                     <div class="chat-text inline-block rounded-lg px-4 py-2 break-words max-w-full ${
