@@ -695,14 +695,14 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
             if (lowerCaseMessage.startsWith("open spotify")) { smartReplyAndOpen("Opening Spotify for you, Master.", "https://open.spotify.com"); return; }
             if (lowerCaseMessage.startsWith("open youtube music")) { smartReplyAndOpen("Opening YouTube Music, Master.", "https://music.youtube.com"); return; }
             if (lowerCaseMessage.startsWith("play trailer of ")) { const query = encodeURIComponent(message.replace(/play trailer of /i, "").trim() + " trailer"); smartReplyAndOpen("Searching YouTube for trailer, Master.", `https://www.youtube.com/results?search_query=${query}`); return; }
-            if (lowerCaseMessage.startsWith("play") && lowerCaseMessage.includes("on netflix")) { const title = message.replace(/play /i, "").replace(/ on netflix/i, "").trim(); const query = encodeURIComponent(title + " site:netflix.com"); smartReplyAndOpen(`Searching Netflix for *${title}*, Master.`, `https://www.google.com/search?q=${query}`); return; }
+            if (lowerCaseMessage.startsWith("play") && lowerCaseMessage.includes("on netflix")) { const title = message.replace(/play /i, "").replace(/ on netflix/i, "").trim(); const query = encodeURIComponent(title + " site:netflix.com"); smartReplyAndOpen(`Searching Netflix for ${title}, Master.`, `https://www.google.com/search?q=${query}`); return; }
             if (lowerCaseMessage.startsWith("play ")) {
                 const song = message.replace(/play /i, "").replace(/ on youtube/i, "").replace(/ on spotify/i, "").trim();
                 const query = encodeURIComponent(song);
                 let platform = "YouTube";
                 let url = `https://www.youtube.com/results?search_query=${query}`;
                 if (lowerCaseMessage.includes("on spotify")) { platform = "Spotify"; url = `https://open.spotify.com/search/${query}`; }
-                smartReplyAndOpen(`Playing *${song}* on ${platform}.`, url); return;
+                smartReplyAndOpen(`Playing ${song} on ${platform}.`, url); return;
             }
             if (lowerCaseMessage.startsWith("search images of ")) { const queryText = message.replace(/search images of /i, "").trim(); const query = encodeURIComponent(queryText); smartReplyAndOpen(`Searching Google Images for ${queryText}.`, `https://www.google.com/search?tbm=isch&q=${query}`); return; }
             if (lowerCaseMessage.startsWith("search news about ")) { const query = encodeURIComponent(message.replace(/search news about /i, "").trim()); smartReplyAndOpen(`Searching Google News for ${query}.`, `https://news.google.com/search?q=${query}`); return; }
