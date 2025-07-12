@@ -788,7 +788,7 @@ async function handleSmartCommands(message, lowerCaseMessage) {
         if (!lastSmartCommand) return "Hmm... there’s nothing to repeat yet, Master.";
         return await handleSmartCommands(lastSmartCommand, lastSmartCommand);
     }
-if (lowerCaseMessage.includes("self-destruct")) {
+if (lowerCaseMessage.includes("self destruct")) {
   document.body.classList.add("shake-effect");
   const aiMessageIndex = addMessage("ai", "⚠️ Initiating Self-Destruct Sequence...");
   const aiDiv = getMessageDiv(aiMessageIndex);
