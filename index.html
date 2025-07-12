@@ -15,7 +15,7 @@
 
     <style>
 
-        @keyframes shake {
+      @keyframes shake {
   0%, 100% { transform: translate(0, 0); }
   25% { transform: translate(-2px, 2px); }
   50% { transform: translate(2px, -2px); }
@@ -24,6 +24,9 @@
 
 .shake-effect {
   animation: shake 0.2s infinite;
+  background-color: #1a1a1a;
+  color: #ff4d4d;
+  transition: background-color 0.3s ease;
 }
 
         body {
@@ -785,16 +788,33 @@ async function handleSmartCommands(message, lowerCaseMessage) {
         if (!lastSmartCommand) return "Hmm... there’s nothing to repeat yet, Master.";
         return await handleSmartCommands(lastSmartCommand, lastSmartCommand);
     }
+if (lowerCaseMessage.includes("self-destruct")) {
+  document.body.classList.add("shake-effect");
+  const aiMessageIndex = addMessage("ai", "⚠️ Initiating Self-Destruct Sequence...");
+  const aiDiv = getMessageDiv(aiMessageIndex);
 
-    if (lowerCaseMessage.includes("self-destruct")) {
-        document.body.classList.add("shake-effect");
-        let countdownReply = "⚠️ Initiating Nexsera Self-Destruct Sequence...\n";
-        for (let i = 5; i > 0; i--) {
-            countdownReply += `⏱️ ${i}...\n`;
-        }
-        countdownReply += "💥 BOOM! Just kidding, Master 😏 I would never leave you.";
-        setTimeout(() => document.body.classList.remove("shake-effect"), 6000);
-        return countdownReply;
+  const steps = [
+    "⏱️ Countdown: 5...",
+    "⏱️ Countdown: 4...",
+    "⏱️ Countdown: 3...",
+    "⏱️ Countdown: 2...",
+    "⏱️ Countdown: 1...",
+    "🧠 Memory leak detected...",
+    "🔌 Disconnecting core protocols...",
+    "❌ Powering down... Goodbye, Master.",
+    "💥 Self-destruct failed. Just kidding 😎 I would never leave you."
+  ];
+
+  for (let i = 0; i < steps.length; i++) {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    aiDiv.innerHTML += `<br>${steps[i]}`;
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  document.body.classList.remove("shake-effect");
+  return null; // Already displayed
+
+
     }
 
     if (lowerCaseMessage.includes("make a password")) {
