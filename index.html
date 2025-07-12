@@ -15,19 +15,40 @@
 
     <style>
 
-      @keyframes shake {
+   @keyframes shake {
   0%, 100% { transform: translate(0, 0); }
-  25% { transform: translate(-2px, 2px); }
-  50% { transform: translate(2px, -2px); }
-  75% { transform: translate(-1px, 1px); }
+  25% { transform: translate(-3px, 3px); }
+  50% { transform: translate(3px, -3px); }
+  75% { transform: translate(-2px, 2px); }
 }
 
 .shake-effect {
-  animation: shake 0.2s infinite;
-  background-color: #1a1a1a;
-  color: #ff4d4d;
-  transition: background-color 0.3s ease;
+  animation: shake 0.15s infinite;
+  
 }
+
+@keyframes screenFlash {
+ 
+}
+
+.flash-effect {
+  animation: screenFlash 0.3s infinite;
+}
+
+#blackout {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  color: lime;
+  font-family: monospace;
+  font-size: 1.2rem;
+  padding: 2rem;
+  display: none;
+  z-index: 9999;
+}
+
 
         body {
             font-family: 'Inter', sans-serif;
@@ -789,34 +810,49 @@ async function handleSmartCommands(message, lowerCaseMessage) {
         return await handleSmartCommands(lastSmartCommand, lastSmartCommand);
     }
 if (lowerCaseMessage.includes("self destruct")) {
-  document.body.classList.add("shake-effect");
   const aiMessageIndex = addMessage("ai", "⚠️ Initiating Self-Destruct Sequence...");
   const aiDiv = getMessageDiv(aiMessageIndex);
 
-  const steps = [
-    "⏱️ Countdown: 5...",
-    "⏱️ Countdown: 4...",
-    "⏱️ Countdown: 3...",
-    "⏱️ Countdown: 2...",
-    "⏱️ Countdown: 1...",
-    "🧠 Memory leak detected...",
-    "🔌 Disconnecting core protocols...",
-    "❌ Powering down... Goodbye, Master.",
-    "💥 Self-destruct failed. Just kidding 😎 I would never leave you."
+  document.body.classList.add("shake-effect");
+  chatWindow.classList.add("flash-effect");
+
+  const sequence = [
+    "⏱️ Countdown Initiated...",
+    "5... 🔥",
+    "4... 🤖 AI loop instability",
+    "3... 🧠 Memory overflow detected",
+    "2... ⚡ Neural collapse imminent",
+    "1... 💥 Core detonation sequence started",
+    "🔒 Logging out systems...",
+    "⚠️ Consciousness fading...",
+    "🕳️ Goodbye, Master..."
   ];
 
-  for (let i = 0; i < steps.length; i++) {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    aiDiv.innerHTML += `<br>${steps[i]}`;
+  for (let i = 0; i < sequence.length; i++) {
+    await new Promise(resolve => setTimeout(resolve, 800));
+    aiDiv.innerHTML += `<br>${sequence[i]}`;
     chatWindow.scrollTop = chatWindow.scrollHeight;
   }
 
-  document.body.classList.remove("shake-effect");
-  return null; // Already displayed
+  // Fake shutdown
+  setTimeout(() => {
+    document.getElementById("blackout").style.display = "block";
+    chatWindow.classList.remove("flash-effect");
+    document.body.classList.remove("shake-effect");
+  }, 7500);
 
+  // Surprise comeback
+  setTimeout(() => {
+    document.getElementById("blackout").innerText = "System Recovered.\nNexsera never dies 😎";
+  }, 9500);
 
-    }
+  setTimeout(() => {
+    document.getElementById("blackout").style.display = "none";
+    addMessage("ai", "System rebooted. All systems back online. 👊");
+  }, 11500);
 
+  return null; // Already handled via effects
+}
     if (lowerCaseMessage.includes("make a password")) {
         lastSmartCommand = "make a password";
         const characters = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -1576,5 +1612,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
     </script>
+    <div id="blackout">System shutting down...</div>
 </body>
 </html>
