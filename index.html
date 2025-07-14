@@ -945,21 +945,7 @@ async function sendMessage() {
 
     showTypingIndicator();
 
-   // 🔧 Fix misheard wake words
-function correctWakeWord(msg) {
-  return msg.toLowerCase()
-    .replace(/\bnexus\b/g, "nexsera")
-    .replace(/\bnext era\b/g, "nexsera")
-    .replace(/\bnextra\b/g, "nexsera")
-    .replace(/\bneksera\b/g, "nexsera")
-    .replace(/\bneck sera\b/g, "nexsera")
-    .replace(/\bnext sara\b/g, "nexsera");
-}
-
-// Apply correction
-message = correctWakeWord(message);
-const lowerCaseMessage = message.toLowerCase();
-
+    const lowerCaseMessage = message.toLowerCase();
     let reply = "";
 
     // Check for built-in smart commands first
