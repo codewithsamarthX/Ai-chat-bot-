@@ -1413,7 +1413,14 @@ recordBtn.addEventListener("click", () => {
     // Prefill prompt function for quick suggestion buttons
     function prefillPrompt(text) {
         chatInput.value = text;
-        chatInput.focus();
+
+        // Detect if mobile — auto send instead of waiting
+        if (/Mobi|Android/i.test(navigator.userAgent)) {
+            hideEmptyState();
+            sendMessage();
+        } else {
+            chatInput.focus();
+        }
     }
 
     // If you want to auto-send instead of just filling:
@@ -1428,9 +1435,14 @@ recordBtn.addEventListener("click", () => {
         // === Quick Prompt Button Function ===
 function prefillPrompt(text) {
     chatInput.value = text;
-    chatInput.focus();
-    // If you want auto-send instead of just prefill, uncomment below:
-    // sendMessage();
+
+    // Detect if mobile — auto send instead of waiting
+    if (/Mobi|Android/i.test(navigator.userAgent)) {
+        hideEmptyState();
+        sendMessage();
+    } else {
+        chatInput.focus();
+    }
 }
 
 // === Empty State Control ===
