@@ -682,6 +682,59 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
             const cityName = city || defaultCity;
             return `The weather in ${cityName} is currently sunny with a temperature of 25°C.`;
         }
+// ✅ Math Expression Calculator
+function isMathExpression(input) {
+  return /^[0-9+\-*/%().\s]+$/.test(input);
+}
+function calculateExpression(expr) {
+  try {
+    let result = Function(`"use strict"; return (${expr})`)();
+    return result;
+  } catch {
+    return "❌ Invalid Expression";
+  }
+}
+
+// ✅ Date & Time Math
+function daysFromNow(days) {
+  const future = new Date();
+  future.setDate(future.getDate() + days);
+  return future.toDateString();
+}
+function daysUntil(dateStr) {
+  try {
+    const today = new Date();
+    const target = new Date(dateStr);
+    const diffTime = target - today;
+    if (isNaN(diffTime)) return "❌ Invalid date";
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return `${diffDays} days`;
+  } catch {
+    return "❌ Invalid date";
+  }
+}
+
+// ✅ Simple Knowledge Tools
+function factorial(n) {
+  if (n < 0) return "❌ Invalid (negative)";
+  let result = 1;
+  for (let i = 2; i <= n; i++) result *= i;
+  return result;
+}
+function isPrime(n) {
+  if (n <= 1) return false;
+  for (let i = 2; i * i <= n; i++) {
+    if (n % i === 0) return false;
+  }
+  return true;
+}
+function primesTill(n) {
+  const primes = [];
+  for (let i = 2; i <= n; i++) {
+    if (isPrime(i)) primes.push(i);
+  }
+  return primes.join(", ");
+}
 
         /**
          * Handles sending a message, displaying user input, simulating AI response,
@@ -690,6 +743,138 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
         async function sendMessage() {
             const message = chatInput.value.trim();
             if (!message && filesToSend.length === 0) return;
+            
+
+// --- CUSTOM TOOLS BEFORE NORMAL AI LOGIC ---
+
+// ✅ Calculator
+if (isMathExpression(message)) {
+    const result = calculateExpression(message);
+
+    let currentChat = chatHistory.find(chat => chat.id === currentChatId);
+    if (!currentChatId) {
+        currentChatId = generateChatId();
+        currentChat = { id: currentChatId, title: message, messages: [] };
+        chatHistory.unshift(currentChat);
+        renderHistoryList();
+    }
+
+    const aiMessageIndex = currentChat.messages.length;
+    currentChat.messages.push({ role: "ai", content: `= ${result}` });
+
+    const calcCard = `
+      <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+        <p class="text-sm text-gray-500 dark:text-gray-300">📐 Calculator</p>
+        <p class="text-gray-700 dark:text-gray-200 mt-1"><b>${message}</b></p>
+        <p class="text-lg font-semibold text-red-600 dark:text-red-400">= ${result}</p>
+      </div>
+    `;
+    const aiMessageDiv = createChatEntry(calcCard, "ai", aiMessageIndex);
+    aiMessageDiv.innerHTML = calcCard;
+    saveChatHistoryForUser();
+    return; // stop here (no default reply)
+}
+
+// ✅ Date & Time Math
+// ✅ Date & Time Math — CARD OUTPUTS + EARLY RETURNS
+{
+  const lc = message.toLowerCase();
+
+  const ensureChat = () => {
+    let currentChat = chatHistory.find(chat => chat.id === currentChatId);
+    if (!currentChatId) {
+      currentChatId = generateChatId();
+      currentChat = { id: currentChatId, title: message, messages: [] };
+      chatHistory.unshift(currentChat);
+      renderHistoryList();
+    }
+    return currentChat;
+  };
+
+  const emitCard = (html) => {
+    const currentChat = ensureChat();
+    const aiMessageIndex = currentChat.messages.length;
+    currentChat.messages.push({ role: "ai", content: html });
+    const aiDiv = createChatEntry(html, "ai", aiMessageIndex);
+    aiDiv.innerHTML = html;
+    saveChatHistoryForUser();
+    hideEmptyState();
+  };
+
+  // 45 days from now
+  const fromNowMatch = lc.match(/(\d+)\s*days?\s*from\s*now/);
+  if (fromNowMatch) {
+    const num = parseInt(fromNowMatch[1], 10);
+    const dateStr = daysFromNow(num);
+    emitCard(`
+      <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+        <p class="text-sm text-gray-500 dark:text-gray-300">📅 Date Math</p>
+        <p class="text-gray-700 dark:text-gray-200 mt-1"><b>${num} day(s) from now</b></p>
+        <p class="text-lg font-semibold">${dateStr}</p>
+      </div>`);
+    return;
+  }
+
+  // days until X
+  const untilMatch = lc.match(/days?\s*until\s+(.+)/i);
+  if (untilMatch) {
+    const dateInput = message.replace(/^\s*days?\s*until\s+/i, "").trim();
+    const target = new Date(dateInput);
+    const daysLeft = daysUntil(dateInput);
+    const nice = isNaN(target) ? "Invalid date" : target.toDateString();
+    emitCard(`
+      <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+        <p class="text-sm text-gray-500 dark:text-gray-300">📅 Countdown</p>
+        <p class="text-gray-700 dark:text-gray-200 mt-1">Until <b>${dateInput}</b> <span class="text-xs opacity-70">(${nice})</span></p>
+        <p class="text-lg font-semibold">${daysLeft}</p>
+      </div>`);
+    return;
+  }
+
+  // factorial of N
+  const factMatch = lc.match(/factorial\s+of\s+(\d+)/);
+  if (factMatch) {
+    const n = parseInt(factMatch[1], 10);
+    const result = factorial(n);
+    emitCard(`
+      <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+        <p class="text-sm text-gray-500 dark:text-gray-300">🔢 Factorial</p>
+        <p class="text-gray-700 dark:text-gray-200 mt-1"><b>Factorial of ${n}</b></p>
+        <p class="text-lg font-semibold">${result}</p>
+      </div>`);
+    return;
+  }
+
+  // is N prime
+  const primeCheckMatch = lc.match(/^is\s+(\d+)\s+prime/);
+  if (primeCheckMatch) {
+    const n = parseInt(primeCheckMatch[1], 10);
+    const ok = isPrime(n);
+    emitCard(`
+      <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+        <p class="text-sm text-gray-500 dark:text-gray-300">🔢 Prime Check</p>
+        <p class="text-lg font-semibold">${n} → ${ok ? "✅ Prime" : "❌ Not Prime"}</p>
+      </div>`);
+    return;
+  }
+
+  // primes till N
+  const primesTillMatch = lc.match(/primes?\s*till\s+(\d+)/);
+  if (primesTillMatch) {
+    const n = parseInt(primesTillMatch[1], 10);
+    const list = primesTill(n);
+    emitCard(`
+      <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+        <p class="text-sm text-gray-500 dark:text-gray-300">🔢 Prime Numbers</p>
+        <p class="text-xs text-gray-500 dark:text-gray-300 mb-1">Up to ${n}</p>
+        <p class="text-gray-800 dark:text-gray-100 break-words">${list || "—"}</p>
+      </div>`);
+    return;
+  }
+}
+
+
+            
 
             hideEmptyState(); // ✅ hides welcome box when you send anything
 
