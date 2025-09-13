@@ -408,6 +408,10 @@ const sidebarOverlay = document.getElementById("sidebarOverlay");
         const recordBtn = document.getElementById("recordBtn");
 
 
+
+
+
+
       // --- Sidebar Toggle (Works on all screen sizes) ---
 function toggleSidebarFn() {
     isSidebarOpen = !isSidebarOpen;
@@ -454,8 +458,7 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
         let currentChatId = null; // ID of the currently active chat session
         let isTyping = false; // Flag to manage typing indicator state
         let preferredResponseSpeed = parseInt(localStorage.getItem("preferredResponseSpeed") || "500");
-        let autoScrollEnabled = localStorage.getItem("autoScroll") === "true";
-        let users = JSON.parse(localStorage.getItem("userList")) || [];
+        let autoScrollEnabled = localStorage.getItem("autoScroll") !== "false";        let users = JSON.parse(localStorage.getItem("userList")) || [];
         let currentUser = localStorage.getItem("currentUser") || null;
 
         // --- Utility Functions ---
@@ -677,11 +680,44 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
          * @param {string} city - The city for which to get weather.
          * @returns {Promise<string>} A promise resolving to weather information.
          */
-        async function getWeatherData(city) {
-            const defaultCity = "your current location";
-            const cityName = city || defaultCity;
-            return `The weather in ${cityName} is currently sunny with a temperature of 25°C.`;
+        // ==========================
+// Real Weather API Function
+// ==========================
+async function getWeatherData(city) {
+    if (!city) city = "Nashik"; // fallback if user gives no city
+    const apiKey = "870665bf2180b59f08a6d6b31e6bb2d0";
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error("Weather fetch failed");
         }
+        const data = await response.json();
+
+        const temp = Math.round(data.main.temp);
+        const desc = data.weather[0].description;
+        const feels = Math.round(data.main.feels_like);
+        const humidity = data.main.humidity;
+        const wind = data.wind.speed;
+
+        // return as safe string (HTML card for chat)
+        return `
+            <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+                <p class="text-sm text-gray-500 dark:text-gray-300">🌦 Weather Update</p>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">${data.name}</h3>
+                <p class="text-gray-700 dark:text-gray-200 capitalize">${desc}</p>
+                <p class="text-2xl font-bold text-cyan-600 dark:text-cyan-400">${temp}°C</p>
+                <p class="text-sm text-gray-600 dark:text-gray-300">Feels like: ${feels}°C | 💧 ${humidity}% | 🌬 ${wind} m/s</p>
+            </div>
+        `;
+    } catch (err) {
+        console.error("Weather error:", err);
+        return `❌ Unable to fetch weather for ${city}`;
+    }
+}
+           
+        
 // ✅ Math Expression Calculator
 function isMathExpression(input) {
   return /^[0-9+\-*/%().\s]+$/.test(input);
@@ -915,8 +951,7 @@ if (isMathExpression(message)) {
             if (lowerCaseMessage.startsWith("translate ")) { const match = message.match(/translate (.+) to (.+)/i); if (match) { const phrase = encodeURIComponent(match[1]); const lang = encodeURIComponent(match[2]); smartReplyAndOpen(`Translating ${match[1]} to ${match[2]}...`, `https://translate.google.com/?sl=auto&tl=${lang}&text=${phrase}&op=translate`); return; } }
             if (lowerCaseMessage.startsWith("calculate ")) { const expression = encodeURIComponent(message.replace(/calculate /i, "").trim()); smartReplyAndOpen(`Calculating ${expression}...`, `https://www.google.com/search?q=${expression}`); return; }
             if (lowerCaseMessage.startsWith("define ")) { const word = encodeURIComponent(message.replace(/define /i, "").trim()); smartReplyAndOpen(`Defining ${word}...`, `https://www.google.com/search?q=define+${word}`); return; }
-            if (lowerCaseMessage.startsWith("weather in ")) { const city = message.replace(/weather in /i, "").trim(); const encodedCity = encodeURIComponent(city); smartReplyAndOpen(`Fetching weather for ${city}...`, `https://www.google.com/search?q=weather+in+${encodedCity}`); return; }
-
+            
             if (introText) introText.remove();
 
             let fileNames = filesToSend.map(file => `📁 ${file.name}`).join("<br>");
@@ -935,6 +970,42 @@ if (isMathExpression(message)) {
             currentChat.messages.push({ role: "user", content: userMessageContent });
             createChatEntry(userMessageContent, "user", userMessageIndex);
             saveChatHistoryForUser();
+// --- Auto Google Search for uploaded files ---
+if (filesToSend.length > 0) {
+    for (const file of filesToSend) {
+        // Clean filename
+        let query = file.name.replace(/\.trashed-\d+-/i, "");
+
+        if (file.type === "text/plain") {
+            try {
+                const text = await file.text();
+                query = text.split(/\s+/).slice(0, 6).join(" ");
+            } catch (err) {
+                console.error("Text file read error:", err);
+            }
+        }
+
+        if (file.type === "application/pdf") {
+            query = query.replace(/\.pdf$/i, "");
+        }
+
+        if (file.type.startsWith("image/")) {
+            // Open Google Images for visual search
+            const searchUrl = `https://images.google.com/`;
+            smartReplyAndOpen(`🔎 Please upload your image here for a visual search.`, searchUrl);
+            continue; // skip filename search
+        }
+
+        // Default: filename/text search
+        const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        smartReplyAndOpen(`Searching Google for content from ${query}...`, searchUrl);
+    }
+
+    // Clear files after searching
+    filesToSend = [];
+    updateFilePreview();
+}
+
 
             chatInput.value = "";
             filesToSend = [];
