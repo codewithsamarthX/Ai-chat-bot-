@@ -993,20 +993,20 @@ async function sendMessage() {
 
   // 7) Smart open/search/play commands that open a new window/tab
   // (use same checks you had — they call smartReplyAndOpen which creates AI reply + window.open)
-  if (lc.startsWith("open whatsapp")) { smartReplyAndOpen("Opening WhatsApp Web for you, Master.", "https://web.whatsapp.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open instagram")) { smartReplyAndOpen("Opening Instagram, Master.", "https://www.instagram.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open github")) { smartReplyAndOpen("Opening GitHub, Master.", "https://github.com/"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open flipkart")) { smartReplyAndOpen("Opening Flipkart, Master.", "https://www.flipkart.com/"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open amazon")) { smartReplyAndOpen("Opening Amazon, Master.", "https://www.amazon.in/"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open facebook")) { smartReplyAndOpen("Opening Facebook, Master.", "https://www.facebook.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open twitter") || lc.startsWith("open x")) { smartReplyAndOpen("Opening Twitter, Master.", "https://twitter.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open linkedin")) { smartReplyAndOpen("Opening LinkedIn, Master.", "https://www.linkedin.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open netflix")) { smartReplyAndOpen("Opening Netflix, Master.", "https://www.netflix.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open portfolio") || lc.startsWith("open my portfolio")) { smartReplyAndOpen("Opening your portfolio, Master.", "https://samarthnagpure-byte.github.io/portfolio/"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open spotify")) { smartReplyAndOpen("Opening Spotify for you, Master.", "https://open.spotify.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open youtube music")) { smartReplyAndOpen("Opening YouTube Music, Master.", "https://music.youtube.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("play trailer of ")) { const query = encodeURIComponent(message.replace(/play trailer of /i, "").trim() + " trailer"); smartReplyAndOpen("Searching YouTube for trailer, Master.", `https://www.youtube.com/results?search_query=${query}`); hideTypingIndicator(); return; }
-  if (lc.startsWith("play") && lc.includes("on netflix")) { const title = message.replace(/play /i, "").replace(/ on netflix/i, "").trim(); const query = encodeURIComponent(title + " site:netflix.com"); smartReplyAndOpen(`Searching Netflix for ${title}, Master.`, `https://www.google.com/search?q=${query}`); hideTypingIndicator(); return; }
+  if (lc.startsWith("open whatsapp")) { smartReplyAndOpen("Opening WhatsApp Web for you, Sir.", "https://web.whatsapp.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open instagram")) { smartReplyAndOpen("Opening Instagram, Sir.", "https://www.instagram.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open github")) { smartReplyAndOpen("Opening GitHub, Sir.", "https://github.com/"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open flipkart")) { smartReplyAndOpen("Opening Flipkart, Sir.", "https://www.flipkart.com/"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open amazon")) { smartReplyAndOpen("Opening Amazon, Sir.", "https://www.amazon.in/"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open facebook")) { smartReplyAndOpen("Opening Facebook, Sir.", "https://www.facebook.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open twitter") || lc.startsWith("open x")) { smartReplyAndOpen("Opening Twitter, Sir.", "https://twitter.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open linkedin")) { smartReplyAndOpen("Opening LinkedIn, Sir.", "https://www.linkedin.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open netflix")) { smartReplyAndOpen("Opening Netflix, Sir.", "https://www.netflix.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open portfolio") || lc.startsWith("open my portfolio")) { smartReplyAndOpen("Opening your portfolio, Sir.", "https://samarthnagpure-byte.github.io/portfolio/"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open spotify")) { smartReplyAndOpen("Opening Spotify for you, Sir.", "https://open.spotify.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open youtube music")) { smartReplyAndOpen("Opening YouTube Music, Sir.", "https://music.youtube.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("play trailer of ")) { const query = encodeURIComponent(message.replace(/play trailer of /i, "").trim() + " trailer"); smartReplyAndOpen("Searching YouTube for trailer, Sir.", `https://www.youtube.com/results?search_query=${query}`); hideTypingIndicator(); return; }
+  if (lc.startsWith("play") && lc.includes("on netflix")) { const title = message.replace(/play /i, "").replace(/ on netflix/i, "").trim(); const query = encodeURIComponent(title + " site:netflix.com"); smartReplyAndOpen(`Searching Netflix for ${title}, Sir.`, `https://www.google.com/search?q=${query}`); hideTypingIndicator(); return; }
   if (lc.startsWith("play ")) {
     const song = message.replace(/play /i, "").replace(/ on youtube/i, "").replace(/ on spotify/i, "").trim();
     const query = encodeURIComponent(song);
@@ -1024,8 +1024,8 @@ async function sendMessage() {
   if (lc.startsWith("search videos of ")) { const query = encodeURIComponent(message.replace(/search videos of /i, "").trim()); smartReplyAndOpen(`Searching YouTube for ${query}.`, `https://www.youtube.com/results?search_query=${query}`); hideTypingIndicator(); return; }
   if (lc.startsWith("search ")) { const queryText = message.replace(/search /i, "").trim(); const query = encodeURIComponent(queryText); smartReplyAndOpen(`Searching Google for ${queryText}.`, `https://www.google.com/search?q=${query}`); hideTypingIndicator(); return; }
   if (lc.startsWith("navigate to ")) { const place = message.replace(/navigate to /i, "").trim(); const encoded = encodeURIComponent(place); smartReplyAndOpen(`Navigating to ${place} on Google Maps...`, `https://www.google.com/maps/search/${encoded}`); hideTypingIndicator(); return; }
-  if (lc.startsWith("open youtube")) { smartReplyAndOpen("Opening YouTube, Master.", "https://www.youtube.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open gmail")) { smartReplyAndOpen("Opening Gmail, Master.", "https://mail.google.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open youtube")) { smartReplyAndOpen("Opening YouTube, Sir.", "https://www.youtube.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open gmail")) { smartReplyAndOpen("Opening Gmail, Sir.", "https://mail.google.com"); hideTypingIndicator(); return; }
   if (lc.startsWith("set timer for ")) { const time = message.replace(/set timer for /i, "").trim(); smartReplyAndOpen(`Setting a timer for ${time}...`, `https://www.google.com/search?q=timer+for+${encodeURIComponent(time)}`); hideTypingIndicator(); return; }
   if (lc.startsWith("translate ")) { const match = message.match(/translate (.+) to (.+)/i); if (match) { const phrase = encodeURIComponent(match[1]); const lang = encodeURIComponent(match[2]); smartReplyAndOpen(`Translating ${match[1]} to ${match[2]}...`, `https://translate.google.com/?sl=auto&tl=${lang}&text=${phrase}&op=translate`); hideTypingIndicator(); return; } }
   if (lc.startsWith("calculate ")) { const expression = encodeURIComponent(message.replace(/calculate /i, "").trim()); smartReplyAndOpen(`Calculating ${expression}...`, `https://www.google.com/search?q=${expression}`); hideTypingIndicator(); return; }
@@ -1037,17 +1037,17 @@ async function sendMessage() {
     hideTypingIndicator();
 
     let reply;
-    if (["hi", "hello"].includes(lc)) { reply = "Welcome back, Master. How may I assist you today?"; }
-    else if (lc.includes("help")) { reply = "Of course, Master. What would you like me to do?"; }
-    else if (lc.includes("who are you")) { reply = "I am Nexsera, Master. Your dedicated assistant, optimized for precision and efficiency."; }
+    if (["hi", "hello"].includes(lc)) { reply = "Welcome back, Sir. How may I assist you today?"; }
+    else if (lc.includes("help")) { reply = "Of course, Sir. What would you like me to do?"; }
+    else if (lc.includes("who are you")) { reply = "I am Nexsera, Sir. Your dedicated assistant, optimized for precision and efficiency."; }
     else if (lc.includes("features")) { reply = "Nexsera Ai can chat, summarize text, manage files, and more!"; }
-    else if (lc.includes("thank you") || lc.includes("thanks")) { reply = "Always a pleasure, Master."; }
-    else if (lc.includes("goodbye") || lc.includes("bye")) { reply = "Farewell, Master. I await your next command."; }
+    else if (lc.includes("thank you") || lc.includes("thanks")) { reply = "Always a pleasure, Sir."; }
+    else if (lc.includes("goodbye") || lc.includes("bye")) { reply = "Farewell, Sir. I await your next command."; }
     else if (lc.includes("make a password")) {
       const characters = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
       let password = "";
       for (let i = 0; i < 12; i++) { password += characters.charAt(Math.floor(Math.random() * characters.length)); }
-      reply = `As requested, Master, here is your secure 12-character password: \`${password}\` 🔐`;
+      reply = `As requested, Sir, here is your secure 12-character password: \`${password}\` 🔐`;
     }
     else if (lc.includes("joke")) { reply = "Sure! Why don’t scientists trust atoms? Because they make up everything! 😄"; }
     else if (lc.includes("quote")) { reply = "“The best way to get started is to quit talking and begin doing.” – Walt Disney ✨"; }
@@ -1057,28 +1057,28 @@ async function sendMessage() {
       const existing = JSON.parse(localStorage.getItem("reminders") || "[]");
       existing.push({ task, time: new Date().toLocaleString() });
       localStorage.setItem("reminders", JSON.stringify(existing));
-      reply = `Okay, Master. I’ve saved: “${task}” in your reminders.`;
+      reply = `Okay, Sir. I’ve saved: “${task}” in your reminders.`;
     }
     else if (lc.includes("show my reminders")) {
       const saved = JSON.parse(localStorage.getItem("reminders") || "[]");
-      if (saved.length === 0) { reply = "You have no reminders yet, Master."; }
+      if (saved.length === 0) { reply = "You have no reminders yet, Sir."; }
       else { reply = "Here are your reminders:<br>" + saved.map(r => `📌 ${r.task} (${r.time})`).join("<br>"); }
     }
-    else if (lc.includes("who made you")) { reply = "Master Samarth Nagpure engineered me to serve you with intelligence and reliability."; }
+    else if (lc.includes("who made you")) { reply = "Sir Samarth Nagpure engineered me to serve you with intelligence and reliability."; }
     else if (lc.includes("what can you do")) { reply = "I can chat, generate passwords, tell jokes, show quotes, summarize text, and more!"; }
     else if (lc.includes("settings")) { reply = "You can access settings from the top right corner or the sidebar."; }
     else if (lc.includes("dark mode") || lc.includes("light mode")) { reply = "You can toggle light/dark mode using the sun/moon icon in the header!"; }
     else if (lc.includes("new chat")) { reply = "To start a new chat, click the 'New Chat' button in the sidebar."; }
-    else if (["ok", "okay", "sure"].includes(lc)) { reply = "Understood, Master. Please instruct me further."; }
-    else if (["how are you", "how are you doing"].some(q => lc.includes(q))) { reply = "Functioning optimally, Master. Standing by for your instructions."; }
-    else if (lc.includes("summarize")) { reply = "Certainly, Master. Kindly provide the content you'd like summarized."; }
-    else if (lc.includes("explain")) { reply = "Absolutely, Master. What concept would you like me to elaborate on?"; }
+    else if (["ok", "okay", "sure"].includes(lc)) { reply = "Understood, Sir. Please instruct me further."; }
+    else if (["how are you", "how are you doing"].some(q => lc.includes(q))) { reply = "Functioning optimally, Sir. Standing by for your instructions."; }
+    else if (lc.includes("summarize")) { reply = "Certainly, Sir. Kindly provide the content you'd like summarized."; }
+    else if (lc.includes("explain")) { reply = "Absolutely, Sir. What concept would you like me to elaborate on?"; }
     else if (lc.includes("what's the date") || lc.includes("what day")) { const today = new Date(); reply = `Today is ${today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.`; }
     else if (lc.includes("fact")) { reply = "Did you know? The Eiffel Tower can grow more than 6 inches during summer due to heat! 🌞"; }
     else if (lc.includes("i'm stressed") || lc.includes("relax")) { reply = "Take a deep breath. You're doing great! 🌸 Try focusing on something you love."; }
     else if (lc.includes("idea for") || lc.includes("suggest")) { reply = "How about trying something creative today? Like writing a short poem or doodling something fun!"; }
     else if (lc.includes("i'm bored")) { reply = "Feeling bored? Try learning a random skill online like origami, drawing, or speed typing!"; }
-    else if (["what's your name", "what is your name", "what your name"].some(q => lc.includes(q))) { reply = "You may address me as Nexsera, Master — always at your service."; }
+    else if (["what's your name", "what is your name", "what your name"].some(q => lc.includes(q))) { reply = "You may address me as Nexsera, Sir — always at your service."; }
     else if (lc.includes("debug") || lc.includes("fix this code")) { reply = "Sure, please paste the code you'd like me to help with."; }
     else if (lc.includes("regex")) { reply = "Tell me what you need the regular expression to match, and I’ll help you generate it."; }
     else if (lc.includes("write a function")) { reply = "Got it! Please describe what the function should do."; }
@@ -1090,7 +1090,7 @@ async function sendMessage() {
     else if (lc.includes("define") || lc.includes("meaning of")) { reply = "Here’s the definition of that word:"; }
     else {
       // fallback
-      reply = "I didn't quite get that — can you rephrase or give me a bit more detail, Master?";
+      reply = "I didn't quite get that — can you rephrase or give me a bit more detail, Sir?";
     }
 
     // append AI reply as streaming text so it looks natural
