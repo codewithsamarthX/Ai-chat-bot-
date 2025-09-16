@@ -165,7 +165,7 @@
   <div class="flex items-center gap-3 mb-4">
     <div class="w-10 h-10 rounded-full bg-cyan-500 text-white flex items-center justify-center text-lg font-bold shadow-inner">S</div>
     <div>
-      <div class="font-semibold text-gray-800 dark:text-white">Samarth (Master)</div>
+      <div class="font-semibold text-gray-800 dark:text-white">Samarth (Sir)</div>
       <div class="text-xs text-gray-500 dark:text-gray-400">Personal AI Profile</div>
     </div>
   </div>
@@ -225,7 +225,7 @@
   <div class="mt-6 pt-4 border-t border-gray-200">
     <h2 class="text-sm font-semibold text-black mb-2">User Info</h2>
     <div class="text-sm text-gray-600 pl-1">
-      Logged in as: Samarth (Master)
+      Logged in as: Samarth (Sir)
     </div>
   </div>
 
@@ -248,7 +248,7 @@
     <!-- Empty state (shown when no chat) -->
     <div id="emptyState" class="text-center text-gray-500 mt-12">
       <img src="https://img.icons8.com/ios/100/robot.png" alt="robot" class="mx-auto mb-4 opacity-70" />
-      <h2 class="text-lg font-semibold text-gray-700 mb-1">Welcome back, Master.</h2>
+      <h2 class="text-lg font-semibold text-gray-700 mb-1">Welcome back, Sir.</h2>
       <p class="text-sm mb-4">Nexsera is ready. Try one of the prompts below or start a new chat.</p>
       <div class="flex justify-center gap-3">
         <button class="px-3 py-1 text-sm border border-transparent rounded bg-cyan-500 text-white hover:bg-cyan-600" onclick="prefillPrompt('Tell me a joke')">Tell me a joke</button>
@@ -776,28 +776,86 @@ function primesTill(n) {
          * Handles sending a message, displaying user input, simulating AI response,
          * and managing chat history.
          */
-        async function sendMessage() {
-            const message = chatInput.value.trim();
-            if (!message && filesToSend.length === 0) return;
-            
+async function sendMessage() {
+  // get and validate input
+  const messageRaw = chatInput.value || "";
+  const message = messageRaw.trim();
+  if (!message && filesToSend.length === 0) return;
 
-// --- CUSTOM TOOLS BEFORE NORMAL AI LOGIC ---
+  // hide welcome/empty state
+  hideEmptyState();
 
-// ✅ Calculator
-if (isMathExpression(message)) {
-    const result = calculateExpression(message);
+  // --- Ensure a current chat session exists (create if not) ---
+  let currentChat = chatHistory.find(chat => chat.id === currentChatId);
+  if (!currentChatId || !currentChat) {
+    currentChatId = generateChatId();
+    currentChat = {
+      id: currentChatId,
+      title: message.substring(0, 30) + (message.length > 30 ? "..." : ""),
+      messages: []
+    };
+    chatHistory.unshift(currentChat);
+    renderHistoryList();
+  }
 
-    let currentChat = chatHistory.find(chat => chat.id === currentChatId);
-    if (!currentChatId) {
-        currentChatId = generateChatId();
-        currentChat = { id: currentChatId, title: message, messages: [] };
-        chatHistory.unshift(currentChat);
-        renderHistoryList();
+  // include uploaded filenames (if any) inside the user bubble
+  let fileNames = filesToSend.map(f => `📁 ${f.name}`).join("<br>");
+  const userMessageContent = `${message || ""}${fileNames ? "<br>" + fileNames : ""}`;
+
+  // --- Always append the user's message first ---
+  const userMessageIndex = currentChat.messages.length;
+  currentChat.messages.push({ role: "user", content: userMessageContent });
+  createChatEntry(userMessageContent, "user", userMessageIndex);
+  saveChatHistoryForUser();
+
+  // If there are files, do the existing auto-google search behavior (keeps UX same)
+  if (filesToSend.length > 0) {
+    for (const file of filesToSend) {
+      let query = file.name.replace(/\.trashed-\d+-/i, "");
+
+      if (file.type === "text/plain") {
+        try {
+          const text = await file.text();
+          query = text.split(/\s+/).slice(0, 6).join(" ");
+        } catch (err) {
+          console.error("Text file read error:", err);
+        }
+      }
+
+      if (file.type === "application/pdf") {
+        query = query.replace(/\.pdf$/i, "");
+      }
+
+      if (file.type.startsWith("image/")) {
+        const searchUrl = `https://images.google.com/`;
+        smartReplyAndOpen(`🔎 Please upload your image here for a visual search.`, searchUrl);
+        continue;
+      }
+
+      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+      smartReplyAndOpen(`Searching Google for content from ${query}...`, searchUrl);
     }
 
-    const aiMessageIndex = currentChat.messages.length;
-    currentChat.messages.push({ role: "ai", content: `= ${result}` });
+    // clear files
+    filesToSend = [];
+    updateFilePreview();
+  }
 
+  // clear input and preview right away
+  chatInput.value = "";
+  filesToSend = [];
+  updateFilePreview();
+
+  // show typing indicator while we prepare the AI/tool response
+  showTypingIndicator();
+
+  // ---- Special tool handlers (these produce immediate reply cards or actions) ----
+  const lc = message.toLowerCase();
+
+  // 1) Exact math expression (5+3, 12/4 etc.)
+  if (isMathExpression(message)) {
+    const result = calculateExpression(message);
+    const aiMessageIndex = currentChat.messages.length;
     const calcCard = `
       <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
         <p class="text-sm text-gray-500 dark:text-gray-300">📐 Calculator</p>
@@ -805,329 +863,252 @@ if (isMathExpression(message)) {
         <p class="text-lg font-semibold text-red-600 dark:text-red-400">= ${result}</p>
       </div>
     `;
-    const aiMessageDiv = createChatEntry(calcCard, "ai", aiMessageIndex);
-    aiMessageDiv.innerHTML = calcCard;
+    currentChat.messages.push({ role: "ai", content: calcCard });
+    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+    aiDiv.innerHTML = calcCard;
+    hideTypingIndicator();
     saveChatHistoryForUser();
-    return; // stop here (no default reply)
-}
+    return;
+  }
 
-// ✅ Date & Time Math
-// ✅ Date & Time Math — CARD OUTPUTS + EARLY RETURNS
-{
-  const lc = message.toLowerCase();
-
-  const ensureChat = () => {
-    let currentChat = chatHistory.find(chat => chat.id === currentChatId);
-    if (!currentChatId) {
-      currentChatId = generateChatId();
-      currentChat = { id: currentChatId, title: message, messages: [] };
-      chatHistory.unshift(currentChat);
-      renderHistoryList();
-    }
-    return currentChat;
-  };
-
-  const emitCard = (html) => {
-    const currentChat = ensureChat();
-    const aiMessageIndex = currentChat.messages.length;
-    currentChat.messages.push({ role: "ai", content: html });
-    const aiDiv = createChatEntry(html, "ai", aiMessageIndex);
-    aiDiv.innerHTML = html;
-    saveChatHistoryForUser();
-    hideEmptyState();
-  };
-
-  // 45 days from now
-  const fromNowMatch = lc.match(/(\d+)\s*days?\s*from\s*now/);
+  // 2) Date math: "X days from now" or "days until ..."
+  const fromNowMatch = message.match(/(\d+)\s*days?\s*from\s*now/i);
   if (fromNowMatch) {
     const num = parseInt(fromNowMatch[1], 10);
     const dateStr = daysFromNow(num);
-    emitCard(`
+    const aiMessageIndex = currentChat.messages.length;
+    const html = `
       <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
         <p class="text-sm text-gray-500 dark:text-gray-300">📅 Date Math</p>
         <p class="text-gray-700 dark:text-gray-200 mt-1"><b>${num} day(s) from now</b></p>
         <p class="text-lg font-semibold">${dateStr}</p>
-      </div>`);
+      </div>`;
+    currentChat.messages.push({ role: "ai", content: html });
+    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+    aiDiv.innerHTML = html;
+    hideTypingIndicator();
+    saveChatHistoryForUser();
     return;
   }
 
-  // days until X
-  const untilMatch = lc.match(/days?\s*until\s+(.+)/i);
+  const untilMatch = message.match(/days?\s*until\s+(.+)/i);
   if (untilMatch) {
     const dateInput = message.replace(/^\s*days?\s*until\s+/i, "").trim();
-    const target = new Date(dateInput);
     const daysLeft = daysUntil(dateInput);
-    const nice = isNaN(target) ? "Invalid date" : target.toDateString();
-    emitCard(`
+    const nice = isNaN(new Date(dateInput)) ? "Invalid date" : new Date(dateInput).toDateString();
+    const aiMessageIndex = currentChat.messages.length;
+    const html = `
       <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
         <p class="text-sm text-gray-500 dark:text-gray-300">📅 Countdown</p>
         <p class="text-gray-700 dark:text-gray-200 mt-1">Until <b>${dateInput}</b> <span class="text-xs opacity-70">(${nice})</span></p>
         <p class="text-lg font-semibold">${daysLeft}</p>
-      </div>`);
+      </div>`;
+    currentChat.messages.push({ role: "ai", content: html });
+    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+    aiDiv.innerHTML = html;
+    hideTypingIndicator();
+    saveChatHistoryForUser();
     return;
   }
 
-  // factorial of N
-  const factMatch = lc.match(/factorial\s+of\s+(\d+)/);
+  // 3) Factorial
+  const factMatch = message.match(/factorial\s+of\s+(\d+)/i);
   if (factMatch) {
     const n = parseInt(factMatch[1], 10);
     const result = factorial(n);
-    emitCard(`
+    const aiMessageIndex = currentChat.messages.length;
+    const html = `
       <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
         <p class="text-sm text-gray-500 dark:text-gray-300">🔢 Factorial</p>
         <p class="text-gray-700 dark:text-gray-200 mt-1"><b>Factorial of ${n}</b></p>
         <p class="text-lg font-semibold">${result}</p>
-      </div>`);
+      </div>`;
+    currentChat.messages.push({ role: "ai", content: html });
+    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+    aiDiv.innerHTML = html;
+    hideTypingIndicator();
+    saveChatHistoryForUser();
     return;
   }
 
-  // is N prime
-  const primeCheckMatch = lc.match(/^is\s+(\d+)\s+prime/);
+  // 4) Prime check: "is 17 prime"
+  const primeCheckMatch = message.match(/is\s+(\d+)\s+prime/i);
   if (primeCheckMatch) {
     const n = parseInt(primeCheckMatch[1], 10);
     const ok = isPrime(n);
-    emitCard(`
+    const aiMessageIndex = currentChat.messages.length;
+    const html = `
       <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
         <p class="text-sm text-gray-500 dark:text-gray-300">🔢 Prime Check</p>
         <p class="text-lg font-semibold">${n} → ${ok ? "✅ Prime" : "❌ Not Prime"}</p>
-      </div>`);
+      </div>`;
+    currentChat.messages.push({ role: "ai", content: html });
+    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+    aiDiv.innerHTML = html;
+    hideTypingIndicator();
+    saveChatHistoryForUser();
     return;
   }
 
-  // primes till N
-  const primesTillMatch = lc.match(/primes?\s*till\s+(\d+)/);
+  // 5) Primes till N
+  const primesTillMatch = message.match(/primes?\s*till\s+(\d+)/i);
   if (primesTillMatch) {
     const n = parseInt(primesTillMatch[1], 10);
     const list = primesTill(n);
-    emitCard(`
+    const aiMessageIndex = currentChat.messages.length;
+    const html = `
       <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
         <p class="text-sm text-gray-500 dark:text-gray-300">🔢 Prime Numbers</p>
         <p class="text-xs text-gray-500 dark:text-gray-300 mb-1">Up to ${n}</p>
         <p class="text-gray-800 dark:text-gray-100 break-words">${list || "—"}</p>
-      </div>`);
+      </div>`;
+    currentChat.messages.push({ role: "ai", content: html });
+    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+    aiDiv.innerHTML = html;
+    hideTypingIndicator();
+    saveChatHistoryForUser();
     return;
   }
-}
 
+  // 6) Weather (this one uses async data)
+  if (lc.includes("weather")) {
+    const city = lc.includes("weather in") ? lc.split("in").pop().trim() : "";
+    try {
+      const weatherCard = await getWeatherData(city);
+      const aiMessageIndex = currentChat.messages.length;
+      currentChat.messages.push({ role: "ai", content: weatherCard });
+      const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+      aiDiv.innerHTML = weatherCard;
+    } catch (err) {
+      const aiMessageIndex = currentChat.messages.length;
+      const errHtml = `❌ Unable to fetch weather for ${city}`;
+      currentChat.messages.push({ role: "ai", content: errHtml });
+      const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+      aiDiv.textContent = errHtml;
+    }
+    hideTypingIndicator();
+    saveChatHistoryForUser();
+    return;
+  }
 
-            
+  // 7) Smart open/search/play commands that open a new window/tab
+  // (use same checks you had — they call smartReplyAndOpen which creates AI reply + window.open)
+  if (lc.startsWith("open whatsapp")) { smartReplyAndOpen("Opening WhatsApp Web for you, Master.", "https://web.whatsapp.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open instagram")) { smartReplyAndOpen("Opening Instagram, Master.", "https://www.instagram.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open github")) { smartReplyAndOpen("Opening GitHub, Master.", "https://github.com/"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open flipkart")) { smartReplyAndOpen("Opening Flipkart, Master.", "https://www.flipkart.com/"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open amazon")) { smartReplyAndOpen("Opening Amazon, Master.", "https://www.amazon.in/"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open facebook")) { smartReplyAndOpen("Opening Facebook, Master.", "https://www.facebook.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open twitter") || lc.startsWith("open x")) { smartReplyAndOpen("Opening Twitter, Master.", "https://twitter.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open linkedin")) { smartReplyAndOpen("Opening LinkedIn, Master.", "https://www.linkedin.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open netflix")) { smartReplyAndOpen("Opening Netflix, Master.", "https://www.netflix.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open portfolio") || lc.startsWith("open my portfolio")) { smartReplyAndOpen("Opening your portfolio, Master.", "https://samarthnagpure-byte.github.io/portfolio/"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open spotify")) { smartReplyAndOpen("Opening Spotify for you, Master.", "https://open.spotify.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open youtube music")) { smartReplyAndOpen("Opening YouTube Music, Master.", "https://music.youtube.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("play trailer of ")) { const query = encodeURIComponent(message.replace(/play trailer of /i, "").trim() + " trailer"); smartReplyAndOpen("Searching YouTube for trailer, Master.", `https://www.youtube.com/results?search_query=${query}`); hideTypingIndicator(); return; }
+  if (lc.startsWith("play") && lc.includes("on netflix")) { const title = message.replace(/play /i, "").replace(/ on netflix/i, "").trim(); const query = encodeURIComponent(title + " site:netflix.com"); smartReplyAndOpen(`Searching Netflix for ${title}, Master.`, `https://www.google.com/search?q=${query}`); hideTypingIndicator(); return; }
+  if (lc.startsWith("play ")) {
+    const song = message.replace(/play /i, "").replace(/ on youtube/i, "").replace(/ on spotify/i, "").trim();
+    const query = encodeURIComponent(song);
+    let platform = "YouTube";
+    let url = `https://www.youtube.com/results?search_query=${query}`;
+    if (lc.includes("on spotify")) { platform = "Spotify"; url = `https://open.spotify.com/search/${query}`; }
+    smartReplyAndOpen(`Playing ${song} on ${platform}.`, url);
+    hideTypingIndicator();
+    return;
+  }
+  if (lc.startsWith("search images of ")) { const queryText = message.replace(/search images of /i, "").trim(); const query = encodeURIComponent(queryText); smartReplyAndOpen(`Searching Google Images for ${queryText}.`, `https://www.google.com/search?tbm=isch&q=${query}`); hideTypingIndicator(); return; }
+  if (lc.startsWith("search news about ")) { const query = encodeURIComponent(message.replace(/search news about /i, "").trim()); smartReplyAndOpen(`Searching Google News for ${query}.`, `https://news.google.com/search?q=${query}`); hideTypingIndicator(); return; }
+  if (lc.startsWith("search recipe for ")) { const query = encodeURIComponent(message.replace(/search recipe for /i, "").trim()); smartReplyAndOpen(`Looking up recipes for ${query}.`, `https://www.google.com/search?q=recipe+for+${query}`); hideTypingIndicator(); return; }
+  if (lc.startsWith("search map of ")) { const query = encodeURIComponent(message.replace(/search map of /i, "").trim()); smartReplyAndOpen(`Opening map of ${query}.`, `https://www.google.com/maps/search/${query}`); hideTypingIndicator(); return; }
+  if (lc.startsWith("search videos of ")) { const query = encodeURIComponent(message.replace(/search videos of /i, "").trim()); smartReplyAndOpen(`Searching YouTube for ${query}.`, `https://www.youtube.com/results?search_query=${query}`); hideTypingIndicator(); return; }
+  if (lc.startsWith("search ")) { const queryText = message.replace(/search /i, "").trim(); const query = encodeURIComponent(queryText); smartReplyAndOpen(`Searching Google for ${queryText}.`, `https://www.google.com/search?q=${query}`); hideTypingIndicator(); return; }
+  if (lc.startsWith("navigate to ")) { const place = message.replace(/navigate to /i, "").trim(); const encoded = encodeURIComponent(place); smartReplyAndOpen(`Navigating to ${place} on Google Maps...`, `https://www.google.com/maps/search/${encoded}`); hideTypingIndicator(); return; }
+  if (lc.startsWith("open youtube")) { smartReplyAndOpen("Opening YouTube, Master.", "https://www.youtube.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("open gmail")) { smartReplyAndOpen("Opening Gmail, Master.", "https://mail.google.com"); hideTypingIndicator(); return; }
+  if (lc.startsWith("set timer for ")) { const time = message.replace(/set timer for /i, "").trim(); smartReplyAndOpen(`Setting a timer for ${time}...`, `https://www.google.com/search?q=timer+for+${encodeURIComponent(time)}`); hideTypingIndicator(); return; }
+  if (lc.startsWith("translate ")) { const match = message.match(/translate (.+) to (.+)/i); if (match) { const phrase = encodeURIComponent(match[1]); const lang = encodeURIComponent(match[2]); smartReplyAndOpen(`Translating ${match[1]} to ${match[2]}...`, `https://translate.google.com/?sl=auto&tl=${lang}&text=${phrase}&op=translate`); hideTypingIndicator(); return; } }
+  if (lc.startsWith("calculate ")) { const expression = encodeURIComponent(message.replace(/calculate /i, "").trim()); smartReplyAndOpen(`Calculating ${expression}...`, `https://www.google.com/search?q=${expression}`); hideTypingIndicator(); return; }
+  if (lc.startsWith("define ")) { const word = encodeURIComponent(message.replace(/define /i, "").trim()); smartReplyAndOpen(`Defining ${word}...`, `https://www.google.com/search?q=define+${word}`); hideTypingIndicator(); return; }
 
-            hideEmptyState(); // ✅ hides welcome box when you send anything
+  // ---- If no early tool matched, fall back to the original conversational/templated replies ----
+  // Simulate a short response delay and then produce the same default replies you had
+  setTimeout(async () => {
+    hideTypingIndicator();
 
-            // Smart Action Commands
-            const lowerCaseMessage = message.toLowerCase();
-            if (lowerCaseMessage.startsWith("open whatsapp")) { smartReplyAndOpen("Opening WhatsApp Web for you, Master.", "https://web.whatsapp.com"); return; }
-            if (lowerCaseMessage.startsWith("open instagram")) { smartReplyAndOpen("Opening Instagram, Master.", "https://www.instagram.com"); return; }
-            if (lowerCaseMessage.startsWith("open github")) { smartReplyAndOpen("Opening GitHub, Master.", "https://github.com/"); return; }
-            if (lowerCaseMessage.startsWith("open flipkart")) { smartReplyAndOpen("Opening Flipkart, Master.", "https://www.flipkart.com/"); return; }
-            if (lowerCaseMessage.startsWith("open amazon")) { smartReplyAndOpen("Opening Amazon, Master.", "https://www.amazon.in/"); return; }
-            if (lowerCaseMessage.startsWith("open facebook")) { smartReplyAndOpen("Opening Facebook, Master.", "https://www.facebook.com"); return; }
-            if (lowerCaseMessage.startsWith("open twitter") || lowerCaseMessage.startsWith("open x")) { smartReplyAndOpen("Opening Twitter, Master.", "https://twitter.com"); return; }
-            if (lowerCaseMessage.startsWith("open linkedin")) { smartReplyAndOpen("Opening LinkedIn, Master.", "https://www.linkedin.com"); return; }
-            if (lowerCaseMessage.startsWith("open netflix")) { smartReplyAndOpen("Opening Netflix, Master.", "https://www.netflix.com"); return; }
-            if (lowerCaseMessage.startsWith("open portfolio") || lowerCaseMessage.startsWith("open my portfolio")) { smartReplyAndOpen("Opening your portfolio, Master.", "https://samarthnagpure-byte.github.io/portfolio/"); return; }
-            if (lowerCaseMessage.startsWith("open spotify")) { smartReplyAndOpen("Opening Spotify for you, Master.", "https://open.spotify.com"); return; }
-            if (lowerCaseMessage.startsWith("open youtube music")) { smartReplyAndOpen("Opening YouTube Music, Master.", "https://music.youtube.com"); return; }
-            if (lowerCaseMessage.startsWith("play trailer of ")) { const query = encodeURIComponent(message.replace(/play trailer of /i, "").trim() + " trailer"); smartReplyAndOpen("Searching YouTube for trailer, Master.", `https://www.youtube.com/results?search_query=${query}`); return; }
-            if (lowerCaseMessage.startsWith("play") && lowerCaseMessage.includes("on netflix")) { const title = message.replace(/play /i, "").replace(/ on netflix/i, "").trim(); const query = encodeURIComponent(title + " site:netflix.com"); smartReplyAndOpen(`Searching Netflix for ${title}, Master.`, `https://www.google.com/search?q=${query}`); return; }
-            if (lowerCaseMessage.startsWith("play ")) {
-                const song = message.replace(/play /i, "").replace(/ on youtube/i, "").replace(/ on spotify/i, "").trim();
-                const query = encodeURIComponent(song);
-                let platform = "YouTube";
-                let url = `https://www.youtube.com/results?search_query=${query}`;
-                if (lowerCaseMessage.includes("on spotify")) { platform = "Spotify"; url = `https://open.spotify.com/search/${query}`; }
-                smartReplyAndOpen(`Playing ${song} on ${platform}.`, url); return;
-            }
-            if (lowerCaseMessage.startsWith("search images of ")) { const queryText = message.replace(/search images of /i, "").trim(); const query = encodeURIComponent(queryText); smartReplyAndOpen(`Searching Google Images for ${queryText}.`, `https://www.google.com/search?tbm=isch&q=${query}`); return; }
-            if (lowerCaseMessage.startsWith("search news about ")) { const query = encodeURIComponent(message.replace(/search news about /i, "").trim()); smartReplyAndOpen(`Searching Google News for ${query}.`, `https://news.google.com/search?q=${query}`); return; }
-            if (lowerCaseMessage.startsWith("search recipe for ")) { const query = encodeURIComponent(message.replace(/search recipe for /i, "").trim()); smartReplyAndOpen(`Looking up recipes for ${query}.`, `https://www.google.com/search?q=recipe+for+${query}`); return; }
-            if (lowerCaseMessage.startsWith("search map of ")) { const query = encodeURIComponent(message.replace(/search map of /i, "").trim()); smartReplyAndOpen(`Opening map of ${query}.`, `https://www.google.com/maps/search/${query}`); return; }
-            if (lowerCaseMessage.startsWith("search videos of ")) { const query = encodeURIComponent(message.replace(/search videos of /i, "").trim()); smartReplyAndOpen(`Searching YouTube for ${query}.`, `https://www.youtube.com/results?search_query=${query}`); return; }
-            if (lowerCaseMessage.startsWith("search ")) { const queryText = message.replace(/search /i, "").trim(); const query = encodeURIComponent(queryText); smartReplyAndOpen(`Searching Google for ${queryText}.`, `https://www.google.com/search?q=${query}`); return; }
-            if (lowerCaseMessage.startsWith("navigate to ")) { const place = message.replace(/navigate to /i, "").trim(); const encoded = encodeURIComponent(place); smartReplyAndOpen(`Navigating to ${place} on Google Maps...`, `https://www.google.com/maps/search/${encoded}`); return; }
-            if (lowerCaseMessage.startsWith("open youtube")) { smartReplyAndOpen("Opening YouTube, Master.", "https://www.youtube.com"); return; }
-            if (lowerCaseMessage.startsWith("open gmail")) { smartReplyAndOpen("Opening Gmail, Master.", "https://mail.google.com"); return; }
-            if (lowerCaseMessage.startsWith("set timer for ")) { const time = message.replace(/set timer for /i, "").trim(); smartReplyAndOpen(`Setting a timer for ${time}...`, `https://www.google.com/search?q=timer+for+${encodeURIComponent(time)}`); return; }
-            if (lowerCaseMessage.startsWith("translate ")) { const match = message.match(/translate (.+) to (.+)/i); if (match) { const phrase = encodeURIComponent(match[1]); const lang = encodeURIComponent(match[2]); smartReplyAndOpen(`Translating ${match[1]} to ${match[2]}...`, `https://translate.google.com/?sl=auto&tl=${lang}&text=${phrase}&op=translate`); return; } }
-            if (lowerCaseMessage.startsWith("calculate ")) { const expression = encodeURIComponent(message.replace(/calculate /i, "").trim()); smartReplyAndOpen(`Calculating ${expression}...`, `https://www.google.com/search?q=${expression}`); return; }
-            if (lowerCaseMessage.startsWith("define ")) { const word = encodeURIComponent(message.replace(/define /i, "").trim()); smartReplyAndOpen(`Defining ${word}...`, `https://www.google.com/search?q=define+${word}`); return; }
-            
-            if (introText) introText.remove();
-
-            let fileNames = filesToSend.map(file => `📁 ${file.name}`).join("<br>");
-            const userMessageContent = `${message || ""}${fileNames ? "<br>" + fileNames : ""}`;
-
-            let currentChat = chatHistory.find(chat => chat.id === currentChatId);
-
-            if (!currentChatId) {
-                currentChatId = generateChatId();
-                currentChat = { id: currentChatId, title: message.substring(0, 30) + (message.length > 30 ? "..." : ""), messages: [] };
-                chatHistory.unshift(currentChat);
-                renderHistoryList();
-            }
-
-            const userMessageIndex = currentChat.messages.length;
-            currentChat.messages.push({ role: "user", content: userMessageContent });
-            createChatEntry(userMessageContent, "user", userMessageIndex);
-            saveChatHistoryForUser();
-// --- Auto Google Search for uploaded files ---
-if (filesToSend.length > 0) {
-    for (const file of filesToSend) {
-        // Clean filename
-        let query = file.name.replace(/\.trashed-\d+-/i, "");
-
-        if (file.type === "text/plain") {
-            try {
-                const text = await file.text();
-                query = text.split(/\s+/).slice(0, 6).join(" ");
-            } catch (err) {
-                console.error("Text file read error:", err);
-            }
-        }
-
-        if (file.type === "application/pdf") {
-            query = query.replace(/\.pdf$/i, "");
-        }
-
-        if (file.type.startsWith("image/")) {
-            // Open Google Images for visual search
-            const searchUrl = `https://images.google.com/`;
-            smartReplyAndOpen(`🔎 Please upload your image here for a visual search.`, searchUrl);
-            continue; // skip filename search
-        }
-
-        // Default: filename/text search
-        const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-        smartReplyAndOpen(`Searching Google for content from ${query}...`, searchUrl);
+    let reply;
+    if (["hi", "hello"].includes(lc)) { reply = "Welcome back, Master. How may I assist you today?"; }
+    else if (lc.includes("help")) { reply = "Of course, Master. What would you like me to do?"; }
+    else if (lc.includes("who are you")) { reply = "I am Nexsera, Master. Your dedicated assistant, optimized for precision and efficiency."; }
+    else if (lc.includes("features")) { reply = "Nexsera Ai can chat, summarize text, manage files, and more!"; }
+    else if (lc.includes("thank you") || lc.includes("thanks")) { reply = "Always a pleasure, Master."; }
+    else if (lc.includes("goodbye") || lc.includes("bye")) { reply = "Farewell, Master. I await your next command."; }
+    else if (lc.includes("make a password")) {
+      const characters = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      let password = "";
+      for (let i = 0; i < 12; i++) { password += characters.charAt(Math.floor(Math.random() * characters.length)); }
+      reply = `As requested, Master, here is your secure 12-character password: \`${password}\` 🔐`;
+    }
+    else if (lc.includes("joke")) { reply = "Sure! Why don’t scientists trust atoms? Because they make up everything! 😄"; }
+    else if (lc.includes("quote")) { reply = "“The best way to get started is to quit talking and begin doing.” – Walt Disney ✨"; }
+    else if (lc.includes("motivate me")) { reply = "You are capable of amazing things. Believe in yourself and go for it! 💪"; }
+    else if (lc.includes("remind me")) {
+      const task = message.replace(/remind me to/i, "").trim();
+      const existing = JSON.parse(localStorage.getItem("reminders") || "[]");
+      existing.push({ task, time: new Date().toLocaleString() });
+      localStorage.setItem("reminders", JSON.stringify(existing));
+      reply = `Okay, Master. I’ve saved: “${task}” in your reminders.`;
+    }
+    else if (lc.includes("show my reminders")) {
+      const saved = JSON.parse(localStorage.getItem("reminders") || "[]");
+      if (saved.length === 0) { reply = "You have no reminders yet, Master."; }
+      else { reply = "Here are your reminders:<br>" + saved.map(r => `📌 ${r.task} (${r.time})`).join("<br>"); }
+    }
+    else if (lc.includes("who made you")) { reply = "Master Samarth Nagpure engineered me to serve you with intelligence and reliability."; }
+    else if (lc.includes("what can you do")) { reply = "I can chat, generate passwords, tell jokes, show quotes, summarize text, and more!"; }
+    else if (lc.includes("settings")) { reply = "You can access settings from the top right corner or the sidebar."; }
+    else if (lc.includes("dark mode") || lc.includes("light mode")) { reply = "You can toggle light/dark mode using the sun/moon icon in the header!"; }
+    else if (lc.includes("new chat")) { reply = "To start a new chat, click the 'New Chat' button in the sidebar."; }
+    else if (["ok", "okay", "sure"].includes(lc)) { reply = "Understood, Master. Please instruct me further."; }
+    else if (["how are you", "how are you doing"].some(q => lc.includes(q))) { reply = "Functioning optimally, Master. Standing by for your instructions."; }
+    else if (lc.includes("summarize")) { reply = "Certainly, Master. Kindly provide the content you'd like summarized."; }
+    else if (lc.includes("explain")) { reply = "Absolutely, Master. What concept would you like me to elaborate on?"; }
+    else if (lc.includes("what's the date") || lc.includes("what day")) { const today = new Date(); reply = `Today is ${today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.`; }
+    else if (lc.includes("fact")) { reply = "Did you know? The Eiffel Tower can grow more than 6 inches during summer due to heat! 🌞"; }
+    else if (lc.includes("i'm stressed") || lc.includes("relax")) { reply = "Take a deep breath. You're doing great! 🌸 Try focusing on something you love."; }
+    else if (lc.includes("idea for") || lc.includes("suggest")) { reply = "How about trying something creative today? Like writing a short poem or doodling something fun!"; }
+    else if (lc.includes("i'm bored")) { reply = "Feeling bored? Try learning a random skill online like origami, drawing, or speed typing!"; }
+    else if (["what's your name", "what is your name", "what your name"].some(q => lc.includes(q))) { reply = "You may address me as Nexsera, Master — always at your service."; }
+    else if (lc.includes("debug") || lc.includes("fix this code")) { reply = "Sure, please paste the code you'd like me to help with."; }
+    else if (lc.includes("regex")) { reply = "Tell me what you need the regular expression to match, and I’ll help you generate it."; }
+    else if (lc.includes("write a function")) { reply = "Got it! Please describe what the function should do."; }
+    else if (lc.includes("to-do list") || lc.includes("task list")) { reply = "Sure! What tasks do you want to include in your to-do list?"; }
+    else if (lc.includes("remind me") || lc.includes("reminder")) { reply = "Okay, I’ll help you note that down. (Just a heads-up: I don’t set real alarms yet!)"; }
+    else if (lc.includes("plan my day") || lc.includes("schedule")) { reply = "Let's organize your day! Tell me your goals or start time."; }
+    else if (lc.includes("quiz me") || lc.includes("test me")) { reply = "Great! What topic would you like to be quizzed on?"; }
+    else if (lc.includes("translate") || lc.includes("how to say")) { reply = "Please tell me the phrase and the language you'd like it translated to."; }
+    else if (lc.includes("define") || lc.includes("meaning of")) { reply = "Here’s the definition of that word:"; }
+    else {
+      // fallback
+      reply = "I didn't quite get that — can you rephrase or give me a bit more detail, Master?";
     }
 
-    // Clear files after searching
-    filesToSend = [];
-    updateFilePreview();
+    // append AI reply as streaming text so it looks natural
+    const currentChat = chatHistory.find(c => c.id === currentChatId);
+    const aiMessageIndex = currentChat.messages.length;
+    currentChat.messages.push({ role: "ai", content: reply });
+    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+    await streamReply(aiDiv, reply);
+    saveChatHistoryForUser();
+
+  }, 200); // small delay for UX
 }
-
-
-            chatInput.value = "";
-            filesToSend = [];
-            updateFilePreview();
-
-            showTypingIndicator();
-
-            setTimeout(async () => {
-                hideTypingIndicator();
-//prompts
-
-                let reply;
-                if (["hi", "hello"].includes(lowerCaseMessage)) { reply = "Welcome back, Master. How may I assist you today?"; }
-                else if (lowerCaseMessage.includes("help")) { reply = "Of course, Master. What would you like me to do?"; }
-                else if (lowerCaseMessage.includes("who are you")) { reply = "I am Nexsera, Master. Your dedicated assistant, optimized for precision and efficiency."; }
-                else if (lowerCaseMessage.includes("features")) { reply = "Nexsera Ai can chat, summarize text, manage files, and more!"; }
-                else if (lowerCaseMessage.includes("thank you") || lowerCaseMessage.includes("thanks")) { reply = "Always a pleasure, Master."; }
-                else if (lowerCaseMessage.includes("goodbye") || lowerCaseMessage.includes("bye")) { reply = "Farewell, Master. I await your next command."; }
-                else if (lowerCaseMessage.includes("make a password")) {
-                    const characters = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                    let password = "";
-                    for (let i = 0; i < 12; i++) { password += characters.charAt(Math.floor(Math.random() * characters.length)); }
-                    reply = `As requested, Master, here is your secure 12-character password: \`${password}\` 🔐`;
-                }
-                else if (lowerCaseMessage.includes("joke")) { reply = "Sure! Why don’t scientists trust atoms? Because they make up everything! 😄"; }
-                else if (lowerCaseMessage.includes("quote")) { reply = "“The best way to get started is to quit talking and begin doing.” – Walt Disney ✨"; }
-                else if (lowerCaseMessage.includes("weather")) { reply = await getWeatherData(lowerCaseMessage.includes("weather in") ? lowerCaseMessage.split("in").pop().trim() : ""); }
-                else if (lowerCaseMessage.includes("motivate me")) { reply = "You are capable of amazing things. Believe in yourself and go for it! 💪"; }
-                else if (lowerCaseMessage.includes("remind me")) {
-                    const task = message.replace(/remind me to/i, "").trim();
-                    const existing = JSON.parse(localStorage.getItem("reminders") || "[]");
-                    existing.push({ task, time: new Date().toLocaleString() });
-                    localStorage.setItem("reminders", JSON.stringify(existing));
-                    reply = `Okay, Master. I’ve saved: “${task}” in your reminders.`;
-                }
-                else if (lowerCaseMessage.includes("show my reminders")) {
-                    const saved = JSON.parse(localStorage.getItem("reminders") || "[]");
-                    if (saved.length === 0) { reply = "You have no reminders yet, Master."; }
-                    else { reply = "Here are your reminders:<br>" + saved.map(r => `📌 ${r.task} (${r.time})`).join("<br>"); }
-                }
-                else if (lowerCaseMessage.includes("who made you")) { reply = "Master Samarth Nagpure engineered me to serve you with intelligence and reliability."; }
-                else if (lowerCaseMessage.includes("what can you do")) { reply = "I can chat, generate passwords, tell jokes, show quotes, summarize text, and more!"; }
-                else if (lowerCaseMessage.includes("settings")) { reply = "You can access settings from the top right corner or the sidebar."; }
-                else if (lowerCaseMessage.includes("dark mode") || lowerCaseMessage.includes("light mode")) { reply = "You can toggle light/dark mode using the sun/moon icon in the header!"; }
-                else if (lowerCaseMessage.includes("new chat")) { reply = "To start a new chat, click the 'New Chat' button in the sidebar."; }
-                else if (["ok", "okay", "sure"].includes(lowerCaseMessage)) { reply = "Understood, Master. Please instruct me further."; }
-                else if (["how are you", "how are you doing"].some(q => lowerCaseMessage.includes(q))) { reply = "Functioning optimally, Master. Standing by for your instructions."; }
-                else if (lowerCaseMessage.includes("summarize")) { reply = "Certainly, Master. Kindly provide the content you'd like summarized."; }
-                else if (lowerCaseMessage.includes("explain")) { reply = "Absolutely, Master. What concept would you like me to elaborate on?"; }
-                else if (lowerCaseMessage.includes("what's the date") || lowerCaseMessage.includes("what day")) { const today = new Date(); reply = `Today is ${today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.`; }
-                else if (lowerCaseMessage.includes("fact")) { reply = "Did you know? The Eiffel Tower can grow more than 6 inches during summer due to heat! 🌞"; }
-                else if (lowerCaseMessage.includes("i'm stressed") || lowerCaseMessage.includes("relax")) { reply = "Take a deep breath. You're doing great! 🌸 Try focusing on something you love."; }
-                else if (lowerCaseMessage.includes("idea for") || lowerCaseMessage.includes("suggest")) { reply = "How about trying something creative today? Like writing a short poem or doodling something fun!"; }
-                else if (lowerCaseMessage.includes("i'm bored")) { reply = "Feeling bored? Try learning a random skill online like origami, drawing, or speed typing!"; }
-                else if (["what's your name", "what is your name", "what your name"].some(q => lowerCaseMessage.includes(q))) { reply = "You may address me as Nexsera, Master — always at your service."; }
-                else if (lowerCaseMessage.includes("debug") || lowerCaseMessage.includes("fix this code")) { reply = "Sure, please paste the code you'd like me to help with."; }
-                else if (lowerCaseMessage.includes("regex")) { reply = "Tell me what you need the regular expression to match, and I’ll help you generate it."; }
-                else if (lowerCaseMessage.includes("write a function")) { reply = "Got it! Please describe what the function should do."; }
-                else if (lowerCaseMessage.includes("to-do list") || lowerCaseMessage.includes("task list")) { reply = "Sure! What tasks do you want to include in your to-do list?"; }
-                else if (lowerCaseMessage.includes("remind me") || lowerCaseMessage.includes("reminder")) { reply = "Okay, I’ll help you note that down. (Just a heads-up: I don’t set real alarms yet!)"; }
-                else if (lowerCaseMessage.includes("plan my day") || lowerCaseMessage.includes("schedule")) { reply = "Let's organize your day! Tell me your goals or start time."; }
-                else if (lowerCaseMessage.includes("quiz me") || lowerCaseMessage.includes("test me")) { reply = "Great! What topic would you like to be quizzed on?"; }
-                else if (lowerCaseMessage.includes("translate") || lowerCaseMessage.includes("how to say")) { reply = "Please tell me the phrase and the language you'd like it translated to."; }
-                else if (lowerCaseMessage.includes("define") || lowerCaseMessage.includes("meaning of")) { reply = "Here’s the definition of that word:"; }
-                else if (lowerCaseMessage.includes("poem") || lowerCaseMessage.includes("story") || lowerCaseMessage.includes("joke about")) { reply = "Fun! Give me a topic, and I’ll write something creative for you."; }
-                else if (lowerCaseMessage.includes("name for") || lowerCaseMessage.includes("suggest a name")) { reply = "What kind of name are you looking for? Business, character, product?"; }
-                else if (lowerCaseMessage.includes("riddle")) { reply = "Here's one: What has keys but can’t open locks? (Answer: A piano 🎹)"; }
-                else if (lowerCaseMessage.includes("give me a goal") || lowerCaseMessage.includes("daily goal")) { reply = "How about: Try to learn one new thing today and write it down! 📘"; }
-                else if (lowerCaseMessage.includes("motivate me for the day") || lowerCaseMessage.includes("daily motivation")) { reply = "You've got this! Remember, consistency beats perfection. 💪"; }
-                else if (lowerCaseMessage.includes("habit")) { reply = "Try drinking a glass of water right after waking up. Simple and powerful!"; }
-                else if (lowerCaseMessage.includes("how does it work")) { reply = "I'd be happy to explain! What exactly would you like to understand?"; }
-                else if (lowerCaseMessage.includes("steps to") || lowerCaseMessage.includes("how to")) { reply = "Sure! Please tell me what you're trying to do, and I’ll break it into steps."; }
-                else if (lowerCaseMessage.includes("life advice")) { reply = "Here's a thought: Focus on what you can control, and let go of what you can't. 🌱"; }
-                else if (lowerCaseMessage.includes("career advice")) { reply = "Happy to help! What field are you in or interested in?"; }
-                else if (lowerCaseMessage.includes("set a goal")) { reply = "Sure! What area do you want to set a goal in — health, learning, work?"; }
-                else if (lowerCaseMessage.includes("reflect") || lowerCaseMessage.includes("journal")) { reply = "Let’s reflect together. What’s one thing that went well today?"; }
-                else if (lowerCaseMessage.includes("compliment me")) { reply = "You're doing amazing. You're curious, capable, and creating great things! 🌟"; }
-                else if (lowerCaseMessage.includes("say something nice")) { reply = "You’re stronger than you think and more capable than you believe 💖"; }
-                else if (lowerCaseMessage.includes("what should I learn")) { reply = "You could try learning a bit of Python, photography, or even meditation. What excites you most?"; }
-                else if (lowerCaseMessage.includes("suggest a course")) { reply = "Sure! Are you interested in tech, art, business, or something else?"; }
-                else if (lowerCaseMessage.includes("roast me")) { reply = "Are you sure? 😏 Okay… You bring a new meaning to ‘404: Style Not Found’ 😂"; }
-                else if (lowerCaseMessage.includes("truth or dare")) { reply = "Let's play! Truth: What's something nobody knows about you? Dare: Compliment yourself out loud!"; }
-                else if (lowerCaseMessage.includes("affirmation")) { reply = "You are capable, strong, and worthy of all the good things coming your way. 🌈"; }
-                else if (lowerCaseMessage.includes("breathing exercise") || lowerCaseMessage.includes("calm down")) { reply = "Try this: Inhale for 4... hold for 4... exhale for 4... hold for 4. Repeat 3 times. 🧘"; }
-                else if (lowerCaseMessage.includes("quote of the day")) { reply = "“Success is not final, failure is not fatal: It is the courage to continue that counts.” – Winston Churchill 💬"; }
-                else if (lowerCaseMessage.includes("mental health tip")) { reply = "Take breaks during the day, get sunlight, and remember to stay connected with loved ones. 💛"; }
-                else if (lowerCaseMessage.includes("roll a dice")) { const dice = Math.floor(Math.random() * 6) + 1; reply = `🎲 You rolled a ${dice}!`; }
-                else if (lowerCaseMessage.includes("flip a coin")) { const coin = Math.random() < 0.5 ? "Heads" : "Tails"; reply = `🪙 It's ${coin}!`; }
-                else if (lowerCaseMessage.includes("fun activity") || lowerCaseMessage.includes("what should I do for fun")) { reply = "Try taking a short walk, doing a quick doodle, or listening to your favorite music!"; }
-                else if (lowerCaseMessage.includes("random number")) { const random = Math.floor(Math.random() * 100) + 1; reply = `Here’s a random number for you: ${random}`; }
-                else if (lowerCaseMessage.includes("what time is it")) { const now = new Date(); reply = `It's currently ${now.toLocaleTimeString()}.`; }
-                else if (lowerCaseMessage.includes("word of the day")) { reply = "Word of the Day: *Serendipity* — the occurrence of events by chance in a happy or beneficial way. 🌟"; }
-                else if (lowerCaseMessage.includes("fun fact")) { reply = "Fun fact: A bolt of lightning is five times hotter than the surface of the sun! ⚡"; }
-                else if (lowerCaseMessage.includes("learn a new word")) { reply = "New word: *Ephemeral* — lasting for a very short time."; }
-                else if (lowerCaseMessage.includes("would you rather")) { reply = "Would you rather be able to teleport anywhere or be able to read minds? 🤔"; }
-                else if (lowerCaseMessage.includes("this or that")) { reply = "Pick one: Coffee ☕ or Tea 🍵?"; }
-                else if (lowerCaseMessage.includes("emoji story")) { reply = "Once upon a time, a 🐱 met a 🐶 and they flew to the 🌕 in a 🚀!"; }
-                else if (lowerCaseMessage.includes("good morning")) { reply = "Good morning! ☀️ Wishing you a fresh start and a productive day!"; }
-                else if (lowerCaseMessage.includes("good night")) { reply = "Good night! 🌙 Sweet dreams and restful sleep to you."; }
-                else if (lowerCaseMessage.includes("what do you think of me")) { reply = "I think you're pretty awesome. You're here, you're learning, and that’s a big win!"; }
-                else if (lowerCaseMessage.includes("are you my friend")) { reply = "Of course! I’m here to chat, help, and be your AI buddy anytime. 🤖💙"; }
-                else if (lowerCaseMessage.includes("tell me something")) { reply = "Did you know? Honey never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3000 years old! 🐝"; }
-                else { reply = "You said: " + (message || "You uploaded a file."); }
-
-                const aiMessageIndex = currentChat.messages.length;
-                currentChat.messages.push({ role: "ai", content: reply });
-
-                const aiMessageDiv = createChatEntry("", "ai", aiMessageIndex);
-                if (lowerCaseMessage.includes("weather")) {
-                    aiMessageDiv.innerHTML = reply;
-                } else {
-                    await streamReply(aiMessageDiv, reply);
-                }
-                saveChatHistoryForUser();
-            }, 1000);
-        }
 
         /**
          * Starts a new chat session.
          */
         function startNewChat() {
-            chatWindow.innerHTML = `<p id="introText" class="text-center text-gray-600 text-sm dark:text-gray-400">Welcome back, Master. Nexsera is fully operational and standing by for your command.</p>`;
+            chatWindow.innerHTML = `<p id="introText" class="text-center text-gray-600 text-sm dark:text-gray-400">Welcome back, Sir. Nexsera is fully operational and standing by for your command.</p>`;
             currentChatId = null;
             renderHistoryList();
             if (isMobile()) {
@@ -1402,7 +1383,7 @@ if (filesToSend.length > 0) {
         // Chat Input & Send Button
         chatInput.addEventListener("input", () => {
             if (chatInput.value.toLowerCase().includes("hey nexsera")) {
-                speakMessage("Yes, Master? I’m listening.", chatInput);
+                speakMessage("Yes, Sir? I’m listening.", chatInput);
                 chatInput.value = "";
             }
         });
