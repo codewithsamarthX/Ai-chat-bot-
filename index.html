@@ -303,8 +303,8 @@
 
 <p class="text-[10px] text-center text-gray-500">
   Nexsera Ai may make mistakes. Consider checking important information. 
-  <a href="#" class="underline text-black">Terms</a> and 
-  <a href="#" class="underline text-black">Privacy</a>.
+  <a href="contact.html" class="underline text-black">Terms</a> and 
+  <a href="contact.html" class="underline text-black">Privacy</a>.
 </p>
 
         </div>
@@ -463,24 +463,15 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
 
         // --- Utility Functions ---
 
-        /**
-         * Checks if the current viewport width is considered mobile.
-         * @returns {boolean} True if mobile, false otherwise.
-         */
         const isMobile = () => window.innerWidth <= 640;
 
-        /**
-         * Saves the current chat history to localStorage for the current user.
-         */
+       
         function saveChatHistoryForUser() {
             if (currentUser) {
                 localStorage.setItem(`chatHistory_${currentUser}`, JSON.stringify(chatHistory));
             }
         }
 
-        /**
-         * Loads chat history from localStorage for the current user.
-         */
         function loadUserChatHistory(username) {
             const saved = localStorage.getItem(`chatHistory_${username}`);
             chatHistory = saved ? JSON.parse(saved) : [];
@@ -489,10 +480,7 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
             startNewChat(); // Start a fresh chat window for the new user
         }
 
-        /**
-         * Switches the active user and loads their chat history.
-         * @param {string} username - The username to switch to.
-         */
+       
         function switchUser(username) {
             currentUser = username;
             localStorage.setItem("currentUser", username);
@@ -501,17 +489,13 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
             hideUserManagementBox(); // Hide box after switching
         }
 
-        /**
-         * Updates the UI to show the currently logged-in user.
-         */
+       
         function updateLoggedInUserUI() {
             loggedInUserSpan.textContent = currentUser || "Guest";
             userButton.textContent = currentUser ? currentUser.charAt(0).toUpperCase() : "S";
         }
 
-        /**
-         * Renders the list of users in the user management dropdown.
-         */
+       
         function renderUserList() {
             userSelect.innerHTML = '<option value="" disabled selected>Select User</option>';
             users.forEach(user => {
@@ -523,26 +507,14 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
             });
         }
 
-        /**
-         * Saves the list of users to localStorage.
-         */
         function saveUsers() {
             localStorage.setItem("userList", JSON.stringify(users));
         }
 
-        /**
-         * Generates a unique ID for a new chat session.
-         * @returns {string} A unique chat ID.
-         */
+       
         const generateChatId = () => Date.now().toString();
 
-        /**
-         * Creates and appends a chat message to the chat window.
-         * @param {string} message - The content of the message.
-         * @param {'user'|'ai'} type - The type of message ('user' or 'ai').
-         * @param {number} messageIndex - The index of the message within the current chat's messages array.
-         * @returns {HTMLElement} The inner div element containing the message text.
-         */
+        
         function createChatEntry(message, type, messageIndex) {
             const msgContainer = document.createElement("div");
            msgContainer.className = type === "user" ? "text-right pr-3 sm:pr-8" : "text-left pl-3 sm:pl-8";
@@ -675,11 +647,7 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
             window.open(url, "_blank");
         }
 
-        /**
-         * Simulates fetching weather data.
-         * @param {string} city - The city for which to get weather.
-         * @returns {Promise<string>} A promise resolving to weather information.
-         */
+        
         // ==========================
 // Real Weather API Function
 // ==========================
@@ -772,10 +740,6 @@ function primesTill(n) {
   return primes.join(", ");
 }
 
-        /**
-         * Handles sending a message, displaying user input, simulating AI response,
-         * and managing chat history.
-         */
 async function sendMessage() {
   // get and validate input
   const messageRaw = chatInput.value || "";
@@ -1192,11 +1156,6 @@ async function sendMessage() {
             }
         }
 
-        /**
-         * Deletes a specific message from the current chat session.
-         * @param {string} chatId - The ID of the chat session.
-         * @param {number} messageIndex - The index of the message to delete.
-         */
         function deleteMessage(chatId, messageIndex) {
             const chat = chatHistory.find(c => c.id === chatId);
             if (chat && chat.messages.length > messageIndex) {
@@ -1206,10 +1165,7 @@ async function sendMessage() {
             }
         }
 
-        /**
-         * Copies the given text to the clipboard.
-         * @param {string} text - The text to copy.
-         */
+       
         async function copyMessage(text) {
             try {
                 await navigator.clipboard.writeText(text);
@@ -1222,11 +1178,7 @@ async function sendMessage() {
             }
         }
 
-        /**
-         * Speaks the given text using SpeechSynthesis.
-         * @param {string} text - The text to speak.
-         * @param {HTMLElement} messageDiv - The message div to apply glow effect to.
-         */
+      
         function speakMessage(text, messageDiv) {
             if ('speechSynthesis' in window) {
                 if (speechSynthesis.speaking) {
@@ -1253,9 +1205,7 @@ async function sendMessage() {
             }
         }
 
-        /**
-         * Filters the chat history displayed in the sidebar.
-         */
+        
         function filterHistory() {
             const searchTerm = searchHistory.value.toLowerCase();
             const filteredHistory = chatHistory.filter(chat =>
@@ -1291,9 +1241,7 @@ async function sendMessage() {
             });
         }
 
-        /**
-         * Updates the file preview area.
-         */
+       
         function updateFilePreview() {
             filePreview.innerHTML = '';
             filesToSend.forEach((file, index) => {
@@ -1315,9 +1263,6 @@ async function sendMessage() {
             });
         }
 
-        /**
-         * Toggles between light and dark mode.
-         */
         function toggleDarkMode() {
             document.body.classList.toggle("dark");
             const isDarkMode = document.body.classList.contains("dark");
@@ -1327,9 +1272,7 @@ async function sendMessage() {
             document.body.classList.add(isDarkMode ? "bg-gray-900" : "bg-gray-100", isDarkMode ? "text-gray-100" : "text-gray-800");
         }
 
-        /**
-         * Hides the sidebar.
-         */
+       
         function hideSidebar() {
             sidebar.classList.add("-translate-x-full");
             document.body.classList.remove("sidebar-open");
@@ -1344,9 +1287,7 @@ async function sendMessage() {
             }
         }
 
-        /**
-         * Shows the sidebar.
-         */
+       
         function showSidebar() {
             sidebar.classList.remove("-translate-x-full");
             document.body.classList.add("sidebar-open");
@@ -1356,10 +1297,6 @@ async function sendMessage() {
             }
         }
 
-        /**
-         * Shows a modal/panel with a transition.
-         * @param {HTMLElement} panel - The panel element to show.
-         */
         function showPanel(panel) {
             panel.classList.remove("hidden");
             setTimeout(() => {
@@ -1367,10 +1304,7 @@ async function sendMessage() {
             }, 10);
         }
 
-        /**
-         * Hides a modal/panel with a transition.
-         * @param {HTMLElement} panel - The panel element to hide.
-         */
+        
         function hidePanel(panel) {
             panel.classList.add("opacity-0", "scale-95");
             setTimeout(() => {
@@ -1646,8 +1580,6 @@ recordBtn.addEventListener("click", () => {
 
 <!-- Add this at the very end of your <script> tag, before it closes -->
 
-    // Existing code above...
-
     // Prefill prompt function for quick suggestion buttons
     function prefillPrompt(text) {
         chatInput.value = text;
@@ -1660,15 +1592,6 @@ recordBtn.addEventListener("click", () => {
             chatInput.focus();
         }
     }
-
-    // If you want to auto-send instead of just filling:
-    /*
-    function prefillPrompt(text) {
-        chatInput.value = text;
-        sendMessage();
-    }
-    */
-
 
         // === Quick Prompt Button Function ===
 function prefillPrompt(text) {
