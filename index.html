@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-<meta name="google-site-verification" content="ZXNtnHqjefnD-TJSRli8rXlzJlgHMxV1K3qRT6srOl4" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Nexsera Ai</title>
     <link rel="icon" type="image/png" href="https://img.icons8.com/pulsar-line/48/nfc-n.png" />
@@ -19,6 +18,23 @@
             font-family: 'Inter', sans-serif;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
+
+
+  /* 🌟 Smooth dropdown animation for AI Tools menu */
+  #aiToolsMenu {
+    transform-origin: top;
+    transition: all 0.2s ease;
+  }
+
+  #aiToolsMenu:not(.hidden) {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  .hidden#aiToolsMenu {
+    transform: scale(0.95);
+    opacity: 0;
+  }
 
         /* Custom scrollbar */
         .chat-scrollbar::-webkit-scrollbar { width: 8px; }
@@ -126,39 +142,54 @@
     <div id="sidebarOverlay" class="overlay fixed inset-0 bg-black bg-opacity-50 z-10 hidden sm:hidden"></div>
 
     <header class="z-30 sticky top-0 px-2 sm:px-4 mt-2">
-        <div class="w-full shadow-md rounded-lg px-4 py-2 flex items-center justify-between bg-white border border-gray-200 max-w-[98%] mx-auto">
-            <!-- Left: Sidebar Toggle + Title -->
-            <div class="flex items-center space-x-2">
-                <button id="toggleSidebar" aria-label="Toggle sidebar" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
-                    </svg>
-                </button>
-                <span id="headerTitle" class="font-semibold text-base text-gray-800 tracking-wide">Nexsera Ai</span>
-            </div>
+  <div class="w-full shadow-md rounded-lg px-4 py-2 flex items-center justify-between bg-white border border-gray-200 max-w-[98%] mx-auto">
 
-            <!-- Right: Action Buttons -->
-            <div class="flex items-center space-x-2">
-                <!-- Theme toggle -->
-                <button id="themeToggle" title="Toggle Theme" class="p-2 rounded-full hover:bg-gray-100 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 19.5V21M4.22 4.22l1.06 1.06M17.72 17.72l1.06 1.06M3 12h1.5M19.5 12H21M4.22 19.78l1.06-1.06M17.72 6.28l1.06-1.06M12 6.75A5.25 5.25 0 1 1 6.75 12 5.26 5.26 0 0 1 12 6.75z" />
-                    </svg>
-                </button>
+    <!-- Left: Sidebar Toggle + Title -->
+    <div class="flex items-center space-x-2">
+      <!-- Sidebar Toggle -->
+      <button id="toggleSidebar" aria-label="Toggle sidebar" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+        </svg>
+      </button>
 
-                <!-- Settings -->
-                <button id="settingsBtn" title="Settings" class="p-2 rounded-full hover:bg-gray-100 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.827 3.31-2.37 2.37a1.724 1.724 0 0 0-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.827-2.37-2.37a1.724 1.724 0 0 0-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.827-3.31 2.37-2.37a1.724 1.724 0 0 0 2.573-1.066z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
-                    </svg>
-                </button>
+      <!-- Logo + Title -->
+      <img src="https://img.icons8.com/pulsar-line/48/nfc-n.png" alt="logo" class="w-7 h-7" />
+      <div>
+        <div id="headerTitle" class="font-semibold text-gray-800">Nexsera AI</div>
+        <div class="text-xs text-gray-500">Personal AI Assistant</div>
+      </div>
+    </div>
 
-                <!-- User icon -->
-                <div id="userBtn" class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 hover:bg-gray-300 transition">S</div>
-            </div>
-        </div>
-    </header>
+    <!-- Right: Action Buttons -->
+    <div class="flex items-center space-x-2">
+      <!-- Theme toggle -->
+      <button id="themeToggle" title="Toggle Theme" class="p-2 rounded-full hover:bg-gray-100 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 3v1.5M12 19.5V21M4.22 4.22l1.06 1.06M17.72 17.72l1.06 1.06M3 12h1.5M19.5 12H21M4.22 19.78l1.06-1.06M17.72 6.28l1.06-1.06M12 6.75A5.25 5.25 0 1 1 6.75 12 5.26 5.26 0 0 1 12 6.75z" />
+        </svg>
+      </button>
+
+      <!-- Settings -->
+      <button id="settingsBtn" title="Settings" class="p-2 rounded-full hover:bg-gray-100 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.827 3.31-2.37 2.37a1.724 1.724 0 0 0-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.827-2.37-2.37a1.724 1.724 0 0 0-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.827-3.31 2.37-2.37a1.724 1.724 0 0 0 2.573-1.066z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+        </svg>
+      </button>
+
+      <!-- User Icon -->
+      <div id="userBtn"
+        class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 hover:bg-gray-300 transition">
+        S
+      </div>
+    </div>
+  </div>
+</header>
+
 
     <!-- User Management Box -->
     <!-- Profile Panel -->
@@ -196,6 +227,7 @@
     <div class="flex items-center gap-2">
       <img src="https://img.icons8.com/pulsar-line/48/nfc-n.png" alt="nfc-n" class="w-8 h-8" />
       <span class="text-base font-bold text-gray-900">Nexsera Ai</span>
+      
     </div>
     <button id="closeSidebar" aria-label="Close sidebar" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -263,53 +295,74 @@
 
 
     <footer class="w-full border-t px-2 sm:px-4 py-3 space-y-2 bg-white mb-4">
-        <div class="w-full max-w-[95%] mx-auto flex flex-col gap-2">
-            <div id="filePreview" class="flex flex-wrap gap-2"></div>
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-2">
-<div class="flex w-full items-center space-x-2">
-  <!-- Upload Button -->
-  <div class="w-fit bg-white border border-gray-300 rounded-md p-1.5 shadow-sm hover:border-gray-400 hover:shadow transition">
-    <label for="file-upload" class="cursor-pointer hover:bg-gray-200 transition rounded-md p-1.5 block text-black" title="Upload File">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
-      </svg>
-    </label>
-    <input id="file-upload" type="file" class="hidden" multiple />
-  </div>
+  <div class="w-full max-w-[95%] mx-auto flex flex-col gap-2">
+    <div id="filePreview" class="flex flex-wrap gap-2"></div>
 
-  <div class="flex-grow"></div> <!-- Spacer -->
-
-  <!-- Record Button -->
-  <div class="w-fit bg-white border border-gray-300 rounded-md p-1.5 shadow-sm hover:border-gray-400 hover:shadow transition">
-    <button id="recordBtn" class="cursor-pointer hover:bg-gray-200 transition rounded-md p-1.5 block text-black" title="Start Recording">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
-      </svg>
-    </button>
-  </div>
-</div>
-</div>
-                <div class="flex-grow flex items-center bg-white border border-gray-300 rounded-md px-3 py-2 shadow-sm transition focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200">
-                    <input id="chatInput" type="text" placeholder="Message Nexsera Ai..." class="flex-grow px-2 py-1 bg-transparent text-sm focus:outline-none placeholder-gray-400 text-black"/>
-                    <button id="sendBtn" title="Send" class="bg-black text-white p-2 rounded-md hover:bg-gray-800 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-       <p class="text-xs italic text-center text-gray-500 mt-2">
-  Nexsera v3.58 | Personal AI by Samarth Nagpure 🧠
-</p>
-
-<p class="text-[10px] text-center text-gray-500">
-  Nexsera Ai may make mistakes. Consider checking important information. 
-  <a href="contact.html" class="underline text-black">Terms</a> and 
-  <a href="contact.html" class="underline text-black">Privacy</a>.
-</p>
-
+    <!-- 📁 File | ⚙️ AI Tools | 🎙 Record -->
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-2">
+      <div class="flex w-full items-center justify-between">
+        <!-- Upload Button -->
+        <div class="w-fit bg-white border border-gray-300 rounded-md p-1.5 shadow-sm hover:border-gray-400 hover:shadow transition">
+          <label for="file-upload" class="cursor-pointer hover:bg-gray-200 transition rounded-md p-1.5 block text-black" title="Upload File">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+            </svg>
+          </label>
+          <input id="file-upload" type="file" class="hidden" multiple />
         </div>
-    </footer>
+
+        <!-- 🌟 AI Tools Button -->
+        <div class="relative">
+          <button id="aiToolsBtn" class="flex items-center space-x-1 bg-white border border-gray-300 rounded-md p-1.5 shadow-sm hover:border-gray-400 hover:shadow transition text-black">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />
+            </svg>
+            <span class="text-sm">AI Tools</span>
+          </button>
+
+          <!-- Dropdown Menu -->
+          <div id="aiToolsMenu" class="absolute hidden mt-2 left-1/2 -translate-x-1/2 bg-white border border-gray-200 rounded-md shadow-lg w-44 z-50 py-1 text-sm">
+            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Generate a story')">✨ Generate</button>
+            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Summarize this text:')">📄 Summarize</button>
+            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Translate this to Hindi:')">🌍 Translate</button>
+            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Explain this concept:')">🔍 Explain</button>
+            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Give me a creative idea for a project')">💡 Idea</button>
+          </div>
+        </div>
+
+        <!-- Record Button -->
+        <div class="w-fit bg-white border border-gray-300 rounded-md p-1.5 shadow-sm hover:border-gray-400 hover:shadow transition">
+          <button id="recordBtn" class="cursor-pointer hover:bg-gray-200 transition rounded-md p-1.5 block text-black" title="Start Recording">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 💬 Input and Send -->
+    <div class="flex-grow flex items-center bg-white border border-gray-300 rounded-md px-3 py-2 shadow-sm transition focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200">
+      <input id="chatInput" type="text" placeholder="Message Nexsera Ai..." class="flex-grow px-2 py-1 bg-transparent text-sm focus:outline-none placeholder-gray-400 text-black" />
+      <button id="sendBtn" title="Send" class="bg-black text-white p-2 rounded-md hover:bg-gray-800 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Footer Text -->
+    <p class="text-xs italic text-center text-gray-500 mt-2">
+      Nexsera v3.58 | Personal AI by Samarth Nagpure 🧠
+    </p>
+    <p class="text-[10px] text-center text-gray-500">
+      Nexsera AI may make mistakes. Consider checking important information. 
+      <a href="contact.html" class="underline text-black">Terms</a> and 
+      <a href="contact.html" class="underline text-black">Privacy</a>.
+    </p>
+  </div>
+</footer>
+
 
    <!-- Settings Panel -->
 <div id="settingsPanel" class="fixed z-50 w-[300px] sm:w-[360px] right-4 top-20 bg-[#ffffff] border border-[#e5e7eb] rounded-lg shadow-lg p-4 space-y-4 hidden transition-transform-opacity opacity-0 scale-95 dark:bg-gray-800 dark:border-gray-700">
@@ -406,6 +459,9 @@ const sidebarOverlay = document.getElementById("sidebarOverlay");
         const responseSpeedValue = document.getElementById("responseSpeedValue");
         
         const headerTitle = document.getElementById("headerTitle");
+        const headerSubtitle = headerTitle.nextElementSibling; // "Personal AI Assistant"
+        const headerLogo = headerTitle.closest("div").previousElementSibling; // logo image
+
         const recordBtn = document.getElementById("recordBtn");
 
 
@@ -745,6 +801,15 @@ async function sendMessage() {
   // get and validate input
   const messageRaw = chatInput.value || "";
   const message = messageRaw.trim();
+// 🔹 On first prompt, replace header with user's topic
+if (headerTitle && message) {
+  headerTitle.textContent = message.length > 50 ? message.substring(0, 50) + "..." : message;
+  if (headerSubtitle) headerSubtitle.style.display = "none"; // hide subtitle
+  if (headerLogo) headerLogo.style.display = "none"; // hide logo
+}
+
+
+
   if (!message && filesToSend.length === 0) return;
 
   // hide welcome/empty state
@@ -1631,6 +1696,21 @@ startNewChat = function () {
     originalStartNewChat();
     showEmptyState();
 };
+// 🌟 Toggle AI Tools Dropdown
+const aiToolsBtn = document.getElementById("aiToolsBtn");
+const aiToolsMenu = document.getElementById("aiToolsMenu");
+
+aiToolsBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  aiToolsMenu.classList.toggle("hidden");
+});
+
+// Close the menu when clicking outside
+document.addEventListener("click", (e) => {
+  if (!aiToolsMenu.contains(e.target) && !aiToolsBtn.contains(e.target)) {
+    aiToolsMenu.classList.add("hidden");
+  }
+});
 
     </script>
 </body>
