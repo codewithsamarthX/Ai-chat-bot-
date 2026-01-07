@@ -19,22 +19,21 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
+        /* 🌟 Smooth dropdown animation for AI Tools menu */
+        #aiToolsMenu {
+            transform-origin: top;
+            transition: all 0.2s ease;
+        }
 
-  /* 🌟 Smooth dropdown animation for AI Tools menu */
-  #aiToolsMenu {
-    transform-origin: top;
-    transition: all 0.2s ease;
-  }
+        #aiToolsMenu:not(.hidden) {
+            transform: scale(1);
+            opacity: 1;
+        }
 
-  #aiToolsMenu:not(.hidden) {
-    transform: scale(1);
-    opacity: 1;
-  }
-
-  .hidden#aiToolsMenu {
-    transform: scale(0.95);
-    opacity: 0;
-  }
+        .hidden#aiToolsMenu {
+            transform: scale(0.95);
+            opacity: 0;
+        }
 
         /* Custom scrollbar */
         .chat-scrollbar::-webkit-scrollbar { width: 8px; }
@@ -125,325 +124,432 @@
 
         /* Transition for user management box and settings panel */
         .transition-transform-opacity {
-    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-}
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        }
 
-/* Fix: modern input focus style */
-.chat-input-container:focus-within {
-    border-color: #3b82f6; /* Blue border on focus */
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); /* Subtle glow */
-}
+        /* Fix: modern input focus style */
+        .chat-input-container:focus-within {
+            border-color: #3b82f6; /* Blue border on focus */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); /* Subtle glow */
+        }
 
+        /* New: Improved dark mode styles */
+        .dark {
+            background-color: #1a1a1a;
+            color: #e5e5e5;
+        }
         
+        .dark .bg-white {
+            background-color: #2d2d2d !important;
+        }
+        
+        .dark .text-gray-800 {
+            color: #e5e5e5 !important;
+        }
+        
+        .dark .text-gray-700 {
+            color: #d1d1d1 !important;
+        }
+        
+        .dark .text-gray-600 {
+            color: #b3b3b3 !important;
+        }
+        
+        .dark .text-gray-500 {
+            color: #999999 !important;
+        }
+        
+        .dark .border-gray-200 {
+            border-color: #444444 !important;
+        }
+        
+        .dark .border-gray-300 {
+            border-color: #555555 !important;
+        }
+        
+        .dark .hover\:bg-gray-100:hover {
+            background-color: #3a3a3a !important;
+        }
+        
+        .dark .hover\:bg-gray-200:hover {
+            background-color: #444444 !important;
+        }
+        
+        /* New: Loading animation */
+        .loading-spinner {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #3b82f6;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* New: Improved file preview */
+        .file-preview-item {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            background-color: #f0f0f0;
+            border-radius: 0.375rem;
+            padding: 0.25rem 0.5rem;
+            margin: 0.25rem;
+            font-size: 0.875rem;
+        }
+        
+        .dark .file-preview-item {
+            background-color: #3a3a3a;
+            color: #e5e5e5;
+        }
+        
+        .file-preview-item .remove-file {
+            margin-left: 0.5rem;
+            cursor: pointer;
+            color: #ef4444;
+            font-weight: bold;
+        }
+        
+        /* New: Improved message animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .chat-message-container {
+            animation: fadeInUp 0.3s ease-out;
+        }
+        
+        /* New: Improved button styles */
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        
+        .dark .btn-primary {
+            background-color: #2563eb;
+        }
+        
+        .dark .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
     </style>
+</head>
 <body class="bg-gray-100 text-gray-800 h-screen flex flex-col text-sm relative">
 
     <!-- Dimmed overlay for mobile sidebar -->
     <div id="sidebarOverlay" class="overlay fixed inset-0 bg-black bg-opacity-50 z-10 hidden sm:hidden"></div>
 
     <header class="z-30 sticky top-0 px-2 sm:px-4 mt-2">
-  <div class="w-full shadow-md rounded-lg px-4 py-2 flex items-center justify-between bg-white border border-gray-200 max-w-[98%] mx-auto">
+        <div class="w-full shadow-md rounded-lg px-4 py-2 flex items-center justify-between bg-white border border-gray-200 max-w-[98%] mx-auto">
 
-    <!-- Left: Sidebar Toggle + Title -->
-    <div class="flex items-center space-x-2">
-      <!-- Sidebar Toggle -->
-      <button id="toggleSidebar" aria-label="Toggle sidebar" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
-        </svg>
-      </button>
+            <!-- Left: Sidebar Toggle + Title -->
+            <div class="flex items-center space-x-2">
+                <!-- Sidebar Toggle -->
+                <button id="toggleSidebar" aria-label="Toggle sidebar" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                    </svg>
+                </button>
 
-      <!-- Logo + Title -->
-      <img src="https://img.icons8.com/pulsar-line/48/nfc-n.png" alt="logo" class="w-7 h-7" />
-      <div>
-        <div id="headerTitle" class="font-semibold text-gray-800">Nexsera AI</div>
-        <div class="text-xs text-gray-500">Personal AI Assistant</div>
-      </div>
-    </div>
+                <!-- Logo + Title -->
+                <img src="https://img.icons8.com/pulsar-line/48/nfc-n.png" alt="logo" class="w-7 h-7" />
+                <div>
+                    <div id="headerTitle" class="font-semibold text-gray-800">Nexsera AI</div>
+                    <div class="text-xs text-gray-500">Personal AI Assistant</div>
+                </div>
+            </div>
 
-    <!-- Right: Action Buttons -->
-    <div class="flex items-center space-x-2">
-      <!-- Theme toggle -->
-      <button id="themeToggle" title="Toggle Theme" class="p-2 rounded-full hover:bg-gray-100 transition">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M12 3v1.5M12 19.5V21M4.22 4.22l1.06 1.06M17.72 17.72l1.06 1.06M3 12h1.5M19.5 12H21M4.22 19.78l1.06-1.06M17.72 6.28l1.06-1.06M12 6.75A5.25 5.25 0 1 1 6.75 12 5.26 5.26 0 0 1 12 6.75z" />
-        </svg>
-      </button>
+            <!-- Right: Action Buttons -->
+            <div class="flex items-center space-x-2">
+                <!-- Theme toggle -->
+                <button id="themeToggle" title="Toggle Theme" class="p-2 rounded-full hover:bg-gray-100 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v1.5M12 19.5V21M4.22 4.22l1.06 1.06M17.72 17.72l1.06 1.06M3 12h1.5M19.5 12H21M4.22 19.78l1.06-1.06M17.72 6.28l1.06-1.06M12 6.75A5.25 5.25 0 1 1 6.75 12 5.26 5.26 0 0 1 12 6.75z" />
+                    </svg>
+                </button>
 
-      <!-- Settings -->
-      <button id="settingsBtn" title="Settings" class="p-2 rounded-full hover:bg-gray-100 transition">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.827 3.31-2.37 2.37a1.724 1.724 0 0 0-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.827-2.37-2.37a1.724 1.724 0 0 0-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.827-3.31 2.37-2.37a1.724 1.724 0 0 0 2.573-1.066z" />
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
-        </svg>
-      </button>
+                <!-- Settings -->
+                <button id="settingsBtn" title="Settings" class="p-2 rounded-full hover:bg-gray-100 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.827 3.31-2.37 2.37a1.724 1.724 0 0 0-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.827-2.37-2.37a1.724 1.724 0 0 0-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.827-3.31 2.37-2.37a1.724 1.724 0 0 0 2.573-1.066z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                    </svg>
+                </button>
 
-      <!-- User Icon -->
-      <div id="userBtn"
-        class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 hover:bg-gray-300 transition">
-        S
-      </div>
-    </div>
-  </div>
-</header>
-
+                <!-- User Icon -->
+                <div id="userBtn"
+                    class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 hover:bg-gray-300 transition">
+                    S
+                </div>
+            </div>
+        </div>
+    </header>
 
     <!-- User Management Box -->
     <!-- Profile Panel -->
-<div id="userManagementBox" class="absolute right-4 top-[4.5rem] bg-white border border-gray-200 rounded-md shadow-lg p-4 w-64 hidden z-40 transition-transform-opacity opacity-0 scale-95 dark:bg-gray-800 dark:border-gray-700">
-  <div class="flex items-center gap-3 mb-4">
-    <div class="w-10 h-10 rounded-full bg-cyan-500 text-white flex items-center justify-center text-lg font-bold shadow-inner">S</div>
-    <div>
-      <div class="font-semibold text-gray-800 dark:text-white">Samarth (Sir)</div>
-      <div class="text-xs text-gray-500 dark:text-gray-400">Personal AI Profile</div>
+    <div id="userManagementBox" class="absolute right-4 top-[4.5rem] bg-white border border-gray-200 rounded-md shadow-lg p-4 w-64 hidden z-40 transition-transform-opacity opacity-0 scale-95 dark:bg-gray-800 dark:border-gray-700">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-cyan-500 text-white flex items-center justify-center text-lg font-bold shadow-inner">S</div>
+            <div>
+                <div class="font-semibold text-gray-800 dark:text-white">Samarth (Sir)</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400">Personal AI Profile</div>
+            </div>
+        </div>
+
+        <div class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+            <div class="flex justify-between">
+                <span>Voice Mode:</span>
+                <span id="voiceStatus" class="text-green-500 font-semibold">ON</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Theme:</span>
+                <span id="themeStatus" class="text-cyan-400 font-semibold">Dark</span>
+            </div>
+        </div>
+
+        <div class="mt-4 text-right">
+            <button id="closeUserBox" class="text-xs text-gray-500 hover:text-red-500 transition">Close</button>
+        </div>
     </div>
-  </div>
 
-  <div class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-   <div class="flex justify-between">
-  <span>Voice Mode:</span>
-  <span id="voiceStatus" class="text-green-500 font-semibold">ON</span>
-</div>
-   <div class="flex justify-between">
-  <span>Theme:</span>
-  <span id="themeStatus" class="text-cyan-400 font-semibold">Dark</span>
-</div>
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed left-0 top-0 w-64 h-full bg-white border-r border-gray-200 shadow-md p-4 z-30 transform -translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-2">
+                <img src="https://img.icons8.com/pulsar-line/48/nfc-n.png" alt="nfc-n" class="w-8 h-8" />
+                <span class="text-base font-bold text-gray-900">Nexsera Ai</span>
+            </div>
+            <button id="closeSidebar" aria-label="Close sidebar" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
 
-  </div>
+        <!-- Menu -->
+        <h2 class="text-sm font-semibold text-black mb-3">Menu</h2>
+        <button id="newChatBtn" class="w-full mb-3 flex items-center gap-2 px-3 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            New Chat
+        </button>
 
-  <div class="mt-4 text-right">
-    <button id="closeUserBox" class="text-xs text-gray-500 hover:text-red-500 transition">Close</button>
-  </div>
-</div>
+        <!-- Search -->
+        <input type="text" id="searchHistory" placeholder="Search History..." class="mb-3 w-full px-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-400 text-black focus:outline-none focus:ring-2 focus:ring-blue-500" />
 
+        <!-- History -->
+        <h2 class="text-sm font-semibold text-black mb-2 mt-4">History</h2>
+        <ul id="historyList" class="space-y-1 text-sm text-gray-700">
+            <!-- Dynamic history list items will appear here -->
+        </ul>
 
-   <!-- Sidebar -->
-<aside id="sidebar" class="fixed left-0 top-0 w-64 h-full bg-white border-r border-gray-200 shadow-md p-4 z-30 transform -translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto">
-  <!-- Header -->
-  <div class="flex items-center justify-between mb-5">
-    <div class="flex items-center gap-2">
-      <img src="https://img.icons8.com/pulsar-line/48/nfc-n.png" alt="nfc-n" class="w-8 h-8" />
-      <span class="text-base font-bold text-gray-900">Nexsera Ai</span>
-      
-    </div>
-    <button id="closeSidebar" aria-label="Close sidebar" class="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-  </div>
+        <!-- User Info -->
+        <div class="mt-6 pt-4 border-t border-gray-200">
+            <h2 class="text-sm font-semibold text-black mb-2">User Info</h2>
+            <div class="text-sm text-gray-600 pl-1">
+                Logged in as: Samarth (Sir)
+            </div>
+        </div>
 
-  <!-- Menu -->
-  <h2 class="text-sm font-semibold text-black mb-3">Menu</h2>
-  <button id="newChatBtn" class="w-full mb-3 flex items-center gap-2 px-3 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition text-sm">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-    </svg>
-    New Chat
-  </button>
+        <!-- Settings Button -->
+        <div class="mt-6 pt-4 border-t border-gray-200">
+            <button id="sidebarSettingsBtn" class="flex items-center w-full px-3 py-2 rounded-md hover:bg-gray-100 transition text-left text-sm text-black">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.827 3.31-2.37 2.37a1.724 1.724 0 0 0-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.827-2.37-2.37a1.724 1.724 0 0 0-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.827-3.31 2.37-2.37a1.724 1.724 0 0 0 2.573-1.066z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                </svg>
+                Settings
+            </button>
+        </div>
+    </aside>
 
-  <!-- Search -->
-  <input type="text" id="searchHistory" placeholder="Search History..." class="mb-3 w-full px-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-400 text-black focus:outline-none focus:ring-2 focus:ring-blue-500" />
-
-  <!-- History -->
-  <h2 class="text-sm font-semibold text-black mb-2 mt-4">History</h2>
-  <ul id="historyList" class="space-y-1 text-sm text-gray-700">
-    <!-- Dynamic history list items will appear here -->
-  </ul>
-
-  <!-- User Info -->
-  <div class="mt-6 pt-4 border-t border-gray-200">
-    <h2 class="text-sm font-semibold text-black mb-2">User Info</h2>
-    <div class="text-sm text-gray-600 pl-1">
-      Logged in as: Samarth (Sir)
-    </div>
-  </div>
-
-  <!-- Settings Button -->
-  <div class="mt-6 pt-4 border-t border-gray-200">
-    <button id="sidebarSettingsBtn" class="flex items-center w-full px-3 py-2 rounded-md hover:bg-gray-100 transition text-left text-sm text-black">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.827 3.31-2.37 2.37a1.724 1.724 0 0 0-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.827-2.37-2.37a1.724 1.724 0 0 0-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.827-3.31 2.37-2.37a1.724 1.724 0 0 0 2.573-1.066z" />
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
-      </svg>
-      Settings
-    </button>
-  </div>
-</aside>
-
-
-   <!-- Main chat area -->
-<main id="main" class="flex-grow overflow-y-auto chat-scrollbar">
-  <div id="chatWindow" class="max-w-4xl mx-auto py-6 px-4 space-y-4">
-    <!-- Empty state (shown when no chat) -->
-    <div id="emptyState" class="text-center text-gray-500 mt-12">
-      <img src="https://img.icons8.com/ios/100/robot.png" alt="robot" class="mx-auto mb-4 opacity-70" />
-      <h2 class="text-lg font-semibold text-gray-700 mb-1">Welcome back, Sir.</h2>
-      <p class="text-sm mb-4">Nexsera is ready. Try one of the prompts below or start a new chat.</p>
-      <div class="flex justify-center gap-3">
-        <button class="px-3 py-1 text-sm border border-transparent rounded bg-cyan-500 text-white hover:bg-cyan-600" onclick="prefillPrompt('Tell me a joke')">Tell me a joke</button>
-        <button class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" onclick="prefillPrompt('Weather in Mumbai')">Weather in Mumbai</button>
-        <button class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" onclick="prefillPrompt('Summarize this text:')">Summarize text</button>
-      </div>
-    </div>
-    <!-- chat messages will append here -->
-  </div>
-</main>
-
+    <!-- Main chat area -->
+    <main id="main" class="flex-grow overflow-y-auto chat-scrollbar">
+        <div id="chatWindow" class="max-w-4xl mx-auto py-6 px-4 space-y-4">
+            <!-- Empty state (shown when no chat) -->
+            <div id="emptyState" class="text-center text-gray-500 mt-12">
+                <img src="https://img.icons8.com/ios/100/robot.png" alt="robot" class="mx-auto mb-4 opacity-70" />
+                <h2 class="text-lg font-semibold text-gray-700 mb-1">Welcome back, Sir.</h2>
+                <p class="text-sm mb-4">Nexsera is ready. Try one of the prompts below or start a new chat.</p>
+                <div class="flex justify-center gap-3">
+                    <button class="px-3 py-1 text-sm border border-transparent rounded bg-cyan-500 text-white hover:bg-cyan-600" onclick="prefillPrompt('Tell me a joke')">Tell me a joke</button>
+                    <button class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" onclick="prefillPrompt('Weather in Mumbai')">Weather in Mumbai</button>
+                    <button class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" onclick="prefillPrompt('Summarize this text:')">Summarize text</button>
+                </div>
+            </div>
+            <!-- chat messages will append here -->
+        </div>
+    </main>
 
     <footer class="w-full border-t px-2 sm:px-4 py-3 space-y-2 bg-white mb-4">
-  <div class="w-full max-w-[95%] mx-auto flex flex-col gap-2">
-    <div id="filePreview" class="flex flex-wrap gap-2"></div>
+        <div class="w-full max-w-[95%] mx-auto flex flex-col gap-2">
+            <div id="filePreview" class="flex flex-wrap gap-2"></div>
 
-    <!-- 📁 File | ⚙️ AI Tools | 🎙 Record -->
-    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-2">
-      <div class="flex w-full items-center justify-between">
-        <!-- Upload Button -->
-        <div class="w-fit bg-white border border-gray-300 rounded-md p-1.5 shadow-sm hover:border-gray-400 hover:shadow transition">
-          <label for="file-upload" class="cursor-pointer hover:bg-gray-200 transition rounded-md p-1.5 block text-black" title="Upload File">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
-            </svg>
-          </label>
-          <input id="file-upload" type="file" class="hidden" multiple />
+            <!-- 📁 File | ⚙️ AI Tools | 🎙 Record -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between space-y-2 sm:space-y-0 sm:space-x-2">
+                <div class="flex w-full items-center justify-between">
+                    <!-- Upload Button -->
+                    <div class="w-fit bg-white border border-gray-300 rounded-md p-1.5 shadow-sm hover:border-gray-400 hover:shadow transition">
+                        <label for="file-upload" class="cursor-pointer hover:bg-gray-200 transition rounded-md p-1.5 block text-black" title="Upload File">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                            </svg>
+                        </label>
+                        <input id="file-upload" type="file" class="hidden" multiple />
+                    </div>
+
+                    <!-- 🌟 AI Tools Button -->
+                    <div class="relative">
+                        <button id="aiToolsBtn" class="flex items-center space-x-1 bg-white border border-gray-300 rounded-md p-1.5 shadow-sm hover:border-gray-400 hover:shadow transition text-black">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />
+                            </svg>
+                            <span class="text-sm">AI Tools</span>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div id="aiToolsMenu" class="absolute hidden mt-2 left-1/2 -translate-x-1/2 bg-white border border-gray-200 rounded-md shadow-lg w-44 z-50 py-1 text-sm">
+                            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Generate a story')">✨ Generate</button>
+                            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Summarize this text:')">📄 Summarize</button>
+                            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Translate this to Hindi:')">🌍 Translate</button>
+                            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Explain this concept:')">🔍 Explain</button>
+                            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Give me a creative idea for a project')">💡 Idea</button>
+                        </div>
+                    </div>
+
+                    <!-- Record Button -->
+                    <div class="w-fit bg-white border border-gray-300 rounded-md p-1.5 shadow-sm hover:border-gray-400 hover:shadow transition">
+                        <button id="recordBtn" class="cursor-pointer hover:bg-gray-200 transition rounded-md p-1.5 block text-black" title="Start Recording">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 💬 Input and Send -->
+            <div class="flex-grow flex items-center bg-white border border-gray-300 rounded-md px-3 py-2 shadow-sm transition focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200">
+                <input id="chatInput" type="text" placeholder="Message Nexsera Ai..." class="flex-grow px-2 py-1 bg-transparent text-sm focus:outline-none placeholder-gray-400 text-black" />
+                <button id="sendBtn" title="Send" class="bg-black text-white p-2 rounded-md hover:bg-gray-800 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Footer Text -->
+            <p class="text-xs italic text-center text-gray-500 mt-2">
+                Nexsera v3.58 | Personal AI by Samarth Nagpure 🧠
+            </p>
+            <p class="text-[10px] text-center text-gray-500">
+                Nexsera AI may make mistakes. Consider checking important information. 
+                <a href="contact.html" class="underline text-black">Terms</a> and 
+                <a href="contact.html" class="underline text-black">Privacy</a>.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Settings Panel -->
+    <div id="settingsPanel" class="fixed z-50 w-[300px] sm:w-[360px] right-4 top-20 bg-[#ffffff] border border-[#e5e7eb] rounded-lg shadow-lg p-4 space-y-4 hidden transition-transform-opacity opacity-0 scale-95 dark:bg-gray-800 dark:border-gray-700">
+        <div class="flex justify-between items-center mb-3">
+            <h2 class="text-xl font-bold text-[#374151] dark:text-gray-200">⚙️ Settings</h2>
+            <button id="closeSettingsModal" title="Close" class="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
 
-        <!-- 🌟 AI Tools Button -->
-        <div class="relative">
-          <button id="aiToolsBtn" class="flex items-center space-x-1 bg-white border border-gray-300 rounded-md p-1.5 shadow-sm hover:border-gray-400 hover:shadow transition text-black">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />
-            </svg>
-            <span class="text-sm">AI Tools</span>
-          </button>
+        <!-- Settings Panel Container -->
+        <div class="bg-[#ffffff] border border-[#e5e7eb] rounded-md shadow-lg p-4 text-sm dark:bg-gray-800 dark:border-gray-700">
 
-          <!-- Dropdown Menu -->
-          <div id="aiToolsMenu" class="absolute hidden mt-2 left-1/2 -translate-x-1/2 bg-white border border-gray-200 rounded-md shadow-lg w-44 z-50 py-1 text-sm">
-            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Generate a story')">✨ Generate</button>
-            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Summarize this text:')">📄 Summarize</button>
-            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Translate this to Hindi:')">🌍 Translate</button>
-            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Explain this concept:')">🔍 Explain</button>
-            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Give me a creative idea for a project')">💡 Idea</button>
-          </div>
-        </div>
+            <!-- AI Model -->
+            <div>
+                <label class="block text-sm font-medium text-[#374151] mb-1 dark:text-gray-300">AI Model</label>
+                <select id="modelSelect" class="w-full pl-3 pr-10 py-2 border border-[#e5e7eb] text-sm rounded bg-[#ffffff] text-black dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <option value="default">Default Model</option>
+                    <option value="creative">Creative Model</option>
+                    <option value="factual">Factual Model</option>
+                </select>
+            </div>
 
-        <!-- Record Button -->
-        <div class="w-fit bg-white border border-gray-300 rounded-md p-1.5 shadow-sm hover:border-gray-400 hover:shadow transition">
-          <button id="recordBtn" class="cursor-pointer hover:bg-gray-200 transition rounded-md p-1.5 block text-black" title="Start Recording">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
-            </svg>
-          </button>
+            <!-- Response Speed -->
+            <div class="mt-4">
+                <label class="block text-sm font-medium text-[#374151] mb-1 dark:text-gray-300">Response Speed</label>
+                <input type="range" id="responseSpeed" min="50" max="2000" value="500"
+                       class="w-full h-2 bg-[#e5e7eb] rounded-lg appearance-none cursor-pointer dark:bg-gray-600">
+                <span id="responseSpeedValue" class="text-xs text-gray-500 block mt-1 dark:text-gray-400">500 ms</span>
+            </div>
+
+            <!-- Appearance Section -->
+            <div class="mt-4">
+                <h3 class="font-semibold text-sm text-[#1f2937] mb-2 dark:text-gray-200">Appearance</h3>
+                <label for="fontSizeSelector" class="block text-sm font-medium text-[#374151] mb-1 dark:text-gray-300">Font Size</label>
+                <select id="fontSizeSelector" class="w-full p-2 border border-[#e5e7eb] text-sm rounded text-black dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <option value="text-xs">Small</option>
+                    <option value="text-sm" selected>Medium</option>
+                    <option value="text-base">Large</option>
+                    <option value="text-lg">Extra Large</option>
+                </select>
+            </div>
+
+            <!-- Behavior Toggles -->
+            <div class="flex justify-between items-center mt-4">
+                <label class="text-sm font-medium text-[#374151] dark:text-gray-300">Auto Scroll</label>
+                <label class="inline-flex relative items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" id="autoScrollSwitch">
+                    <div class="w-11 h-6 bg-[#e5e7eb] rounded-full peer peer-checked:bg-[#2563eb] transition-all dark:bg-gray-600 dark:peer-checked:bg-[#2563eb]"></div>
+                </label>
+            </div>
+
+            <!-- Divider -->
+            <hr class="my-4 border-[#e5e7eb] dark:border-gray-700">
+            
+            <!-- Action Buttons -->
+            <div class="space-y-2">
+                <button id="resetSettings" class="w-full px-3 py-2 rounded bg-[#dc2626] text-white text-sm hover:bg-[#b91c1c]">Reset All Settings</button>
+                <button id="clearHistory" class="w-full px-3 py-2 rounded bg-[#dc2626] text-white text-sm hover:bg-[#b91c1c]">Clear Chat History</button>
+            </div>
         </div>
-      </div>
     </div>
-
-    <!-- 💬 Input and Send -->
-    <div class="flex-grow flex items-center bg-white border border-gray-300 rounded-md px-3 py-2 shadow-sm transition focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200">
-      <input id="chatInput" type="text" placeholder="Message Nexsera Ai..." class="flex-grow px-2 py-1 bg-transparent text-sm focus:outline-none placeholder-gray-400 text-black" />
-      <button id="sendBtn" title="Send" class="bg-black text-white p-2 rounded-md hover:bg-gray-800 transition">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
-        </svg>
-      </button>
-    </div>
-
-    <!-- Footer Text -->
-    <p class="text-xs italic text-center text-gray-500 mt-2">
-      Nexsera v3.58 | Personal AI by Samarth Nagpure 🧠
-    </p>
-    <p class="text-[10px] text-center text-gray-500">
-      Nexsera AI may make mistakes. Consider checking important information. 
-      <a href="contact.html" class="underline text-black">Terms</a> and 
-      <a href="contact.html" class="underline text-black">Privacy</a>.
-    </p>
-  </div>
-</footer>
-
-
-   <!-- Settings Panel -->
-<div id="settingsPanel" class="fixed z-50 w-[300px] sm:w-[360px] right-4 top-20 bg-[#ffffff] border border-[#e5e7eb] rounded-lg shadow-lg p-4 space-y-4 hidden transition-transform-opacity opacity-0 scale-95 dark:bg-gray-800 dark:border-gray-700">
-    <div class="flex justify-between items-center mb-3">
-        <h2 class="text-xl font-bold text-[#374151] dark:text-gray-200">⚙️ Settings</h2>
-        <button id="closeSettingsModal" title="Close" class="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-        </button>
-    </div>
-
-    <!-- Settings Panel Container -->
-    <div class="bg-[#ffffff] border border-[#e5e7eb] rounded-md shadow-lg p-4 text-sm dark:bg-gray-800 dark:border-gray-700">
-
-        <!-- AI Model -->
-        <div>
-            <label class="block text-sm font-medium text-[#374151] mb-1 dark:text-gray-300">AI Model</label>
-            <select id="modelSelect" class="w-full pl-3 pr-10 py-2 border border-[#e5e7eb] text-sm rounded bg-[#ffffff] text-black dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                <option value="default">Default Model</option>
-                <option value="creative">Creative Model</option>
-                <option value="factual">Factual Model</option>
-            </select>
-        </div>
-
-        <!-- Response Speed -->
-        <div class="mt-4">
-            <label class="block text-sm font-medium text-[#374151] mb-1 dark:text-gray-300">Response Speed</label>
-            <input type="range" id="responseSpeed" min="50" max="2000" value="500"
-                   class="w-full h-2 bg-[#e5e7eb] rounded-lg appearance-none cursor-pointer dark:bg-gray-600">
-            <span id="responseSpeedValue" class="text-xs text-gray-500 block mt-1 dark:text-gray-400">500 ms</span>
-        </div>
-
-        <!-- Appearance Section -->
-        <div class="mt-4">
-            <h3 class="font-semibold text-sm text-[#1f2937] mb-2 dark:text-gray-200">Appearance</h3>
-            <label for="fontSizeSelector" class="block text-sm font-medium text-[#374151] mb-1 dark:text-gray-300">Font Size</label>
-            <select id="fontSizeSelector" class="w-full p-2 border border-[#e5e7eb] text-sm rounded text-black dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                <option value="text-xs">Small</option>
-                <option value="text-sm" selected>Medium</option>
-                <option value="text-base">Large</option>
-                <option value="text-lg">Extra Large</option>
-            </select>
-        </div>
-
-        <!-- Behavior Toggles -->
-        <div class="flex justify-between items-center mt-4">
-            <label class="text-sm font-medium text-[#374151] dark:text-gray-300">Auto Scroll</label>
-            <label class="inline-flex relative items-center cursor-pointer">
-                <input type="checkbox" class="sr-only peer" id="autoScrollSwitch">
-                <div class="w-11 h-6 bg-[#e5e7eb] rounded-full peer peer-checked:bg-[#2563eb] transition-all dark:bg-gray-600 dark:peer-checked:bg-[#2563eb]"></div>
-            </label>
-        </div>
-
-        <!-- Divider -->
-        <hr class="my-4 border-[#e5e7eb] dark:border-gray-700">
-        
-        <!-- Action Buttons -->
-        <div class="space-y-2">
-            <button id="resetSettings" class="w-full px-3 py-2 rounded bg-[#dc2626] text-white text-sm hover:bg-[#b91c1c]">Reset All Settings</button>
-            <button id="clearHistory" class="w-full px-3 py-2 rounded bg-[#dc2626] text-white text-sm hover:bg-[#b91c1c]">Clear Chat History</button>
-        </div>
-    </div>
-</div>
-
-
 
     <script>
-
         // --- DOM Element References ---
-const toggleSidebar = document.getElementById("toggleSidebar");
-const closeSidebar = document.getElementById("closeSidebar");
-const sidebar = document.getElementById("sidebar");
-const sidebarOverlay = document.getElementById("sidebarOverlay");
-
-        // --- DOM Element References ---
+        const toggleSidebar = document.getElementById("toggleSidebar");
+        const closeSidebar = document.getElementById("closeSidebar");
+        const sidebar = document.getElementById("sidebar");
+        const sidebarOverlay = document.getElementById("sidebarOverlay");
         const chatInput = document.getElementById("chatInput");
         const sendBtn = document.getElementById("sendBtn");
         const chatWindow = document.getElementById("chatWindow");
         const introText = document.getElementById("introText");
-       
         const historyList = document.getElementById("historyList");
         const searchHistory = document.getElementById("searchHistory");
         const fileUpload = document.getElementById("file-upload");
@@ -457,47 +563,10 @@ const sidebarOverlay = document.getElementById("sidebarOverlay");
         const modelSelect = document.getElementById("modelSelect");
         const responseSpeed = document.getElementById("responseSpeed");
         const responseSpeedValue = document.getElementById("responseSpeedValue");
-        
         const headerTitle = document.getElementById("headerTitle");
         const headerSubtitle = headerTitle.nextElementSibling; // "Personal AI Assistant"
         const headerLogo = headerTitle.closest("div").previousElementSibling; // logo image
-
         const recordBtn = document.getElementById("recordBtn");
-
-
-
-
-
-
-      // --- Sidebar Toggle (Works on all screen sizes) ---
-function toggleSidebarFn() {
-    isSidebarOpen = !isSidebarOpen;
-    if (isSidebarOpen) {
-        sidebar.classList.remove('-translate-x-full');
-        if (window.innerWidth <= 640) sidebarOverlay.classList.remove('hidden');
-    } else {
-        sidebar.classList.add('-translate-x-full');
-        if (window.innerWidth <= 640) sidebarOverlay.classList.add('hidden');
-    }
-}
-
-
-// Force close sidebar (used by overlay and close button)
-function closeSidebarFn() {
-    isSidebarOpen = false;
-    sidebar.classList.add('-translate-x-full');
-    if (window.innerWidth <= 640) sidebarOverlay.classList.add('hidden');
-}
-
-
-
-
-// Attach events
-toggleSidebar.addEventListener("click", toggleSidebarFn);
-closeSidebar.addEventListener("click", closeSidebarFn);
-sidebarOverlay.addEventListener("click", closeSidebarFn);
-
-
 
         // User Management Elements
         const userButton = document.getElementById("userBtn");
@@ -509,20 +578,25 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
         const userSelect = document.getElementById("userSelect");
         const loggedInUserSpan = document.getElementById("loggedInUser");
 
+        // AI Tools Elements
+        const aiToolsBtn = document.getElementById("aiToolsBtn");
+        const aiToolsMenu = document.getElementById("aiToolsMenu");
+
         // --- State Variables ---
         let filesToSend = [];
         let chatHistory = []; // Stores all chat sessions
         let currentChatId = null; // ID of the currently active chat session
         let isTyping = false; // Flag to manage typing indicator state
         let preferredResponseSpeed = parseInt(localStorage.getItem("preferredResponseSpeed") || "500");
-        let autoScrollEnabled = localStorage.getItem("autoScroll") !== "false";        let users = JSON.parse(localStorage.getItem("userList")) || [];
+        let autoScrollEnabled = localStorage.getItem("autoScroll") !== "false";
+        let users = JSON.parse(localStorage.getItem("userList")) || [];
         let currentUser = localStorage.getItem("currentUser") || null;
+        let isSidebarOpen = false;
+        let isRecording = false;
 
         // --- Utility Functions ---
-
         const isMobile = () => window.innerWidth <= 640;
 
-       
         function saveChatHistoryForUser() {
             if (currentUser) {
                 localStorage.setItem(`chatHistory_${currentUser}`, JSON.stringify(chatHistory));
@@ -537,7 +611,6 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
             startNewChat(); // Start a fresh chat window for the new user
         }
 
-       
         function switchUser(username) {
             currentUser = username;
             localStorage.setItem("currentUser", username);
@@ -546,13 +619,11 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
             hideUserManagementBox(); // Hide box after switching
         }
 
-       
         function updateLoggedInUserUI() {
             loggedInUserSpan.textContent = currentUser || "Guest";
             userButton.textContent = currentUser ? currentUser.charAt(0).toUpperCase() : "S";
         }
 
-       
         function renderUserList() {
             userSelect.innerHTML = '<option value="" disabled selected>Select User</option>';
             users.forEach(user => {
@@ -568,13 +639,11 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
             localStorage.setItem("userList", JSON.stringify(users));
         }
 
-       
         const generateChatId = () => Date.now().toString();
 
-        
         function createChatEntry(message, type, messageIndex) {
             const msgContainer = document.createElement("div");
-           msgContainer.className = type === "user" ? "text-right pr-3 sm:pr-8" : "text-left pl-3 sm:pl-8";
+            msgContainer.className = type === "user" ? "text-right pr-3 sm:pr-8" : "text-left pl-3 sm:pl-8";
 
             msgContainer.innerHTML = `
                 <div class="chat-message-container group">
@@ -620,9 +689,6 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
             return messageTextDiv;
         }
 
-        /**
-         * Displays a typing indicator.
-         */
         function showTypingIndicator() {
             if (isTyping) return;
             isTyping = true;
@@ -641,9 +707,6 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
             }
         }
 
-        /**
-         * Hides the typing indicator.
-         */
         function hideTypingIndicator() {
             const typingDiv = document.getElementById("typingIndicator");
             if (typingDiv) {
@@ -652,11 +715,6 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
             }
         }
 
-        /**
-         * Simulates streaming of a reply into a message div.
-         * @param {HTMLElement} messageDiv - The div element to stream the text into.
-         * @param {string} fullReply - The complete reply text to stream.
-         */
         async function streamReply(messageDiv, fullReply) {
             if (!messageDiv || !messageDiv.tagName) {
                 console.error("Invalid messageDiv provided for streaming:", messageDiv);
@@ -676,11 +734,6 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
             Prism.highlightAllUnder(messageDiv.parentElement); // Highlight code after streaming
         }
 
-        /**
-         * Handles smart actions like opening URLs based on user commands.
-         * @param {string} reply - The AI's reply.
-         * @param {string} url - The URL to open.
-         */
         function smartReplyAndOpen(reply, url) {
             if (!currentChatId) {
                 currentChatId = generateChatId();
@@ -704,439 +757,433 @@ sidebarOverlay.addEventListener("click", closeSidebarFn);
             window.open(url, "_blank");
         }
 
-        
         // ==========================
-// Real Weather API Function
-// ==========================
-async function getWeatherData(city) {
-    if (!city) city = "Nashik"; // fallback if user gives no city
-    const apiKey = "870665bf2180b59f08a6d6b31e6bb2d0";
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
+        // Real Weather API Function
+        // ==========================
+        async function getWeatherData(city) {
+            if (!city) city = "Nashik"; // fallback if user gives no city
+            const apiKey = "870665bf2180b59f08a6d6b31e6bb2d0";
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
 
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error("Weather fetch failed");
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error("Weather fetch failed");
+                }
+                const data = await response.json();
+
+                const temp = Math.round(data.main.temp);
+                const desc = data.weather[0].description;
+                const feels = Math.round(data.main.feels_like);
+                const humidity = data.main.humidity;
+                const wind = data.wind.speed;
+
+                // return as safe string (HTML card for chat)
+                return `
+                    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+                        <p class="text-sm text-gray-500 dark:text-gray-300">🌦 Weather Update</p>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">${data.name}</h3>
+                        <p class="text-gray-700 dark:text-gray-200 capitalize">${desc}</p>
+                        <p class="text-2xl font-bold text-cyan-600 dark:text-cyan-400">${temp}°C</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">Feels like: ${feels}°C | 💧 ${humidity}% | 🌬 ${wind} m/s</p>
+                    </div>
+                `;
+            } catch (err) {
+                console.error("Weather error:", err);
+                return `❌ Unable to fetch weather for ${city}`;
+            }
         }
-        const data = await response.json();
 
-        const temp = Math.round(data.main.temp);
-        const desc = data.weather[0].description;
-        const feels = Math.round(data.main.feels_like);
-        const humidity = data.main.humidity;
-        const wind = data.wind.speed;
-
-        // return as safe string (HTML card for chat)
-        return `
-            <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm dark:bg-gray-700 dark:border-gray-600">
-                <p class="text-sm text-gray-500 dark:text-gray-300">🌦 Weather Update</p>
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">${data.name}</h3>
-                <p class="text-gray-700 dark:text-gray-200 capitalize">${desc}</p>
-                <p class="text-2xl font-bold text-cyan-600 dark:text-cyan-400">${temp}°C</p>
-                <p class="text-sm text-gray-600 dark:text-gray-300">Feels like: ${feels}°C | 💧 ${humidity}% | 🌬 ${wind} m/s</p>
-            </div>
-        `;
-    } catch (err) {
-        console.error("Weather error:", err);
-        return `❌ Unable to fetch weather for ${city}`;
-    }
-}
-           
-        
-// ✅ Math Expression Calculator
-function isMathExpression(input) {
-  return /^[0-9+\-*/%().\s]+$/.test(input);
-}
-function calculateExpression(expr) {
-  try {
-    let result = Function(`"use strict"; return (${expr})`)();
-    return result;
-  } catch {
-    return "❌ Invalid Expression";
-  }
-}
-
-// ✅ Date & Time Math
-function daysFromNow(days) {
-  const future = new Date();
-  future.setDate(future.getDate() + days);
-  return future.toDateString();
-}
-function daysUntil(dateStr) {
-  try {
-    const today = new Date();
-    const target = new Date(dateStr);
-    const diffTime = target - today;
-    if (isNaN(diffTime)) return "❌ Invalid date";
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return `${diffDays} days`;
-  } catch {
-    return "❌ Invalid date";
-  }
-}
-
-// ✅ Simple Knowledge Tools
-function factorial(n) {
-  if (n < 0) return "❌ Invalid (negative)";
-  let result = 1;
-  for (let i = 2; i <= n; i++) result *= i;
-  return result;
-}
-function isPrime(n) {
-  if (n <= 1) return false;
-  for (let i = 2; i * i <= n; i++) {
-    if (n % i === 0) return false;
-  }
-  return true;
-}
-function primesTill(n) {
-  const primes = [];
-  for (let i = 2; i <= n; i++) {
-    if (isPrime(i)) primes.push(i);
-  }
-  return primes.join(", ");
-}
-
-async function sendMessage() {
-  // get and validate input
-  const messageRaw = chatInput.value || "";
-  const message = messageRaw.trim();
-// 🔹 On first prompt, replace header with user's topic
-if (headerTitle && message) {
-  headerTitle.textContent = message.length > 50 ? message.substring(0, 50) + "..." : message;
-  if (headerSubtitle) headerSubtitle.style.display = "none"; // hide subtitle
-  if (headerLogo) headerLogo.style.display = "none"; // hide logo
-}
-
-
-
-  if (!message && filesToSend.length === 0) return;
-
-  // hide welcome/empty state
-  hideEmptyState();
-
-  // --- Ensure a current chat session exists (create if not) ---
-  let currentChat = chatHistory.find(chat => chat.id === currentChatId);
-  if (!currentChatId || !currentChat) {
-    currentChatId = generateChatId();
-    currentChat = {
-      id: currentChatId,
-      title: message.substring(0, 30) + (message.length > 30 ? "..." : ""),
-      messages: []
-    };
-    chatHistory.unshift(currentChat);
-    renderHistoryList();
-  }
-
-  // include uploaded filenames (if any) inside the user bubble
-  let fileNames = filesToSend.map(f => `📁 ${f.name}`).join("<br>");
-  const userMessageContent = `${message || ""}${fileNames ? "<br>" + fileNames : ""}`;
-
-  // --- Always append the user's message first ---
-  const userMessageIndex = currentChat.messages.length;
-  currentChat.messages.push({ role: "user", content: userMessageContent });
-  createChatEntry(userMessageContent, "user", userMessageIndex);
-  saveChatHistoryForUser();
-
-  // If there are files, do the existing auto-google search behavior (keeps UX same)
-  if (filesToSend.length > 0) {
-    for (const file of filesToSend) {
-      let query = file.name.replace(/\.trashed-\d+-/i, "");
-
-      if (file.type === "text/plain") {
-        try {
-          const text = await file.text();
-          query = text.split(/\s+/).slice(0, 6).join(" ");
-        } catch (err) {
-          console.error("Text file read error:", err);
+        // ✅ Math Expression Calculator
+        function isMathExpression(input) {
+            return /^[0-9+\-*/%().\s]+$/.test(input);
         }
-      }
+        function calculateExpression(expr) {
+            try {
+                let result = Function(`"use strict"; return (${expr})`)();
+                return result;
+            } catch {
+                return "❌ Invalid Expression";
+            }
+        }
 
-      if (file.type === "application/pdf") {
-        query = query.replace(/\.pdf$/i, "");
-      }
+        // ✅ Date & Time Math
+        function daysFromNow(days) {
+            const future = new Date();
+            future.setDate(future.getDate() + days);
+            return future.toDateString();
+        }
+        function daysUntil(dateStr) {
+            try {
+                const today = new Date();
+                const target = new Date(dateStr);
+                const diffTime = target - today;
+                if (isNaN(diffTime)) return "❌ Invalid date";
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return `${diffDays} days`;
+            } catch {
+                return "❌ Invalid date";
+            }
+        }
 
-      if (file.type.startsWith("image/")) {
-        const searchUrl = `https://images.google.com/`;
-        smartReplyAndOpen(`🔎 Please upload your image here for a visual search.`, searchUrl);
-        continue;
-      }
+        // ✅ Simple Knowledge Tools
+        function factorial(n) {
+            if (n < 0) return "❌ Invalid (negative)";
+            let result = 1;
+            for (let i = 2; i <= n; i++) result *= i;
+            return result;
+        }
+        function isPrime(n) {
+            if (n <= 1) return false;
+            for (let i = 2; i * i <= n; i++) {
+                if (n % i === 0) return false;
+            }
+            return true;
+        }
+        function primesTill(n) {
+            const primes = [];
+            for (let i = 2; i <= n; i++) {
+                if (isPrime(i)) primes.push(i);
+            }
+            return primes.join(", ");
+        }
 
-      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-      smartReplyAndOpen(`Searching Google for content from ${query}...`, searchUrl);
-    }
+        async function sendMessage() {
+            // get and validate input
+            const messageRaw = chatInput.value || "";
+            const message = messageRaw.trim();
 
-    // clear files
-    filesToSend = [];
-    updateFilePreview();
-  }
+            // 🔹 On first prompt, replace header with user's topic
+            if (headerTitle && message) {
+                headerTitle.textContent = message.length > 50 ? message.substring(0, 50) + "..." : message;
+                if (headerSubtitle) headerSubtitle.style.display = "none"; // hide subtitle
+                if (headerLogo) headerLogo.style.display = "none"; // hide logo
+            }
 
-  // clear input and preview right away
-  chatInput.value = "";
-  filesToSend = [];
-  updateFilePreview();
+            if (!message && filesToSend.length === 0) return;
 
-  // show typing indicator while we prepare the AI/tool response
-  showTypingIndicator();
+            // hide welcome/empty state
+            hideEmptyState();
 
-  // ---- Special tool handlers (these produce immediate reply cards or actions) ----
-  const lc = message.toLowerCase();
+            // --- Ensure a current chat session exists (create if not) ---
+            let currentChat = chatHistory.find(chat => chat.id === currentChatId);
+            if (!currentChatId || !currentChat) {
+                currentChatId = generateChatId();
+                currentChat = {
+                    id: currentChatId,
+                    title: message.substring(0, 30) + (message.length > 30 ? "..." : ""),
+                    messages: []
+                };
+                chatHistory.unshift(currentChat);
+                renderHistoryList();
+            }
 
-  // 1) Exact math expression (5+3, 12/4 etc.)
-  if (isMathExpression(message)) {
-    const result = calculateExpression(message);
-    const aiMessageIndex = currentChat.messages.length;
-    const calcCard = `
-      <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
-        <p class="text-sm text-gray-500 dark:text-gray-300">📐 Calculator</p>
-        <p class="text-gray-700 dark:text-gray-200 mt-1"><b>${message}</b></p>
-        <p class="text-lg font-semibold text-red-600 dark:text-red-400">= ${result}</p>
-      </div>
-    `;
-    currentChat.messages.push({ role: "ai", content: calcCard });
-    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
-    aiDiv.innerHTML = calcCard;
-    hideTypingIndicator();
-    saveChatHistoryForUser();
-    return;
-  }
+            // include uploaded filenames (if any) inside the user bubble
+            let fileNames = filesToSend.map(f => `📁 ${f.name}`).join("<br>");
+            const userMessageContent = `${message || ""}${fileNames ? "<br>" + fileNames : ""}`;
 
-  // 2) Date math: "X days from now" or "days until ..."
-  const fromNowMatch = message.match(/(\d+)\s*days?\s*from\s*now/i);
-  if (fromNowMatch) {
-    const num = parseInt(fromNowMatch[1], 10);
-    const dateStr = daysFromNow(num);
-    const aiMessageIndex = currentChat.messages.length;
-    const html = `
-      <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
-        <p class="text-sm text-gray-500 dark:text-gray-300">📅 Date Math</p>
-        <p class="text-gray-700 dark:text-gray-200 mt-1"><b>${num} day(s) from now</b></p>
-        <p class="text-lg font-semibold">${dateStr}</p>
-      </div>`;
-    currentChat.messages.push({ role: "ai", content: html });
-    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
-    aiDiv.innerHTML = html;
-    hideTypingIndicator();
-    saveChatHistoryForUser();
-    return;
-  }
+            // --- Always append the user's message first ---
+            const userMessageIndex = currentChat.messages.length;
+            currentChat.messages.push({ role: "user", content: userMessageContent });
+            createChatEntry(userMessageContent, "user", userMessageIndex);
+            saveChatHistoryForUser();
 
-  const untilMatch = message.match(/days?\s*until\s+(.+)/i);
-  if (untilMatch) {
-    const dateInput = message.replace(/^\s*days?\s*until\s+/i, "").trim();
-    const daysLeft = daysUntil(dateInput);
-    const nice = isNaN(new Date(dateInput)) ? "Invalid date" : new Date(dateInput).toDateString();
-    const aiMessageIndex = currentChat.messages.length;
-    const html = `
-      <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
-        <p class="text-sm text-gray-500 dark:text-gray-300">📅 Countdown</p>
-        <p class="text-gray-700 dark:text-gray-200 mt-1">Until <b>${dateInput}</b> <span class="text-xs opacity-70">(${nice})</span></p>
-        <p class="text-lg font-semibold">${daysLeft}</p>
-      </div>`;
-    currentChat.messages.push({ role: "ai", content: html });
-    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
-    aiDiv.innerHTML = html;
-    hideTypingIndicator();
-    saveChatHistoryForUser();
-    return;
-  }
+            // If there are files, do the existing auto-google search behavior (keeps UX same)
+            if (filesToSend.length > 0) {
+                for (const file of filesToSend) {
+                    let query = file.name.replace(/\.trashed-\d+-/i, "");
 
-  // 3) Factorial
-  const factMatch = message.match(/factorial\s+of\s+(\d+)/i);
-  if (factMatch) {
-    const n = parseInt(factMatch[1], 10);
-    const result = factorial(n);
-    const aiMessageIndex = currentChat.messages.length;
-    const html = `
-      <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
-        <p class="text-sm text-gray-500 dark:text-gray-300">🔢 Factorial</p>
-        <p class="text-gray-700 dark:text-gray-200 mt-1"><b>Factorial of ${n}</b></p>
-        <p class="text-lg font-semibold">${result}</p>
-      </div>`;
-    currentChat.messages.push({ role: "ai", content: html });
-    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
-    aiDiv.innerHTML = html;
-    hideTypingIndicator();
-    saveChatHistoryForUser();
-    return;
-  }
+                    if (file.type === "text/plain") {
+                        try {
+                            const text = await file.text();
+                            query = text.split(/\s+/).slice(0, 6).join(" ");
+                        } catch (err) {
+                            console.error("Text file read error:", err);
+                        }
+                    }
 
-  // 4) Prime check: "is 17 prime"
-  const primeCheckMatch = message.match(/is\s+(\d+)\s+prime/i);
-  if (primeCheckMatch) {
-    const n = parseInt(primeCheckMatch[1], 10);
-    const ok = isPrime(n);
-    const aiMessageIndex = currentChat.messages.length;
-    const html = `
-      <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
-        <p class="text-sm text-gray-500 dark:text-gray-300">🔢 Prime Check</p>
-        <p class="text-lg font-semibold">${n} → ${ok ? "✅ Prime" : "❌ Not Prime"}</p>
-      </div>`;
-    currentChat.messages.push({ role: "ai", content: html });
-    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
-    aiDiv.innerHTML = html;
-    hideTypingIndicator();
-    saveChatHistoryForUser();
-    return;
-  }
+                    if (file.type === "application/pdf") {
+                        query = query.replace(/\.pdf$/i, "");
+                    }
 
-  // 5) Primes till N
-  const primesTillMatch = message.match(/primes?\s*till\s+(\d+)/i);
-  if (primesTillMatch) {
-    const n = parseInt(primesTillMatch[1], 10);
-    const list = primesTill(n);
-    const aiMessageIndex = currentChat.messages.length;
-    const html = `
-      <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
-        <p class="text-sm text-gray-500 dark:text-gray-300">🔢 Prime Numbers</p>
-        <p class="text-xs text-gray-500 dark:text-gray-300 mb-1">Up to ${n}</p>
-        <p class="text-gray-800 dark:text-gray-100 break-words">${list || "—"}</p>
-      </div>`;
-    currentChat.messages.push({ role: "ai", content: html });
-    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
-    aiDiv.innerHTML = html;
-    hideTypingIndicator();
-    saveChatHistoryForUser();
-    return;
-  }
+                    if (file.type.startsWith("image/")) {
+                        const searchUrl = `https://images.google.com/`;
+                        smartReplyAndOpen(`🔎 Please upload your image here for a visual search.`, searchUrl);
+                        continue;
+                    }
 
-  // 6) Weather (this one uses async data)
-  if (lc.includes("weather")) {
-    const city = lc.includes("weather in") ? lc.split("in").pop().trim() : "";
-    try {
-      const weatherCard = await getWeatherData(city);
-      const aiMessageIndex = currentChat.messages.length;
-      currentChat.messages.push({ role: "ai", content: weatherCard });
-      const aiDiv = createChatEntry("", "ai", aiMessageIndex);
-      aiDiv.innerHTML = weatherCard;
-    } catch (err) {
-      const aiMessageIndex = currentChat.messages.length;
-      const errHtml = `❌ Unable to fetch weather for ${city}`;
-      currentChat.messages.push({ role: "ai", content: errHtml });
-      const aiDiv = createChatEntry("", "ai", aiMessageIndex);
-      aiDiv.textContent = errHtml;
-    }
-    hideTypingIndicator();
-    saveChatHistoryForUser();
-    return;
-  }
+                    const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                    smartReplyAndOpen(`Searching Google for content from ${query}...`, searchUrl);
+                }
 
-  // 7) Smart open/search/play commands that open a new window/tab
-  // (use same checks you had — they call smartReplyAndOpen which creates AI reply + window.open)
-  if (lc.startsWith("open whatsapp")) { smartReplyAndOpen("Opening WhatsApp Web for you, Sir.", "https://web.whatsapp.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open instagram")) { smartReplyAndOpen("Opening Instagram, Sir.", "https://www.instagram.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open github")) { smartReplyAndOpen("Opening GitHub, Sir.", "https://github.com/"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open flipkart")) { smartReplyAndOpen("Opening Flipkart, Sir.", "https://www.flipkart.com/"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open amazon")) { smartReplyAndOpen("Opening Amazon, Sir.", "https://www.amazon.in/"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open facebook")) { smartReplyAndOpen("Opening Facebook, Sir.", "https://www.facebook.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open twitter") || lc.startsWith("open x")) { smartReplyAndOpen("Opening Twitter, Sir.", "https://twitter.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open linkedin")) { smartReplyAndOpen("Opening LinkedIn, Sir.", "https://www.linkedin.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open netflix")) { smartReplyAndOpen("Opening Netflix, Sir.", "https://www.netflix.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open portfolio") || lc.startsWith("open my portfolio")) { smartReplyAndOpen("Opening your portfolio, Sir.", "https://samarthnagpure-byte.github.io/portfolio/"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open spotify")) { smartReplyAndOpen("Opening Spotify for you, Sir.", "https://open.spotify.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open youtube music")) { smartReplyAndOpen("Opening YouTube Music, Sir.", "https://music.youtube.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("play trailer of ")) { const query = encodeURIComponent(message.replace(/play trailer of /i, "").trim() + " trailer"); smartReplyAndOpen("Searching YouTube for trailer, Sir.", `https://www.youtube.com/results?search_query=${query}`); hideTypingIndicator(); return; }
-  if (lc.startsWith("play") && lc.includes("on netflix")) { const title = message.replace(/play /i, "").replace(/ on netflix/i, "").trim(); const query = encodeURIComponent(title + " site:netflix.com"); smartReplyAndOpen(`Searching Netflix for ${title}, Sir.`, `https://www.google.com/search?q=${query}`); hideTypingIndicator(); return; }
-  if (lc.startsWith("play ")) {
-    const song = message.replace(/play /i, "").replace(/ on youtube/i, "").replace(/ on spotify/i, "").trim();
-    const query = encodeURIComponent(song);
-    let platform = "YouTube";
-    let url = `https://www.youtube.com/results?search_query=${query}`;
-    if (lc.includes("on spotify")) { platform = "Spotify"; url = `https://open.spotify.com/search/${query}`; }
-    smartReplyAndOpen(`Playing ${song} on ${platform}.`, url);
-    hideTypingIndicator();
-    return;
-  }
-  if (lc.startsWith("search images of ")) { const queryText = message.replace(/search images of /i, "").trim(); const query = encodeURIComponent(queryText); smartReplyAndOpen(`Searching Google Images for ${queryText}.`, `https://www.google.com/search?tbm=isch&q=${query}`); hideTypingIndicator(); return; }
-  if (lc.startsWith("search news about ")) { const query = encodeURIComponent(message.replace(/search news about /i, "").trim()); smartReplyAndOpen(`Searching Google News for ${query}.`, `https://news.google.com/search?q=${query}`); hideTypingIndicator(); return; }
-  if (lc.startsWith("search recipe for ")) { const query = encodeURIComponent(message.replace(/search recipe for /i, "").trim()); smartReplyAndOpen(`Looking up recipes for ${query}.`, `https://www.google.com/search?q=recipe+for+${query}`); hideTypingIndicator(); return; }
-  if (lc.startsWith("search map of ")) { const query = encodeURIComponent(message.replace(/search map of /i, "").trim()); smartReplyAndOpen(`Opening map of ${query}.`, `https://www.google.com/maps/search/${query}`); hideTypingIndicator(); return; }
-  if (lc.startsWith("search videos of ")) { const query = encodeURIComponent(message.replace(/search videos of /i, "").trim()); smartReplyAndOpen(`Searching YouTube for ${query}.`, `https://www.youtube.com/results?search_query=${query}`); hideTypingIndicator(); return; }
-  if (lc.startsWith("search ")) { const queryText = message.replace(/search /i, "").trim(); const query = encodeURIComponent(queryText); smartReplyAndOpen(`Searching Google for ${queryText}.`, `https://www.google.com/search?q=${query}`); hideTypingIndicator(); return; }
-  if (lc.startsWith("navigate to ")) { const place = message.replace(/navigate to /i, "").trim(); const encoded = encodeURIComponent(place); smartReplyAndOpen(`Navigating to ${place} on Google Maps...`, `https://www.google.com/maps/search/${encoded}`); hideTypingIndicator(); return; }
-  if (lc.startsWith("open youtube")) { smartReplyAndOpen("Opening YouTube, Sir.", "https://www.youtube.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("open gmail")) { smartReplyAndOpen("Opening Gmail, Sir.", "https://mail.google.com"); hideTypingIndicator(); return; }
-  if (lc.startsWith("set timer for ")) { const time = message.replace(/set timer for /i, "").trim(); smartReplyAndOpen(`Setting a timer for ${time}...`, `https://www.google.com/search?q=timer+for+${encodeURIComponent(time)}`); hideTypingIndicator(); return; }
-  if (lc.startsWith("translate ")) { const match = message.match(/translate (.+) to (.+)/i); if (match) { const phrase = encodeURIComponent(match[1]); const lang = encodeURIComponent(match[2]); smartReplyAndOpen(`Translating ${match[1]} to ${match[2]}...`, `https://translate.google.com/?sl=auto&tl=${lang}&text=${phrase}&op=translate`); hideTypingIndicator(); return; } }
-  if (lc.startsWith("calculate ")) { const expression = encodeURIComponent(message.replace(/calculate /i, "").trim()); smartReplyAndOpen(`Calculating ${expression}...`, `https://www.google.com/search?q=${expression}`); hideTypingIndicator(); return; }
-  if (lc.startsWith("define ")) { const word = encodeURIComponent(message.replace(/define /i, "").trim()); smartReplyAndOpen(`Defining ${word}...`, `https://www.google.com/search?q=define+${word}`); hideTypingIndicator(); return; }
+                // clear files
+                filesToSend = [];
+                updateFilePreview();
+            }
 
-  // ---- If no early tool matched, fall back to the original conversational/templated replies ----
-  // Simulate a short response delay and then produce the same default replies you had
-  setTimeout(async () => {
-    hideTypingIndicator();
+            // clear input and preview right away
+            chatInput.value = "";
+            filesToSend = [];
+            updateFilePreview();
 
-    let reply;
-    if (["hi", "hello"].includes(lc)) { reply = "Welcome back, Sir. How may I assist you today?"; }
-    else if (lc.includes("help")) { reply = "Of course, Sir. What would you like me to do?"; }
-    else if (lc.includes("who are you")) { reply = "I am Nexsera, Sir. Your dedicated assistant, optimized for precision and efficiency."; }
-    else if (lc.includes("features")) { reply = "Nexsera Ai can chat, summarize text, manage files, and more!"; }
-    else if (lc.includes("thank you") || lc.includes("thanks")) { reply = "Always a pleasure, Sir."; }
-    else if (lc.includes("goodbye") || lc.includes("bye")) { reply = "Farewell, Sir. I await your next command."; }
-    else if (lc.includes("make a password")) {
-      const characters = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      let password = "";
-      for (let i = 0; i < 12; i++) { password += characters.charAt(Math.floor(Math.random() * characters.length)); }
-      reply = `As requested, Sir, here is your secure 12-character password: \`${password}\` 🔐`;
-    }
-    else if (lc.includes("joke")) { reply = "Sure! Why don’t scientists trust atoms? Because they make up everything! 😄"; }
-    else if (lc.includes("quote")) { reply = "“The best way to get started is to quit talking and begin doing.” – Walt Disney ✨"; }
-    else if (lc.includes("motivate me")) { reply = "You are capable of amazing things. Believe in yourself and go for it! 💪"; }
-    else if (lc.includes("remind me")) {
-      const task = message.replace(/remind me to/i, "").trim();
-      const existing = JSON.parse(localStorage.getItem("reminders") || "[]");
-      existing.push({ task, time: new Date().toLocaleString() });
-      localStorage.setItem("reminders", JSON.stringify(existing));
-      reply = `Okay, Sir. I’ve saved: “${task}” in your reminders.`;
-    }
-    else if (lc.includes("show my reminders")) {
-      const saved = JSON.parse(localStorage.getItem("reminders") || "[]");
-      if (saved.length === 0) { reply = "You have no reminders yet, Sir."; }
-      else { reply = "Here are your reminders:<br>" + saved.map(r => `📌 ${r.task} (${r.time})`).join("<br>"); }
-    }
-    else if (lc.includes("who made you")) { reply = "Sir Samarth Nagpure engineered me to serve you with intelligence and reliability."; }
-    else if (lc.includes("what can you do")) { reply = "I can chat, generate passwords, tell jokes, show quotes, summarize text, and more!"; }
-    else if (lc.includes("settings")) { reply = "You can access settings from the top right corner or the sidebar."; }
-    else if (lc.includes("dark mode") || lc.includes("light mode")) { reply = "You can toggle light/dark mode using the sun/moon icon in the header!"; }
-    else if (lc.includes("new chat")) { reply = "To start a new chat, click the 'New Chat' button in the sidebar."; }
-    else if (["ok", "okay", "sure"].includes(lc)) { reply = "Understood, Sir. Please instruct me further."; }
-    else if (["how are you", "how are you doing"].some(q => lc.includes(q))) { reply = "Functioning optimally, Sir. Standing by for your instructions."; }
-    else if (lc.includes("summarize")) { reply = "Certainly, Sir. Kindly provide the content you'd like summarized."; }
-    else if (lc.includes("explain")) { reply = "Absolutely, Sir. What concept would you like me to elaborate on?"; }
-    else if (lc.includes("what's the date") || lc.includes("what day")) { const today = new Date(); reply = `Today is ${today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.`; }
-    else if (lc.includes("fact")) { reply = "Did you know? The Eiffel Tower can grow more than 6 inches during summer due to heat! 🌞"; }
-    else if (lc.includes("i'm stressed") || lc.includes("relax")) { reply = "Take a deep breath. You're doing great! 🌸 Try focusing on something you love."; }
-    else if (lc.includes("idea for") || lc.includes("suggest")) { reply = "How about trying something creative today? Like writing a short poem or doodling something fun!"; }
-    else if (lc.includes("i'm bored")) { reply = "Feeling bored? Try learning a random skill online like origami, drawing, or speed typing!"; }
-    else if (["what's your name", "what is your name", "what your name"].some(q => lc.includes(q))) { reply = "You may address me as Nexsera, Sir — always at your service."; }
-    else if (lc.includes("debug") || lc.includes("fix this code")) { reply = "Sure, please paste the code you'd like me to help with."; }
-    else if (lc.includes("regex")) { reply = "Tell me what you need the regular expression to match, and I’ll help you generate it."; }
-    else if (lc.includes("write a function")) { reply = "Got it! Please describe what the function should do."; }
-    else if (lc.includes("to-do list") || lc.includes("task list")) { reply = "Sure! What tasks do you want to include in your to-do list?"; }
-    else if (lc.includes("remind me") || lc.includes("reminder")) { reply = "Okay, I’ll help you note that down. (Just a heads-up: I don’t set real alarms yet!)"; }
-    else if (lc.includes("plan my day") || lc.includes("schedule")) { reply = "Let's organize your day! Tell me your goals or start time."; }
-    else if (lc.includes("quiz me") || lc.includes("test me")) { reply = "Great! What topic would you like to be quizzed on?"; }
-    else if (lc.includes("translate") || lc.includes("how to say")) { reply = "Please tell me the phrase and the language you'd like it translated to."; }
-    else if (lc.includes("define") || lc.includes("meaning of")) { reply = "Here’s the definition of that word:"; }
-    else {
-      // fallback
-      reply = "I didn't quite get that — can you rephrase or give me a bit more detail, Sir?";
-    }
+            // show typing indicator while we prepare the AI/tool response
+            showTypingIndicator();
 
-    // append AI reply as streaming text so it looks natural
-    const currentChat = chatHistory.find(c => c.id === currentChatId);
-    const aiMessageIndex = currentChat.messages.length;
-    currentChat.messages.push({ role: "ai", content: reply });
-    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
-    await streamReply(aiDiv, reply);
-    saveChatHistoryForUser();
+            // ---- Special tool handlers (these produce immediate reply cards or actions) ----
+            const lc = message.toLowerCase();
 
-  }, 200); // small delay for UX
-}
+            // 1) Exact math expression (5+3, 12/4 etc.)
+            if (isMathExpression(message)) {
+                const result = calculateExpression(message);
+                const aiMessageIndex = currentChat.messages.length;
+                const calcCard = `
+                    <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+                        <p class="text-sm text-gray-500 dark:text-gray-300">📐 Calculator</p>
+                        <p class="text-gray-700 dark:text-gray-200 mt-1"><b>${message}</b></p>
+                        <p class="text-lg font-semibold text-red-600 dark:text-red-400">= ${result}</p>
+                    </div>
+                `;
+                currentChat.messages.push({ role: "ai", content: calcCard });
+                const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+                aiDiv.innerHTML = calcCard;
+                hideTypingIndicator();
+                saveChatHistoryForUser();
+                return;
+            }
 
-        /**
-         * Starts a new chat session.
-         */
+            // 2) Date math: "X days from now" or "days until ..."
+            const fromNowMatch = message.match(/(\d+)\s*days?\s*from\s*now/i);
+            if (fromNowMatch) {
+                const num = parseInt(fromNowMatch[1], 10);
+                const dateStr = daysFromNow(num);
+                const aiMessageIndex = currentChat.messages.length;
+                const html = `
+                    <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+                        <p class="text-sm text-gray-500 dark:text-gray-300">📅 Date Math</p>
+                        <p class="text-gray-700 dark:text-gray-200 mt-1"><b>${num} day(s) from now</b></p>
+                        <p class="text-lg font-semibold">${dateStr}</p>
+                    </div>`;
+                currentChat.messages.push({ role: "ai", content: html });
+                const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+                aiDiv.innerHTML = html;
+                hideTypingIndicator();
+                saveChatHistoryForUser();
+                return;
+            }
+
+            const untilMatch = message.match(/days?\s*until\s+(.+)/i);
+            if (untilMatch) {
+                const dateInput = message.replace(/^\s*days?\s*until\s+/i, "").trim();
+                const daysLeft = daysUntil(dateInput);
+                const nice = isNaN(new Date(dateInput)) ? "Invalid date" : new Date(dateInput).toDateString();
+                const aiMessageIndex = currentChat.messages.length;
+                const html = `
+                    <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+                        <p class="text-sm text-gray-500 dark:text-gray-300">📅 Countdown</p>
+                        <p class="text-gray-700 dark:text-gray-200 mt-1">Until <b>${dateInput}</b> <span class="text-xs opacity-70">(${nice})</span></p>
+                        <p class="text-lg font-semibold">${daysLeft}</p>
+                    </div>`;
+                currentChat.messages.push({ role: "ai", content: html });
+                const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+                aiDiv.innerHTML = html;
+                hideTypingIndicator();
+                saveChatHistoryForUser();
+                return;
+            }
+
+            // 3) Factorial
+            const factMatch = message.match(/factorial\s+of\s+(\d+)/i);
+            if (factMatch) {
+                const n = parseInt(factMatch[1], 10);
+                const result = factorial(n);
+                const aiMessageIndex = currentChat.messages.length;
+                const html = `
+                    <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+                        <p class="text-sm text-gray-500 dark:text-gray-300">🔢 Factorial</p>
+                        <p class="text-gray-700 dark:text-gray-200 mt-1"><b>Factorial of ${n}</b></p>
+                        <p class="text-lg font-semibold">${result}</p>
+                    </div>`;
+                currentChat.messages.push({ role: "ai", content: html });
+                const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+                aiDiv.innerHTML = html;
+                hideTypingIndicator();
+                saveChatHistoryForUser();
+                return;
+            }
+
+            // 4) Prime check: "is 17 prime"
+            const primeCheckMatch = message.match(/is\s+(\d+)\s+prime/i);
+            if (primeCheckMatch) {
+                const n = parseInt(primeCheckMatch[1], 10);
+                const ok = isPrime(n);
+                const aiMessageIndex = currentChat.messages.length;
+                const html = `
+                    <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+                        <p class="text-sm text-gray-500 dark:text-gray-300">🔢 Prime Check</p>
+                        <p class="text-lg font-semibold">${n} → ${ok ? "✅ Prime" : "❌ Not Prime"}</p>
+                    </div>`;
+                currentChat.messages.push({ role: "ai", content: html });
+                const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+                aiDiv.innerHTML = html;
+                hideTypingIndicator();
+                saveChatHistoryForUser();
+                return;
+            }
+
+            // 5) Primes till N
+            const primesTillMatch = message.match(/primes?\s*till\s+(\d+)/i);
+            if (primesTillMatch) {
+                const n = parseInt(primesTillMatch[1], 10);
+                const list = primesTill(n);
+                const aiMessageIndex = currentChat.messages.length;
+                const html = `
+                    <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+                        <p class="text-sm text-gray-500 dark:text-gray-300">🔢 Prime Numbers</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-300 mb-1">Up to ${n}</p>
+                        <p class="text-gray-800 dark:text-gray-100 break-words">${list || "—"}</p>
+                    </div>`;
+                currentChat.messages.push({ role: "ai", content: html });
+                const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+                aiDiv.innerHTML = html;
+                hideTypingIndicator();
+                saveChatHistoryForUser();
+                return;
+            }
+
+            // 6) Weather (this one uses async data)
+            if (lc.includes("weather")) {
+                const city = lc.includes("weather in") ? lc.split("in").pop().trim() : "";
+                try {
+                    const weatherCard = await getWeatherData(city);
+                    const aiMessageIndex = currentChat.messages.length;
+                    currentChat.messages.push({ role: "ai", content: weatherCard });
+                    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+                    aiDiv.innerHTML = weatherCard;
+                } catch (err) {
+                    const aiMessageIndex = currentChat.messages.length;
+                    const errHtml = `❌ Unable to fetch weather for ${city}`;
+                    currentChat.messages.push({ role: "ai", content: errHtml });
+                    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+                    aiDiv.textContent = errHtml;
+                }
+                hideTypingIndicator();
+                saveChatHistoryForUser();
+                return;
+            }
+
+            // 7) Smart open/search/play commands that open a new window/tab
+            // (use same checks you had — they call smartReplyAndOpen which creates AI reply + window.open)
+            if (lc.startsWith("open whatsapp")) { smartReplyAndOpen("Opening WhatsApp Web for you, Sir.", "https://web.whatsapp.com"); hideTypingIndicator(); return; }
+            if (lc.startsWith("open instagram")) { smartReplyAndOpen("Opening Instagram, Sir.", "https://www.instagram.com"); hideTypingIndicator(); return; }
+            if (lc.startsWith("open github")) { smartReplyAndOpen("Opening GitHub, Sir.", "https://github.com/"); hideTypingIndicator(); return; }
+            if (lc.startsWith("open flipkart")) { smartReplyAndOpen("Opening Flipkart, Sir.", "https://www.flipkart.com/"); hideTypingIndicator(); return; }
+            if (lc.startsWith("open amazon")) { smartReplyAndOpen("Opening Amazon, Sir.", "https://www.amazon.in/"); hideTypingIndicator(); return; }
+            if (lc.startsWith("open facebook")) { smartReplyAndOpen("Opening Facebook, Sir.", "https://www.facebook.com"); hideTypingIndicator(); return; }
+            if (lc.startsWith("open twitter") || lc.startsWith("open x")) { smartReplyAndOpen("Opening Twitter, Sir.", "https://twitter.com"); hideTypingIndicator(); return; }
+            if (lc.startsWith("open linkedin")) { smartReplyAndOpen("Opening LinkedIn, Sir.", "https://www.linkedin.com"); hideTypingIndicator(); return; }
+            if (lc.startsWith("open netflix")) { smartReplyAndOpen("Opening Netflix, Sir.", "https://www.netflix.com"); hideTypingIndicator(); return; }
+            if (lc.startsWith("open portfolio") || lc.startsWith("open my portfolio")) { smartReplyAndOpen("Opening your portfolio, Sir.", "https://samarthnagpure-byte.github.io/portfolio/"); hideTypingIndicator(); return; }
+            if (lc.startsWith("open spotify")) { smartReplyAndOpen("Opening Spotify for you, Sir.", "https://open.spotify.com"); hideTypingIndicator(); return; }
+            if (lc.startsWith("open youtube music")) { smartReplyAndOpen("Opening YouTube Music, Sir.", "https://music.youtube.com"); hideTypingIndicator(); return; }
+            if (lc.startsWith("play trailer of ")) { const query = encodeURIComponent(message.replace(/play trailer of /i, "").trim() + " trailer"); smartReplyAndOpen("Searching YouTube for trailer, Sir.", `https://www.youtube.com/results?search_query=${query}`); hideTypingIndicator(); return; }
+            if (lc.startsWith("play") && lc.includes("on netflix")) { const title = message.replace(/play /i, "").replace(/ on netflix/i, "").trim(); const query = encodeURIComponent(title + " site:netflix.com"); smartReplyAndOpen(`Searching Netflix for ${title}, Sir.`, `https://www.google.com/search?q=${query}`); hideTypingIndicator(); return; }
+            if (lc.startsWith("play ")) {
+                const song = message.replace(/play /i, "").replace(/ on youtube/i, "").replace(/ on spotify/i, "").trim();
+                const query = encodeURIComponent(song);
+                let platform = "YouTube";
+                let url = `https://www.youtube.com/results?search_query=${query}`;
+                if (lc.includes("on spotify")) { platform = "Spotify"; url = `https://open.spotify.com/search/${query}`; }
+                smartReplyAndOpen(`Playing ${song} on ${platform}.`, url);
+                hideTypingIndicator();
+                return;
+            }
+            if (lc.startsWith("search images of ")) { const queryText = message.replace(/search images of /i, "").trim(); const query = encodeURIComponent(queryText); smartReplyAndOpen(`Searching Google Images for ${queryText}.`, `https://www.google.com/search?tbm=isch&q=${query}`); hideTypingIndicator(); return; }
+            if (lc.startsWith("search news about ")) { const query = encodeURIComponent(message.replace(/search news about /i, "").trim()); smartReplyAndOpen(`Searching Google News for ${query}.`, `https://news.google.com/search?q=${query}`); hideTypingIndicator(); return; }
+            if (lc.startsWith("search recipe for ")) { const query = encodeURIComponent(message.replace(/search recipe for /i, "").trim()); smartReplyAndOpen(`Looking up recipes for ${query}.`, `https://www.google.com/search?q=recipe+for+${query}`); hideTypingIndicator(); return; }
+            if (lc.startsWith("search map of ")) { const query = encodeURIComponent(message.replace(/search map of /i, "").trim()); smartReplyAndOpen(`Opening map of ${query}.`, `https://www.google.com/maps/search/${query}`); hideTypingIndicator(); return; }
+            if (lc.startsWith("search videos of ")) { const query = encodeURIComponent(message.replace(/search videos of /i, "").trim()); smartReplyAndOpen(`Searching YouTube for ${query}.`, `https://www.youtube.com/results?search_query=${query}`); hideTypingIndicator(); return; }
+            if (lc.startsWith("search ")) { const queryText = message.replace(/search /i, "").trim(); const query = encodeURIComponent(queryText); smartReplyAndOpen(`Searching Google for ${queryText}.`, `https://www.google.com/search?q=${query}`); hideTypingIndicator(); return; }
+            if (lc.startsWith("navigate to ")) { const place = message.replace(/navigate to /i, "").trim(); const encoded = encodeURIComponent(place); smartReplyAndOpen(`Navigating to ${place} on Google Maps...`, `https://www.google.com/maps/search/${encoded}`); hideTypingIndicator(); return; }
+            if (lc.startsWith("open youtube")) { smartReplyAndOpen("Opening YouTube, Sir.", "https://www.youtube.com"); hideTypingIndicator(); return; }
+            if (lc.startsWith("open gmail")) { smartReplyAndOpen("Opening Gmail, Sir.", "https://mail.google.com"); hideTypingIndicator(); return; }
+            if (lc.startsWith("set timer for ")) { const time = message.replace(/set timer for /i, "").trim(); smartReplyAndOpen(`Setting a timer for ${time}...`, `https://www.google.com/search?q=timer+for+${encodeURIComponent(time)}`); hideTypingIndicator(); return; }
+            if (lc.startsWith("translate ")) { const match = message.match(/translate (.+) to (.+)/i); if (match) { const phrase = encodeURIComponent(match[1]); const lang = encodeURIComponent(match[2]); smartReplyAndOpen(`Translating ${match[1]} to ${match[2]}...`, `https://translate.google.com/?sl=auto&tl=${lang}&text=${phrase}&op=translate`); hideTypingIndicator(); return; } }
+            if (lc.startsWith("calculate ")) { const expression = encodeURIComponent(message.replace(/calculate /i, "").trim()); smartReplyAndOpen(`Calculating ${expression}...`, `https://www.google.com/search?q=${expression}`); hideTypingIndicator(); return; }
+            if (lc.startsWith("define ")) { const word = encodeURIComponent(message.replace(/define /i, "").trim()); smartReplyAndOpen(`Defining ${word}...`, `https://www.google.com/search?q=define+${word}`); hideTypingIndicator(); return; }
+
+            // ---- If no early tool matched, fall back to the original conversational/templated replies ----
+            // Simulate a short response delay and then produce the same default replies you had
+            setTimeout(async () => {
+                hideTypingIndicator();
+
+                let reply;
+                if (["hi", "hello"].includes(lc)) { reply = "Welcome back, Sir. How may I assist you today?"; }
+                else if (lc.includes("help")) { reply = "Of course, Sir. What would you like me to do?"; }
+                else if (lc.includes("who are you")) { reply = "I am Nexsera, Sir. Your dedicated assistant, optimized for precision and efficiency."; }
+                else if (lc.includes("features")) { reply = "Nexsera Ai can chat, summarize text, manage files, and more!"; }
+                else if (lc.includes("thank you") || lc.includes("thanks")) { reply = "Always a pleasure, Sir."; }
+                else if (lc.includes("goodbye") || lc.includes("bye")) { reply = "Farewell, Sir. I await your next command."; }
+                else if (lc.includes("make a password")) {
+                    const characters = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                    let password = "";
+                    for (let i = 0; i < 12; i++) { password += characters.charAt(Math.floor(Math.random() * characters.length)); }
+                    reply = `As requested, Sir, here is your secure 12-character password: \`${password}\` 🔐`;
+                }
+                else if (lc.includes("joke")) { reply = "Sure! Why don't scientists trust atoms? Because they make up everything! 😄"; }
+                else if (lc.includes("quote")) { reply = "“The best way to get started is to quit talking and begin doing.” – Walt Disney ✨"; }
+                else if (lc.includes("motivate me")) { reply = "You are capable of amazing things. Believe in yourself and go for it! 💪"; }
+                else if (lc.includes("remind me")) {
+                    const task = message.replace(/remind me to/i, "").trim();
+                    const existing = JSON.parse(localStorage.getItem("reminders") || "[]");
+                    existing.push({ task, time: new Date().toLocaleString() });
+                    localStorage.setItem("reminders", JSON.stringify(existing));
+                    reply = `Okay, Sir. I've saved: "${task}" in your reminders.`;
+                }
+                else if (lc.includes("show my reminders")) {
+                    const saved = JSON.parse(localStorage.getItem("reminders") || "[]");
+                    if (saved.length === 0) { reply = "You have no reminders yet, Sir."; }
+                    else { reply = "Here are your reminders:<br>" + saved.map(r => `📌 ${r.task} (${r.time})`).join("<br>"); }
+                }
+                else if (lc.includes("who made you")) { reply = "Sir Samarth Nagpure engineered me to serve you with intelligence and reliability."; }
+                else if (lc.includes("what can you do")) { reply = "I can chat, generate passwords, tell jokes, show quotes, summarize text, and more!"; }
+                else if (lc.includes("settings")) { reply = "You can access settings from the top right corner or the sidebar."; }
+                else if (lc.includes("dark mode") || lc.includes("light mode")) { reply = "You can toggle light/dark mode using the sun/moon icon in the header!"; }
+                else if (lc.includes("new chat")) { reply = "To start a new chat, click the 'New Chat' button in the sidebar."; }
+                else if (["ok", "okay", "sure"].includes(lc)) { reply = "Understood, Sir. Please instruct me further."; }
+                else if (["how are you", "how are you doing"].some(q => lc.includes(q))) { reply = "Functioning optimally, Sir. Standing by for your instructions."; }
+                else if (lc.includes("summarize")) { reply = "Certainly, Sir. Kindly provide the content you'd like summarized."; }
+                else if (lc.includes("explain")) { reply = "Absolutely, Sir. What concept would you like me to elaborate on?"; }
+                else if (lc.includes("what's the date") || lc.includes("what day")) { const today = new Date(); reply = `Today is ${today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.`; }
+                else if (lc.includes("fact")) { reply = "Did you know? The Eiffel Tower can grow more than 6 inches during summer due to heat! 🌞"; }
+                else if (lc.includes("i'm stressed") || lc.includes("relax")) { reply = "Take a deep breath. You're doing great! 🌸 Try focusing on something you love."; }
+                else if (lc.includes("idea for") || lc.includes("suggest")) { reply = "How about trying something creative today? Like writing a short poem or doodling something fun!"; }
+                else if (lc.includes("i'm bored")) { reply = "Feeling bored? Try learning a random skill online like origami, drawing, or speed typing!"; }
+                else if (["what's your name", "what is your name", "what your name"].some(q => lc.includes(q))) { reply = "You may address me as Nexsera, Sir — always at your service."; }
+                else if (lc.includes("debug") || lc.includes("fix this code")) { reply = "Sure, please paste the code you'd like me to help with."; }
+                else if (lc.includes("regex")) { reply = "Tell me what you need the regular expression to match, and I'll help you generate it."; }
+                else if (lc.includes("write a function")) { reply = "Got it! Please describe what the function should do."; }
+                else if (lc.includes("to-do list") || lc.includes("task list")) { reply = "Sure! What tasks do you want to include in your to-do list?"; }
+                else if (lc.includes("remind me") || lc.includes("reminder")) { reply = "Okay, I'll help you note that down. (Just a heads-up: I don't set real alarms yet!)"; }
+                else if (lc.includes("plan my day") || lc.includes("schedule")) { reply = "Let's organize your day! Tell me your goals or start time."; }
+                else if (lc.includes("quiz me") || lc.includes("test me")) { reply = "Great! What topic would you like to be quizzed on?"; }
+                else if (lc.includes("translate") || lc.includes("how to say")) { reply = "Please tell me the phrase and the language you'd like it translated to."; }
+                else if (lc.includes("define") || lc.includes("meaning of")) { reply = "Here's the definition of that word:"; }
+                else {
+                    // fallback
+                    reply = "I didn't quite get that — can you rephrase or give me a bit more detail, Sir?";
+                }
+
+                // append AI reply as streaming text so it looks natural
+                const currentChat = chatHistory.find(c => c.id === currentChatId);
+                const aiMessageIndex = currentChat.messages.length;
+                currentChat.messages.push({ role: "ai", content: reply });
+                const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+                await streamReply(aiDiv, reply);
+                saveChatHistoryForUser();
+
+            }, 200); // small delay for UX
+        }
+
         function startNewChat() {
             chatWindow.innerHTML = `<p id="introText" class="text-center text-gray-600 text-sm dark:text-gray-400">Welcome back, Sir. Nexsera is fully operational and standing by for your command.</p>`;
             currentChatId = null;
@@ -1147,9 +1194,6 @@ if (headerTitle && message) {
             }
         }
 
-        /**
-         * Renders the chat history list in the sidebar.
-         */
         function renderHistoryList() {
             historyList.innerHTML = '';
             chatHistory.forEach(chat => {
@@ -1180,10 +1224,6 @@ if (headerTitle && message) {
             });
         }
 
-        /**
-         * Loads and displays a specific chat session.
-         * @param {string} chatId - The ID of the chat session to load.
-         */
         function loadChat(chatId) {
             const chat = chatHistory.find(c => c.id === chatId);
             if (chat) {
@@ -1204,10 +1244,6 @@ if (headerTitle && message) {
             }
         }
 
-        /**
-         * Deletes a chat session from history.
-         * @param {string} chatIdToDelete - The ID of the chat session to delete.
-         */
         function deleteChat(chatIdToDelete) {
             const chatIndex = chatHistory.findIndex(chat => chat.id === chatIdToDelete);
             if (chatIndex > -1) {
@@ -1231,20 +1267,17 @@ if (headerTitle && message) {
             }
         }
 
-       
         async function copyMessage(text) {
             try {
                 await navigator.clipboard.writeText(text);
                 // Provide visual feedback
-                const originalText = copyButton.textContent;
-                copyButton.textContent = "Copied!";
-                setTimeout(() => copyButton.textContent = originalText, 1500);
+                showToast("Message copied to clipboard!");
             } catch (err) {
                 console.error('Failed to copy message: ', err);
+                showToast("Failed to copy message");
             }
         }
 
-      
         function speakMessage(text, messageDiv) {
             if ('speechSynthesis' in window) {
                 if (speechSynthesis.speaking) {
@@ -1267,11 +1300,10 @@ if (headerTitle && message) {
 
                 speechSynthesis.speak(utterance);
             } else {
-                alert("Text-to-speech not supported in your browser.");
+                showToast("Text-to-speech not supported in your browser.");
             }
         }
 
-        
         function filterHistory() {
             const searchTerm = searchHistory.value.toLowerCase();
             const filteredHistory = chatHistory.filter(chat =>
@@ -1307,20 +1339,19 @@ if (headerTitle && message) {
             });
         }
 
-       
         function updateFilePreview() {
             filePreview.innerHTML = '';
             filesToSend.forEach((file, index) => {
                 const fileDiv = document.createElement('div');
-                fileDiv.className = 'flex items-center bg-gray-100 border border-gray-300 rounded px-2 py-1 text-xs text-black dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200';
+                fileDiv.className = 'file-preview-item';
                 fileDiv.innerHTML = `
                     📁 ${file.name}
-                    <button class="ml-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300" data-index="${index}">&times;</button>
+                    <span class="remove-file" data-index="${index}">&times;</span>
                 `;
                 filePreview.appendChild(fileDiv);
             });
 
-            filePreview.querySelectorAll('button').forEach(btn => {
+            filePreview.querySelectorAll('.remove-file').forEach(btn => {
                 btn.onclick = () => {
                     const i = parseInt(btn.dataset.index);
                     filesToSend.splice(i, 1);
@@ -1336,13 +1367,20 @@ if (headerTitle && message) {
 
             document.body.classList.remove(isDarkMode ? "bg-gray-100" : "bg-gray-900", isDarkMode ? "text-gray-800" : "text-gray-100");
             document.body.classList.add(isDarkMode ? "bg-gray-900" : "bg-gray-100", isDarkMode ? "text-gray-100" : "text-gray-800");
+            
+            // Update theme status in user box
+            const themeStatus = document.getElementById("themeStatus");
+            if (themeStatus) {
+                themeStatus.textContent = isDarkMode ? "Dark" : "Light";
+                themeStatus.className = isDarkMode ? "text-cyan-400 font-semibold" : "text-yellow-500 font-semibold";
+            }
         }
 
-       
         function hideSidebar() {
             sidebar.classList.add("-translate-x-full");
             document.body.classList.remove("sidebar-open");
             sidebarOverlay.classList.add("hidden");
+            isSidebarOpen = false;
             if (!currentChatId) {
                 headerTitle.textContent = "Nexsera Ai";
             } else {
@@ -1353,11 +1391,11 @@ if (headerTitle && message) {
             }
         }
 
-       
         function showSidebar() {
             sidebar.classList.remove("-translate-x-full");
             document.body.classList.add("sidebar-open");
             sidebarOverlay.classList.remove("hidden");
+            isSidebarOpen = true;
             if (isMobile()) {
                 headerTitle.textContent = "Menu";
             }
@@ -1370,7 +1408,6 @@ if (headerTitle && message) {
             }, 10);
         }
 
-        
         function hidePanel(panel) {
             panel.classList.add("opacity-0", "scale-95");
             setTimeout(() => {
@@ -1378,12 +1415,46 @@ if (headerTitle && message) {
             }, 300);
         }
 
+        function hideUserManagementBox() {
+            userBox.classList.add("hidden", "opacity-0", "scale-95");
+        }
+
+        function showUserManagementBox() {
+            userBox.classList.remove("hidden", "opacity-0", "scale-95");
+        }
+
+        // New: Toast notification function
+        function showToast(message, duration = 3000) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-md shadow-lg z-50 transition-opacity duration-300';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, duration);
+        }
+
+        // New: Improved empty state functions
+        function hideEmptyState() {
+            const emptyState = document.getElementById("emptyState");
+            if (emptyState) emptyState.style.display = "none";
+        }
+
+        function showEmptyState() {
+            const emptyState = document.getElementById("emptyState");
+            if (emptyState) emptyState.style.display = "block";
+        }
+
         // --- Event Listeners ---
 
         // Chat Input & Send Button
         chatInput.addEventListener("input", () => {
             if (chatInput.value.toLowerCase().includes("hey nexsera")) {
-                speakMessage("Yes, Sir? I’m listening.", chatInput);
+                speakMessage("Yes, Sir? I'm listening.", chatInput);
                 chatInput.value = "";
             }
         });
@@ -1418,22 +1489,6 @@ if (headerTitle && message) {
 
         // Theme Toggle
         themeToggle.addEventListener("click", toggleDarkMode);
-        // Theme toggle logic
-themeToggle.addEventListener("click", () => {
-  const html = document.documentElement;
-  const themeText = document.getElementById("themeStatus");
-
-  if (html.classList.contains("dark")) {
-    html.classList.remove("dark");
-    themeText.textContent = "Light";
-    themeText.classList.replace("text-cyan-400", "text-yellow-500");
-  } else {
-    html.classList.add("dark");
-    themeText.textContent = "Dark";
-    themeText.classList.replace("text-yellow-500", "text-cyan-400");
-  }
-});
-
 
         // Settings Panel
         settingsBtn.addEventListener("click", () => showPanel(settingsPanel));
@@ -1463,49 +1518,67 @@ themeToggle.addEventListener("click", () => {
             localStorage.setItem("autoScroll", autoScrollEnabled);
         });
         document.getElementById("resetSettings").addEventListener("click", () => {
-            localStorage.clear();
-            location.reload();
+            if (confirm("Are you sure you want to reset all settings?")) {
+                localStorage.clear();
+                location.reload();
+            }
         });
         document.getElementById("clearHistory").addEventListener("click", () => {
-            localStorage.removeItem(`chatHistory_${currentUser}`);
-            chatHistory = [];
-            startNewChat();
+            if (confirm("Are you sure you want to clear all chat history?")) {
+                localStorage.removeItem(`chatHistory_${currentUser}`);
+                chatHistory = [];
+                startNewChat();
+                showToast("Chat history cleared");
+            }
         });
 
         // User Management Box
-       // Profile dropdown toggle
-userButton.addEventListener("click", () => {
-  userBox.classList.toggle("hidden");
-  userBox.classList.toggle("opacity-0");
-  userBox.classList.toggle("scale-95");
-});
-closeUserBox.addEventListener("click", () => {
-  userBox.classList.add("hidden", "opacity-0", "scale-95");
-});
+        userButton.addEventListener("click", () => {
+            if (userBox.classList.contains("hidden")) {
+                showUserManagementBox();
+            } else {
+                hideUserManagementBox();
+            }
+        });
+        closeUserBox.addEventListener("click", hideUserManagementBox);
+
+        // AI Tools Menu
+        aiToolsBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (aiToolsMenu.classList.contains("hidden")) {
+                aiToolsMenu.classList.remove("hidden");
+            } else {
+                aiToolsMenu.classList.add("hidden");
+            }
+        });
+
+        // Close AI Tools menu when clicking outside
+        document.addEventListener("click", (e) => {
+            if (!aiToolsMenu.contains(e.target) && !aiToolsBtn.contains(e.target)) {
+                aiToolsMenu.classList.add("hidden");
+            }
+        });
 
         // Speech Recognition
         recordBtn.addEventListener("click", () => {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                alert("Sorry, your browser doesn't support speech recognition.");
+                showToast("Sorry, your browser doesn't support speech recognition.");
                 return;
             }
-let isVoiceOn = true; // or false if off by default
 
-recordBtn.addEventListener("click", () => {
-  isVoiceOn = !isVoiceOn; // toggle state
-  const voiceStatus = document.getElementById("voiceStatus");
+            if (isRecording) {
+                // Stop recording
+                isRecording = false;
+                recordBtn.classList.remove("bg-red-500");
+                recordBtn.classList.add("bg-white");
+                return;
+            }
 
-  if (isVoiceOn) {
-    voiceStatus.textContent = "ON";
-    voiceStatus.classList.replace("text-red-500", "text-green-500");
-    // Start recording logic here
-  } else {
-    voiceStatus.textContent = "OFF";
-    voiceStatus.classList.replace("text-green-500", "text-red-500");
-    // Stop recording logic here
-  }
-});
+            // Start recording
+            isRecording = true;
+            recordBtn.classList.remove("bg-white");
+            recordBtn.classList.add("bg-red-500");
 
             const recognition = new SpeechRecognition();
             recognition.lang = "en-US";
@@ -1514,13 +1587,35 @@ recordBtn.addEventListener("click", () => {
 
             recognition.start();
 
-            recognition.onstart = () => console.log("Voice recognition started. Speak now...");
+            recognition.onstart = () => {
+                showToast("Voice recognition started. Speak now...");
+            };
+            
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
                 chatInput.value = transcript;
+                showToast(`Recognized: "${transcript}"`);
+                
+                // Auto-send after a short delay
+                setTimeout(() => {
+                    sendMessage();
+                }, 1000);
             };
-            recognition.onerror = (event) => console.error("Speech recognition error", event.error);
-            recognition.onend = () => console.log("Voice recognition ended.");
+            
+            recognition.onerror = (event) => {
+                console.error("Speech recognition error", event.error);
+                showToast(`Speech recognition error: ${event.error}`);
+                isRecording = false;
+                recordBtn.classList.remove("bg-red-500");
+                recordBtn.classList.add("bg-white");
+            };
+            
+            recognition.onend = () => {
+                console.log("Voice recognition ended.");
+                isRecording = false;
+                recordBtn.classList.remove("bg-red-500");
+                recordBtn.classList.add("bg-white");
+            };
         });
 
         // --- Initializations ---
@@ -1644,74 +1739,18 @@ recordBtn.addEventListener("click", () => {
             });
         });
 
-<!-- Add this at the very end of your <script> tag, before it closes -->
+        // Prefill prompt function for quick suggestion buttons
+        function prefillPrompt(text) {
+            chatInput.value = text;
 
-    // Prefill prompt function for quick suggestion buttons
-    function prefillPrompt(text) {
-        chatInput.value = text;
-
-        // Detect if mobile — auto send instead of waiting
-        if (/Mobi|Android/i.test(navigator.userAgent)) {
-            hideEmptyState();
-            sendMessage();
-        } else {
-            chatInput.focus();
+            // Detect if mobile — auto send instead of waiting
+            if (isMobile()) {
+                hideEmptyState();
+                sendMessage();
+            } else {
+                chatInput.focus();
+            }
         }
-    }
-
-        // === Quick Prompt Button Function ===
-function prefillPrompt(text) {
-    chatInput.value = text;
-
-    // Detect if mobile — auto send instead of waiting
-    if (/Mobi|Android/i.test(navigator.userAgent)) {
-        hideEmptyState();
-        sendMessage();
-    } else {
-        chatInput.focus();
-    }
-}
-
-// === Empty State Control ===
-function hideEmptyState() {
-    const emptyState = document.getElementById("emptyState");
-    if (emptyState) emptyState.style.display = "none";
-}
-
-function showEmptyState() {
-    const emptyState = document.getElementById("emptyState");
-    if (emptyState) emptyState.style.display = "block";
-}
-
-// === Modify sendMessage to auto-hide welcome state ===
-const originalSendMessage = sendMessage;
-sendMessage = async function () {
-    hideEmptyState(); // hide welcome state on first message
-    await originalSendMessage();
-};
-
-// === Modify startNewChat to show welcome state ===
-const originalStartNewChat = startNewChat;
-startNewChat = function () {
-    originalStartNewChat();
-    showEmptyState();
-};
-// 🌟 Toggle AI Tools Dropdown
-const aiToolsBtn = document.getElementById("aiToolsBtn");
-const aiToolsMenu = document.getElementById("aiToolsMenu");
-
-aiToolsBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  aiToolsMenu.classList.toggle("hidden");
-});
-
-// Close the menu when clicking outside
-document.addEventListener("click", (e) => {
-  if (!aiToolsMenu.contains(e.target) && !aiToolsBtn.contains(e.target)) {
-    aiToolsMenu.classList.add("hidden");
-  }
-});
-
     </script>
 </body>
 </html>
