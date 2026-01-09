@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Nexsera Ai</title>
+    <title>Nexsera AI - Advanced Assistant</title>
     <link rel="icon" type="image/png" href="https://img.icons8.com/pulsar-line/48/nfc-n.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -11,7 +11,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-css.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/normalize-whitespace/prism-normalize-whitespace.min.js"></script>
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Marked.js for markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script>
 
     <style>
         body {
@@ -72,7 +81,7 @@
         .chat-message-container:hover .message-actions { display: flex; }
         .text-left .message-actions { justify-content: flex-start; padding-left: 0.5rem; }
 
-        .delete-message-btn, .copy-message-btn, .speak-message-btn {
+        .delete-message-btn, .copy-message-btn, .speak-message-btn, .edit-message-btn {
             border-radius: 0.25rem; width: 24px; height: 24px;
             display: flex; align-items: center; justify-content: center;
             font-size: 0.75rem; cursor: pointer; border: none; z-index: 10;
@@ -80,9 +89,10 @@
         }
         .delete-message-btn { background-color: #ef4444; color: white; }
         .copy-message-btn { background-color: #3b82f6; color: white; }
-        .speak-message-btn { background-color: #10b981; color: white; } /* Green for speak */
+        .speak-message-btn { background-color: #10b981; color: white; }
+        .edit-message-btn { background-color: #f59e0b; color: white; }
 
-        .delete-message-btn:hover, .copy-message-btn:hover, .speak-message-btn:hover {
+        .delete-message-btn:hover, .copy-message-btn:hover, .speak-message-btn:hover, .edit-message-btn:hover {
             transform: translateY(-1px);
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
@@ -174,7 +184,110 @@
         .dark .hover\:bg-gray-200:hover {
             background-color: #444444 !important;
         }
+
+        /* New: Markdown styling */
+        .markdown-content {
+            line-height: 1.6;
+        }
         
+        .markdown-content h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .markdown-content h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .markdown-content h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .markdown-content p {
+            margin-bottom: 0.75rem;
+        }
+        
+        .markdown-content ul, .markdown-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .markdown-content li {
+            margin-bottom: 0.25rem;
+        }
+        
+        .markdown-content blockquote {
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+            margin: 0.75rem 0;
+            font-style: italic;
+            color: #6b7280;
+        }
+        
+        .dark .markdown-content blockquote {
+            color: #9ca3af;
+        }
+        
+        .markdown-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.75rem 0;
+        }
+        
+        .markdown-content th, .markdown-content td {
+            border: 1px solid #e5e7eb;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        
+        .dark .markdown-content th, .dark .markdown-content td {
+            border-color: #4b5563;
+        }
+        
+        .markdown-content th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+        
+        .dark .markdown-content th {
+            background-color: #374151;
+        }
+        
+        .markdown-content img {
+            max-width: 100%;
+            border-radius: 0.375rem;
+            margin: 0.75rem 0;
+        }
+        
+        .markdown-content a {
+            color: #3b82f6;
+            text-decoration: underline;
+        }
+        
+        .dark .markdown-content a {
+            color: #60a5fa;
+        }
+        
+        .markdown-content code {
+            background-color: rgba(0, 0, 0, 0.1);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+            font-size: 0.875em;
+        }
+        
+        .dark .markdown-content code {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
         /* New: Loading animation */
         .loading-spinner {
             border: 3px solid rgba(0, 0, 0, 0.1);
@@ -253,12 +366,119 @@
         .dark .btn-primary:hover {
             background-color: #1d4ed8;
         }
+
+        /* New: Chart container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+            margin: 1rem 0;
+        }
+
+        /* New: Math equation styling */
+        .math-equation {
+            overflow-x: auto;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            background-color: #f9fafb;
+            border-radius: 0.375rem;
+        }
+        
+        .dark .math-equation {
+            background-color: #374151;
+        }
+
+        /* New: Image preview modal */
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .image-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 0.5rem;
+        }
+        
+        .image-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* New: Voice command indicator */
+        .voice-command-active {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(59, 130, 246, 0.9);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            z-index: 100;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+
+        /* New: Keyboard shortcut hint */
+        .keyboard-hint {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            z-index: 50;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800 h-screen flex flex-col text-sm relative">
 
     <!-- Dimmed overlay for mobile sidebar -->
     <div id="sidebarOverlay" class="overlay fixed inset-0 bg-black bg-opacity-50 z-10 hidden sm:hidden"></div>
+
+    <!-- Voice command indicator -->
+    <div id="voiceCommandIndicator" class="voice-command-active hidden">
+        Listening for voice commands...
+    </div>
+
+    <!-- Keyboard shortcut hint -->
+    <div id="keyboardHint" class="keyboard-hint hidden">
+        Press <kbd>Ctrl</kbd>+<kbd>K</kbd> for quick commands
+    </div>
+
+    <!-- Image preview modal -->
+    <div id="imageModal" class="image-modal hidden">
+        <span class="image-modal-close">&times;</span>
+        <img id="modalImage" src="" alt="Preview">
+    </div>
 
     <header class="z-30 sticky top-0 px-2 sm:px-4 mt-2">
         <div class="w-full shadow-md rounded-lg px-4 py-2 flex items-center justify-between bg-white border border-gray-200 max-w-[98%] mx-auto">
@@ -277,12 +497,22 @@
                 <img src="https://img.icons8.com/pulsar-line/48/nfc-n.png" alt="logo" class="w-7 h-7" />
                 <div>
                     <div id="headerTitle" class="font-semibold text-gray-800">Nexsera AI</div>
-                    <div class="text-xs text-gray-500">Personal AI Assistant</div>
+                    <div class="text-xs text-gray-500">Advanced AI Assistant</div>
                 </div>
             </div>
 
             <!-- Right: Action Buttons -->
             <div class="flex items-center space-x-2">
+                <!-- Model Selector -->
+                <div class="hidden sm:block">
+                    <select id="headerModelSelect" class="text-xs border border-gray-300 rounded px-2 py-1 bg-white text-gray-700">
+                        <option value="default">Default</option>
+                        <option value="creative">Creative</option>
+                        <option value="analytical">Analytical</option>
+                        <option value="precise">Precise</option>
+                    </select>
+                </div>
+
                 <!-- Theme toggle -->
                 <button id="themeToggle" title="Toggle Theme" class="p-2 rounded-full hover:bg-gray-100 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -316,7 +546,7 @@
             <div class="w-10 h-10 rounded-full bg-cyan-500 text-white flex items-center justify-center text-lg font-bold shadow-inner">S</div>
             <div>
                 <div class="font-semibold text-gray-800 dark:text-white">Samarth (Sir)</div>
-                <div class="text-xs text-gray-500 dark:text-gray-400">Personal AI Profile</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400">Advanced AI Profile</div>
             </div>
         </div>
 
@@ -328,6 +558,14 @@
             <div class="flex justify-between">
                 <span>Theme:</span>
                 <span id="themeStatus" class="text-cyan-400 font-semibold">Dark</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Context Memory:</span>
+                <span id="memoryStatus" class="text-blue-500 font-semibold">5 chats</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Language:</span>
+                <span id="languageStatus" class="text-purple-500 font-semibold">English</span>
             </div>
         </div>
 
@@ -369,6 +607,29 @@
             <!-- Dynamic history list items will appear here -->
         </ul>
 
+        <!-- Advanced Features -->
+        <h2 class="text-sm font-semibold text-black mb-2 mt-4">Advanced Features</h2>
+        <div class="space-y-1">
+            <button id="exportHistoryBtn" class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 transition text-sm text-black">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Export History
+            </button>
+            <button id="importHistoryBtn" class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 transition text-sm text-black">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                Import History
+            </button>
+            <button id="analyticsBtn" class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 transition text-sm text-black">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                Usage Analytics
+            </button>
+        </div>
+
         <!-- User Info -->
         <div class="mt-6 pt-4 border-t border-gray-200">
             <h2 class="text-sm font-semibold text-black mb-2">User Info</h2>
@@ -396,11 +657,14 @@
             <div id="emptyState" class="text-center text-gray-500 mt-12">
                 <img src="https://img.icons8.com/ios/100/robot.png" alt="robot" class="mx-auto mb-4 opacity-70" />
                 <h2 class="text-lg font-semibold text-gray-700 mb-1">Welcome back, Sir.</h2>
-                <p class="text-sm mb-4">Nexsera is ready. Try one of the prompts below or start a new chat.</p>
-                <div class="flex justify-center gap-3">
+                <p class="text-sm mb-4">Nexsera is ready with advanced capabilities. Try one of the prompts below or start a new chat.</p>
+                <div class="flex justify-center gap-3 flex-wrap">
                     <button class="px-3 py-1 text-sm border border-transparent rounded bg-cyan-500 text-white hover:bg-cyan-600" onclick="prefillPrompt('Tell me a joke')">Tell me a joke</button>
                     <button class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" onclick="prefillPrompt('Weather in Mumbai')">Weather in Mumbai</button>
                     <button class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" onclick="prefillPrompt('Summarize this text:')">Summarize text</button>
+                    <button class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" onclick="prefillPrompt('Create a chart for:')">Create chart</button>
+                    <button class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" onclick="prefillPrompt('Analyze this image:')">Analyze image</button>
+                    <button class="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" onclick="prefillPrompt('Translate to French:')">Translate</button>
                 </div>
             </div>
             <!-- chat messages will append here -->
@@ -421,7 +685,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
                             </svg>
                         </label>
-                        <input id="file-upload" type="file" class="hidden" multiple />
+                        <input id="file-upload" type="file" class="hidden" multiple accept="image/*,.pdf,.txt,.doc,.docx,.csv,.json" />
                     </div>
 
                     <!-- 🌟 AI Tools Button -->
@@ -434,12 +698,16 @@
                         </button>
 
                         <!-- Dropdown Menu -->
-                        <div id="aiToolsMenu" class="absolute hidden mt-2 left-1/2 -translate-x-1/2 bg-white border border-gray-200 rounded-md shadow-lg w-44 z-50 py-1 text-sm">
+                        <div id="aiToolsMenu" class="absolute hidden mt-2 left-1/2 -translate-x-1/2 bg-white border border-gray-200 rounded-md shadow-lg w-48 z-50 py-1 text-sm">
                             <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Generate a story')">✨ Generate</button>
                             <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Summarize this text:')">📄 Summarize</button>
                             <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Translate this to Hindi:')">🌍 Translate</button>
                             <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Explain this concept:')">🔍 Explain</button>
                             <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Give me a creative idea for a project')">💡 Idea</button>
+                            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Create a chart for:')">📊 Chart</button>
+                            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Analyze this image:')">🖼️ Image</button>
+                            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Solve this equation:')">🧮 Math</button>
+                            <button class="block w-full text-left px-3 py-2 hover:bg-gray-100" onclick="prefillPrompt('Sentiment analysis of:')">😊 Sentiment</button>
                         </div>
                     </div>
 
@@ -448,6 +716,15 @@
                         <button id="recordBtn" class="cursor-pointer hover:bg-gray-200 transition rounded-md p-1.5 block text-black" title="Start Recording">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Voice Command Button -->
+                    <div class="w-fit bg-white border border-gray-300 rounded-md p-1.5 shadow-sm hover:border-gray-400 hover:shadow transition">
+                        <button id="voiceCommandBtn" class="cursor-pointer hover:bg-gray-200 transition rounded-md p-1.5 block text-black" title="Voice Commands">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
                             </svg>
                         </button>
                     </div>
@@ -466,7 +743,7 @@
 
             <!-- Footer Text -->
             <p class="text-xs italic text-center text-gray-500 mt-2">
-                Nexsera v3.58 | Personal AI by Samarth Nagpure 🧠
+                Nexsera v4.0 | Advanced AI by Samarth Nagpure 🧠
             </p>
             <p class="text-[10px] text-center text-gray-500">
                 Nexsera AI may make mistakes. Consider checking important information. 
@@ -496,7 +773,8 @@
                 <select id="modelSelect" class="w-full pl-3 pr-10 py-2 border border-[#e5e7eb] text-sm rounded bg-[#ffffff] text-black dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                     <option value="default">Default Model</option>
                     <option value="creative">Creative Model</option>
-                    <option value="factual">Factual Model</option>
+                    <option value="analytical">Analytical Model</option>
+                    <option value="precise">Precise Model</option>
                 </select>
             </div>
 
@@ -520,12 +798,63 @@
                 </select>
             </div>
 
+            <!-- Advanced Features -->
+            <div class="mt-4">
+                <h3 class="font-semibold text-sm text-[#1f2937] mb-2 dark:text-gray-200">Advanced Features</h3>
+                
+                <div class="flex justify-between items-center mt-2">
+                    <label class="text-sm font-medium text-[#374151] dark:text-gray-300">Markdown Support</label>
+                    <label class="inline-flex relative items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer" id="markdownSwitch" checked>
+                        <div class="w-11 h-6 bg-[#e5e7eb] rounded-full peer peer-checked:bg-[#2563eb] transition-all dark:bg-gray-600 dark:peer-checked:bg-[#2563eb]"></div>
+                    </label>
+                </div>
+
+                <div class="flex justify-between items-center mt-2">
+                    <label class="text-sm font-medium text-[#374151] dark:text-gray-300">Math Rendering</label>
+                    <label class="inline-flex relative items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer" id="mathSwitch" checked>
+                        <div class="w-11 h-6 bg-[#e5e7eb] rounded-full peer peer-checked:bg-[#2563eb] transition-all dark:bg-gray-600 dark:peer-checked-bg-[#2563eb]"></div>
+                    </label>
+                </div>
+
+                <div class="flex justify-between items-center mt-2">
+                    <label class="text-sm font-medium text-[#374151] dark:text-gray-300">Context Memory</label>
+                    <select id="contextMemory" class="w-24 p-1 border border-[#e5e7eb] text-sm rounded text-black dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <option value="3">3 chats</option>
+                        <option value="5" selected>5 chats</option>
+                        <option value="10">10 chats</option>
+                        <option value="20">20 chats</option>
+                    </select>
+                </div>
+
+                <div class="flex justify-between items-center mt-2">
+                    <label class="text-sm font-medium text-[#374151] dark:text-gray-300">Language</label>
+                    <select id="languageSelect" class="w-24 p-1 border border-[#e5e7eb] text-sm rounded text-black dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <option value="en" selected>English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="zh">Chinese</option>
+                        <option value="ja">Japanese</option>
+                    </select>
+                </div>
+            </div>
+
             <!-- Behavior Toggles -->
             <div class="flex justify-between items-center mt-4">
                 <label class="text-sm font-medium text-[#374151] dark:text-gray-300">Auto Scroll</label>
                 <label class="inline-flex relative items-center cursor-pointer">
                     <input type="checkbox" class="sr-only peer" id="autoScrollSwitch">
                     <div class="w-11 h-6 bg-[#e5e7eb] rounded-full peer peer-checked:bg-[#2563eb] transition-all dark:bg-gray-600 dark:peer-checked:bg-[#2563eb]"></div>
+                </label>
+            </div>
+
+            <div class="flex justify-between items-center mt-2">
+                <label class="text-sm font-medium text-[#374151] dark:text-gray-300">Voice Commands</label>
+                <label class="inline-flex relative items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" id="voiceCommandSwitch" checked>
+                    <div class="w-11 h-6 bg-[#e5e7eb] rounded-full peer peer-checked:bg-[#2563eb] transition-all dark:bg-gray-600 dark:peer-checked-bg-[#2563eb]"></div>
                 </label>
             </div>
 
@@ -536,6 +865,58 @@
             <div class="space-y-2">
                 <button id="resetSettings" class="w-full px-3 py-2 rounded bg-[#dc2626] text-white text-sm hover:bg-[#b91c1c]">Reset All Settings</button>
                 <button id="clearHistory" class="w-full px-3 py-2 rounded bg-[#dc2626] text-white text-sm hover:bg-[#b91c1c]">Clear Chat History</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Modal -->
+    <div id="analyticsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto dark:bg-gray-800">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">Usage Analytics</h2>
+                <button id="closeAnalyticsModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="bg-gray-100 p-4 rounded-lg dark:bg-gray-700">
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Chat Statistics</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Total Chats</p>
+                            <p class="text-2xl font-bold text-gray-800 dark:text-gray-200" id="totalChats">0</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Total Messages</p>
+                            <p class="text-2xl font-bold text-gray-800 dark:text-gray-200" id="totalMessages">0</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Most Used Tool</p>
+                            <p class="text-2xl font-bold text-gray-800 dark:text-gray-200" id="mostUsedTool">None</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Average Response Time</p>
+                            <p class="text-2xl font-bold text-gray-800 dark:text-gray-200" id="avgResponseTime">0ms</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-100 p-4 rounded-lg dark:bg-gray-700">
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Message Activity</h3>
+                    <div class="chart-container">
+                        <canvas id="messageChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-100 p-4 rounded-lg dark:bg-gray-700">
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">Tool Usage</h3>
+                    <div class="chart-container">
+                        <canvas id="toolChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -561,12 +942,19 @@
         const settingsPanel = document.getElementById("settingsPanel");
         const closeSettingsModal = document.getElementById("closeSettingsModal");
         const modelSelect = document.getElementById("modelSelect");
+        const headerModelSelect = document.getElementById("headerModelSelect");
         const responseSpeed = document.getElementById("responseSpeed");
         const responseSpeedValue = document.getElementById("responseSpeedValue");
         const headerTitle = document.getElementById("headerTitle");
         const headerSubtitle = headerTitle.nextElementSibling; // "Personal AI Assistant"
         const headerLogo = headerTitle.closest("div").previousElementSibling; // logo image
         const recordBtn = document.getElementById("recordBtn");
+        const voiceCommandBtn = document.getElementById("voiceCommandBtn");
+        const voiceCommandIndicator = document.getElementById("voiceCommandIndicator");
+        const keyboardHint = document.getElementById("keyboardHint");
+        const imageModal = document.getElementById("imageModal");
+        const modalImage = document.getElementById("modalImage");
+        const imageModalClose = imageModal.querySelector(".image-modal-close");
 
         // User Management Elements
         const userButton = document.getElementById("userBtn");
@@ -582,6 +970,15 @@
         const aiToolsBtn = document.getElementById("aiToolsBtn");
         const aiToolsMenu = document.getElementById("aiToolsMenu");
 
+        // Analytics Elements
+        const analyticsBtn = document.getElementById("analyticsBtn");
+        const analyticsModal = document.getElementById("analyticsModal");
+        const closeAnalyticsModal = document.getElementById("closeAnalyticsModal");
+
+        // Export/Import Elements
+        const exportHistoryBtn = document.getElementById("exportHistoryBtn");
+        const importHistoryBtn = document.getElementById("importHistoryBtn");
+
         // --- State Variables ---
         let filesToSend = [];
         let chatHistory = []; // Stores all chat sessions
@@ -593,6 +990,20 @@
         let currentUser = localStorage.getItem("currentUser") || null;
         let isSidebarOpen = false;
         let isRecording = false;
+        let isVoiceCommandActive = false;
+        let currentModel = localStorage.getItem("currentModel") || "default";
+        let markdownEnabled = localStorage.getItem("markdownEnabled") !== "false";
+        let mathEnabled = localStorage.getItem("mathEnabled") !== "false";
+        let contextMemory = parseInt(localStorage.getItem("contextMemory") || "5");
+        let currentLanguage = localStorage.getItem("currentLanguage") || "en";
+        let voiceCommandsEnabled = localStorage.getItem("voiceCommandsEnabled") !== "false";
+        let analyticsData = JSON.parse(localStorage.getItem("analyticsData")) || {
+            totalChats: 0,
+            totalMessages: 0,
+            toolUsage: {},
+            messageActivity: {},
+            responseTimes: []
+        };
 
         // --- Utility Functions ---
         const isMobile = () => window.innerWidth <= 640;
@@ -663,6 +1074,11 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
                             </svg>
                         </button>
+                        <button class="edit-message-btn" data-index="${messageIndex}" data-role="${type}" title="Edit message">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                            </svg>
+                        </button>
                         <button class="delete-message-btn" data-index="${messageIndex}" data-role="${type}" title="Delete message">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
@@ -681,10 +1097,21 @@
             const deleteButton = msgContainer.querySelector('.delete-message-btn');
             const copyButton = msgContainer.querySelector('.copy-message-btn');
             const speakButton = msgContainer.querySelector('.speak-message-btn');
+            const editButton = msgContainer.querySelector('.edit-message-btn');
 
             deleteButton.addEventListener('click', () => deleteMessage(currentChatId, messageIndex));
             copyButton.addEventListener('click', () => copyMessage(messageTextDiv.textContent));
             speakButton.addEventListener('click', () => speakMessage(messageTextDiv.textContent, messageTextDiv));
+            editButton.addEventListener('click', () => editMessage(currentChatId, messageIndex, messageTextDiv));
+
+            // Handle image clicks for preview
+            const images = messageTextDiv.querySelectorAll('img');
+            images.forEach(img => {
+                img.addEventListener('click', () => {
+                    modalImage.src = img.src;
+                    imageModal.classList.remove('hidden');
+                });
+            });
 
             return messageTextDiv;
         }
@@ -721,16 +1148,37 @@
                 return;
             }
 
-            const words = fullReply.split(" ");
-            messageDiv.textContent = "";
-            for (let i = 0; i < words.length; i++) {
-                messageDiv.innerHTML += (i > 0 ? " " : "") + words[i];
-                if (autoScrollEnabled) {
-                    chatWindow.scrollTop = chatWindow.scrollHeight;
-                    chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            // Check if markdown is enabled and process the content
+            if (markdownEnabled && !messageDiv.innerHTML.includes('<')) {
+                messageDiv.innerHTML = marked.parse(fullReply);
+                messageDiv.classList.add('markdown-content');
+            } else {
+                const words = fullReply.split(" ");
+                messageDiv.textContent = "";
+                for (let i = 0; i < words.length; i++) {
+                    messageDiv.innerHTML += (i > 0 ? " " : "") + words[i];
+                    if (autoScrollEnabled) {
+                        chatWindow.scrollTop = chatWindow.scrollHeight;
+                        chatWindow.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    }
+                    await new Promise(resolve => setTimeout(resolve, preferredResponseSpeed / words.length));
                 }
-                await new Promise(resolve => setTimeout(resolve, preferredResponseSpeed / words.length));
             }
+            
+            // Process math equations if enabled
+            if (mathEnabled) {
+                const mathElements = messageDiv.querySelectorAll('.math-equation');
+                mathElements.forEach(el => {
+                    try {
+                        katex.render(el.textContent, el, {
+                            throwOnError: false
+                        });
+                    } catch (e) {
+                        console.error("Math rendering error:", e);
+                    }
+                });
+            }
+            
             Prism.highlightAllUnder(messageDiv.parentElement); // Highlight code after streaming
         }
 
@@ -848,6 +1296,195 @@
             return primes.join(", ");
         }
 
+        // ✅ Advanced Math Functions
+        function solveEquation(equation) {
+            try {
+                // Simple equation solver for linear equations: ax + b = c
+                const match = equation.match(/([+-]?\d*\.?\d*)\s*x\s*([+-]\s*\d+\.?\d*)\s*=\s*([+-]?\d+\.?\d*)/i);
+                if (match) {
+                    const a = parseFloat(match[1].replace(/\s/g, ''));
+                    const b = parseFloat(match[2].replace(/\s/g, ''));
+                    const c = parseFloat(match[3].replace(/\s/g, ''));
+                    
+                    if (a !== 0) {
+                        const x = (c - b) / a;
+                        return `x = ${x.toFixed(4)}`;
+                    } else {
+                        return "❌ Cannot solve: coefficient of x is zero";
+                    }
+                }
+                
+                // Try to evaluate as a mathematical expression
+                const result = Function(`"use strict"; return (${equation})`)();
+                return `Result: ${result}`;
+            } catch (error) {
+                return `❌ Error solving equation: ${error.message}`;
+            }
+        }
+
+        // ✅ Sentiment Analysis
+        function analyzeSentiment(text) {
+            // Simple sentiment analysis based on keywords
+            const positiveWords = ["good", "great", "excellent", "amazing", "wonderful", "fantastic", "love", "like", "happy", "joy", "pleased"];
+            const negativeWords = ["bad", "terrible", "awful", "horrible", "hate", "dislike", "sad", "angry", "frustrated", "disappointed"];
+            
+            const words = text.toLowerCase().split(/\s+/);
+            let positiveCount = 0;
+            let negativeCount = 0;
+            
+            words.forEach(word => {
+                if (positiveWords.some(pw => word.includes(pw))) positiveCount++;
+                if (negativeWords.some(nw => word.includes(nw))) negativeCount++;
+            });
+            
+            if (positiveCount > negativeCount) {
+                return {
+                    sentiment: "Positive",
+                    score: Math.min(positiveCount / words.length * 10, 1).toFixed(2),
+                    emoji: "😊"
+                };
+            } else if (negativeCount > positiveCount) {
+                return {
+                    sentiment: "Negative",
+                    score: Math.min(negativeCount / words.length * 10, 1).toFixed(2),
+                    emoji: "😞"
+                };
+            } else {
+                return {
+                    sentiment: "Neutral",
+                    score: "0.50",
+                    emoji: "😐"
+                };
+            }
+        }
+
+        // ✅ Chart Generation
+        function generateChart(data, type = 'bar') {
+            try {
+                // Parse the data (expected format: "label1:value1, label2:value2, ...")
+                const pairs = data.split(',').map(pair => pair.trim().split(':'));
+                const labels = pairs.map(pair => pair[0]);
+                const values = pairs.map(pair => parseFloat(pair[1]));
+                
+                // Generate a unique ID for this chart
+                const chartId = 'chart-' + Date.now();
+                
+                // Create the chart container
+                const chartContainer = document.createElement('div');
+                chartContainer.className = 'chart-container';
+                chartContainer.innerHTML = `<canvas id="${chartId}"></canvas>`;
+                
+                // Return the HTML string for the chart
+                return `
+                    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+                        <p class="text-sm text-gray-500 dark:text-gray-300 mb-2">📊 Data Visualization</p>
+                        <div class="chart-container">
+                            <canvas id="${chartId}"></canvas>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                return `❌ Error generating chart: ${error.message}`;
+            }
+        }
+
+        // ✅ Image Analysis (simulated)
+        function analyzeImage(imageFile) {
+            return new Promise((resolve) => {
+                // Create a FileReader to read the image
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    // In a real implementation, this would send the image to an AI service
+                    // For now, we'll simulate the analysis
+                    setTimeout(() => {
+                        const mockAnalysis = {
+                            objects: ["person", "building", "tree"],
+                            colors: ["blue", "green", "brown"],
+                            description: "This appears to be an outdoor scene with a person standing near a building and trees.",
+                            confidence: "87%"
+                        };
+                        
+                        const result = `
+                            <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+                                <p class="text-sm text-gray-500 dark:text-gray-300">🖼️ Image Analysis</p>
+                                <img src="${e.target.result}" alt="Analyzed image" class="w-full rounded-lg mt-2 mb-2" style="max-height: 200px; object-fit: contain;">
+                                <p class="text-gray-700 dark:text-gray-200">${mockAnalysis.description}</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Detected objects: ${mockAnalysis.objects.join(", ")}</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">Dominant colors: ${mockAnalysis.colors.join(", ")}</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-300">Confidence: ${mockAnalysis.confidence}</p>
+                            </div>
+                        `;
+                        
+                        resolve(result);
+                    }, 1500); // Simulate processing time
+                };
+                
+                reader.readAsDataURL(imageFile);
+            });
+        }
+
+        // ✅ Language Detection
+        function detectLanguage(text) {
+            // Simple language detection based on character patterns
+            const patterns = {
+                'en': /^[a-zA-Z\s\d\W]+$/,
+                'es': /[ñáéíóúü]/i,
+                'fr': /[àâäçéèêëïîôöùûüÿ]/i,
+                'de': /[äöüß]/i,
+                'zh': /[\u4e00-\u9fff]/,
+                'ja': /[\u3040-\u309f\u30a0-\u30ff]/,
+                'ru': /[\u0400-\u04ff]/
+            };
+            
+            for (const [lang, pattern] of Object.entries(patterns)) {
+                if (pattern.test(text)) {
+                    return lang;
+                }
+            }
+            
+            return 'unknown';
+        }
+
+        // ✅ Translation (simulated)
+        function translateText(text, targetLang) {
+            // In a real implementation, this would call a translation API
+            // For now, we'll simulate the translation
+            const translations = {
+                'es': {
+                    'hello': 'hola',
+                    'goodbye': 'adiós',
+                    'thank you': 'gracias',
+                    'please': 'por favor'
+                },
+                'fr': {
+                    'hello': 'bonjour',
+                    'goodbye': 'au revoir',
+                    'thank you': 'merci',
+                    'please': 's\'il vous plaît'
+                },
+                'de': {
+                    'hello': 'hallo',
+                    'goodbye': 'auf wiedersehen',
+                    'thank you': 'danke',
+                    'please': 'bitte'
+                }
+            };
+            
+            const lowerText = text.toLowerCase();
+            const translation = translations[targetLang];
+            
+            if (translation) {
+                for (const [en, trans] of Object.entries(translation)) {
+                    if (lowerText.includes(en)) {
+                        return text.replace(new RegExp(en, 'gi'), trans);
+                    }
+                }
+            }
+            
+            return `[Translated to ${targetLang.toUpperCase()}] ${text}`;
+        }
+
         async function sendMessage() {
             // get and validate input
             const messageRaw = chatInput.value || "";
@@ -876,6 +1513,10 @@
                 };
                 chatHistory.unshift(currentChat);
                 renderHistoryList();
+                
+                // Update analytics
+                analyticsData.totalChats++;
+                saveAnalyticsData();
             }
 
             // include uploaded filenames (if any) inside the user bubble
@@ -887,10 +1528,30 @@
             currentChat.messages.push({ role: "user", content: userMessageContent });
             createChatEntry(userMessageContent, "user", userMessageIndex);
             saveChatHistoryForUser();
+            
+            // Update analytics
+            analyticsData.totalMessages++;
+            saveAnalyticsData();
 
-            // If there are files, do the existing auto-google search behavior (keeps UX same)
+            // If there are files, handle them
             if (filesToSend.length > 0) {
                 for (const file of filesToSend) {
+                    // Check if it's an image
+                    if (file.type.startsWith("image/")) {
+                        showTypingIndicator();
+                        const analysisResult = await analyzeImage(file);
+                        const aiMessageIndex = currentChat.messages.length;
+                        currentChat.messages.push({ role: "ai", content: analysisResult });
+                        const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+                        aiDiv.innerHTML = analysisResult;
+                        hideTypingIndicator();
+                        
+                        // Update analytics
+                        analyticsData.toolUsage['image'] = (analyticsData.toolUsage['image'] || 0) + 1;
+                        saveAnalyticsData();
+                        continue;
+                    }
+                    
                     let query = file.name.replace(/\.trashed-\d+-/i, "");
 
                     if (file.type === "text/plain") {
@@ -906,14 +1567,12 @@
                         query = query.replace(/\.pdf$/i, "");
                     }
 
-                    if (file.type.startsWith("image/")) {
-                        const searchUrl = `https://images.google.com/`;
-                        smartReplyAndOpen(`🔎 Please upload your image here for a visual search.`, searchUrl);
-                        continue;
-                    }
-
                     const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
                     smartReplyAndOpen(`Searching Google for content from ${query}...`, searchUrl);
+                    
+                    // Update analytics
+                    analyticsData.toolUsage['search'] = (analyticsData.toolUsage['search'] || 0) + 1;
+                    saveAnalyticsData();
                 }
 
                 // clear files
@@ -948,10 +1607,38 @@
                 aiDiv.innerHTML = calcCard;
                 hideTypingIndicator();
                 saveChatHistoryForUser();
+                
+                // Update analytics
+                analyticsData.toolUsage['calculator'] = (analyticsData.toolUsage['calculator'] || 0) + 1;
+                saveAnalyticsData();
                 return;
             }
 
-            // 2) Date math: "X days from now" or "days until ..."
+            // 2) Equation solving
+            if (lc.includes("solve") && lc.includes("equation")) {
+                const equation = message.replace(/solve\s+equation\s*/i, "").trim();
+                const result = solveEquation(equation);
+                const aiMessageIndex = currentChat.messages.length;
+                const equationCard = `
+                    <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+                        <p class="text-sm text-gray-500 dark:text-gray-300">🧮 Equation Solver</p>
+                        <p class="text-gray-700 dark:text-gray-200 mt-1"><b>${equation}</b></p>
+                        <p class="text-lg font-semibold text-blue-600 dark:text-blue-400">${result}</p>
+                    </div>
+                `;
+                currentChat.messages.push({ role: "ai", content: equationCard });
+                const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+                aiDiv.innerHTML = equationCard;
+                hideTypingIndicator();
+                saveChatHistoryForUser();
+                
+                // Update analytics
+                analyticsData.toolUsage['equation'] = (analyticsData.toolUsage['equation'] || 0) + 1;
+                saveAnalyticsData();
+                return;
+            }
+
+            // 3) Date math: "X days from now" or "days until ..."
             const fromNowMatch = message.match(/(\d+)\s*days?\s*from\s*now/i);
             if (fromNowMatch) {
                 const num = parseInt(fromNowMatch[1], 10);
@@ -968,6 +1655,10 @@
                 aiDiv.innerHTML = html;
                 hideTypingIndicator();
                 saveChatHistoryForUser();
+                
+                // Update analytics
+                analyticsData.toolUsage['date'] = (analyticsData.toolUsage['date'] || 0) + 1;
+                saveAnalyticsData();
                 return;
             }
 
@@ -988,10 +1679,14 @@
                 aiDiv.innerHTML = html;
                 hideTypingIndicator();
                 saveChatHistoryForUser();
+                
+                // Update analytics
+                analyticsData.toolUsage['date'] = (analyticsData.toolUsage['date'] || 0) + 1;
+                saveAnalyticsData();
                 return;
             }
 
-            // 3) Factorial
+            // 4) Factorial
             const factMatch = message.match(/factorial\s+of\s+(\d+)/i);
             if (factMatch) {
                 const n = parseInt(factMatch[1], 10);
@@ -1008,10 +1703,14 @@
                 aiDiv.innerHTML = html;
                 hideTypingIndicator();
                 saveChatHistoryForUser();
+                
+                // Update analytics
+                analyticsData.toolUsage['math'] = (analyticsData.toolUsage['math'] || 0) + 1;
+                saveAnalyticsData();
                 return;
             }
 
-            // 4) Prime check: "is 17 prime"
+            // 5) Prime check: "is 17 prime"
             const primeCheckMatch = message.match(/is\s+(\d+)\s+prime/i);
             if (primeCheckMatch) {
                 const n = parseInt(primeCheckMatch[1], 10);
@@ -1027,10 +1726,14 @@
                 aiDiv.innerHTML = html;
                 hideTypingIndicator();
                 saveChatHistoryForUser();
+                
+                // Update analytics
+                analyticsData.toolUsage['math'] = (analyticsData.toolUsage['math'] || 0) + 1;
+                saveAnalyticsData();
                 return;
             }
 
-            // 5) Primes till N
+            // 6) Primes till N
             const primesTillMatch = message.match(/primes?\s*till\s+(\d+)/i);
             if (primesTillMatch) {
                 const n = parseInt(primesTillMatch[1], 10);
@@ -1047,10 +1750,14 @@
                 aiDiv.innerHTML = html;
                 hideTypingIndicator();
                 saveChatHistoryForUser();
+                
+                // Update analytics
+                analyticsData.toolUsage['math'] = (analyticsData.toolUsage['math'] || 0) + 1;
+                saveAnalyticsData();
                 return;
             }
 
-            // 6) Weather (this one uses async data)
+            // 7) Weather (this one uses async data)
             if (lc.includes("weather")) {
                 const city = lc.includes("weather in") ? lc.split("in").pop().trim() : "";
                 try {
@@ -1068,10 +1775,166 @@
                 }
                 hideTypingIndicator();
                 saveChatHistoryForUser();
+                
+                // Update analytics
+                analyticsData.toolUsage['weather'] = (analyticsData.toolUsage['weather'] || 0) + 1;
+                saveAnalyticsData();
                 return;
             }
 
-            // 7) Smart open/search/play commands that open a new window/tab
+            // 8) Sentiment analysis
+            if (lc.includes("sentiment") || lc.includes("analyze sentiment")) {
+                const textToAnalyze = message.replace(/sentiment\s+analysis\s+of\s*/i, "").replace(/analyze\s+sentiment\s+of\s*/i, "").trim();
+                const sentiment = analyzeSentiment(textToAnalyze);
+                const aiMessageIndex = currentChat.messages.length;
+                const sentimentCard = `
+                    <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+                        <p class="text-sm text-gray-500 dark:text-gray-300">😊 Sentiment Analysis</p>
+                        <p class="text-gray-700 dark:text-gray-200 mt-1">"${textToAnalyze}"</p>
+                        <p class="text-lg font-semibold">${sentiment.emoji} ${sentiment.sentiment} (Score: ${sentiment.score})</p>
+                    </div>
+                `;
+                currentChat.messages.push({ role: "ai", content: sentimentCard });
+                const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+                aiDiv.innerHTML = sentimentCard;
+                hideTypingIndicator();
+                saveChatHistoryForUser();
+                
+                // Update analytics
+                analyticsData.toolUsage['sentiment'] = (analyticsData.toolUsage['sentiment'] || 0) + 1;
+                saveAnalyticsData();
+                return;
+            }
+
+            // 9) Chart generation
+            if (lc.includes("chart") || lc.includes("graph")) {
+                const dataMatch = message.match(/(?:chart|graph)\s+for\s*:\s*(.+)/i);
+                if (dataMatch) {
+                    const data = dataMatch[1].trim();
+                    const chartHtml = generateChart(data);
+                    const aiMessageIndex = currentChat.messages.length;
+                    currentChat.messages.push({ role: "ai", content: chartHtml });
+                    const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+                    aiDiv.innerHTML = chartHtml;
+                    
+                    // Create the actual chart after adding to DOM
+                    setTimeout(() => {
+                        const chartId = aiDiv.querySelector('canvas').id;
+                        const ctx = document.getElementById(chartId).getContext('2d');
+                        
+                        // Parse the data again for the chart
+                        const pairs = data.split(',').map(pair => pair.trim().split(':'));
+                        const labels = pairs.map(pair => pair[0]);
+                        const values = pairs.map(pair => parseFloat(pair[1]));
+                        
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Data',
+                                    data: values,
+                                    backgroundColor: [
+                                        'rgba(255, 99, 132, 0.2)',
+                                        'rgba(54, 162, 235, 0.2)',
+                                        'rgba(255, 206, 86, 0.2)',
+                                        'rgba(75, 192, 192, 0.2)',
+                                        'rgba(153, 102, 255, 0.2)',
+                                        'rgba(255, 159, 64, 0.2)'
+                                    ],
+                                    borderColor: [
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                        'rgba(255, 159, 64, 1)'
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    }, 100);
+                    
+                    hideTypingIndicator();
+                    saveChatHistoryForUser();
+                    
+                    // Update analytics
+                    analyticsData.toolUsage['chart'] = (analyticsData.toolUsage['chart'] || 0) + 1;
+                    saveAnalyticsData();
+                    return;
+                }
+            }
+
+            // 10) Language detection
+            if (lc.includes("detect language") || lc.includes("what language")) {
+                const textToAnalyze = message.replace(/detect\s+language\s+of\s*/i, "").replace(/what\s+language\s+is\s*/i, "").trim();
+                const detectedLang = detectLanguage(textToAnalyze);
+                const langNames = {
+                    'en': 'English',
+                    'es': 'Spanish',
+                    'fr': 'French',
+                    'de': 'German',
+                    'zh': 'Chinese',
+                    'ja': 'Japanese',
+                    'ru': 'Russian'
+                };
+                const aiMessageIndex = currentChat.messages.length;
+                const langCard = `
+                    <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+                        <p class="text-sm text-gray-500 dark:text-gray-300">🌍 Language Detection</p>
+                        <p class="text-gray-700 dark:text-gray-200 mt-1">"${textToAnalyze}"</p>
+                        <p class="text-lg font-semibold">Detected: ${langNames[detectedLang] || detectedLang}</p>
+                    </div>
+                `;
+                currentChat.messages.push({ role: "ai", content: langCard });
+                const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+                aiDiv.innerHTML = langCard;
+                hideTypingIndicator();
+                saveChatHistoryForUser();
+                
+                // Update analytics
+                analyticsData.toolUsage['language'] = (analyticsData.toolUsage['language'] || 0) + 1;
+                saveAnalyticsData();
+                return;
+            }
+
+            // 11) Translation
+            const translateMatch = message.match(/translate\s+(.+?)\s+to\s+(.+)/i);
+            if (translateMatch) {
+                const textToTranslate = translateMatch[1].trim();
+                const targetLang = translateMatch[2].trim().toLowerCase();
+                const translatedText = translateText(textToTranslate, targetLang);
+                const aiMessageIndex = currentChat.messages.length;
+                const translationCard = `
+                    <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm dark:bg-gray-700 dark:border-gray-600">
+                        <p class="text-sm text-gray-500 dark:text-gray-300">🌍 Translation</p>
+                        <p class="text-gray-700 dark:text-gray-200 mt-1">"${textToTranslate}"</p>
+                        <p class="text-lg font-semibold">→ "${translatedText}"</p>
+                    </div>
+                `;
+                currentChat.messages.push({ role: "ai", content: translationCard });
+                const aiDiv = createChatEntry("", "ai", aiMessageIndex);
+                aiDiv.innerHTML = translationCard;
+                hideTypingIndicator();
+                saveChatHistoryForUser();
+                
+                // Update analytics
+                analyticsData.toolUsage['translate'] = (analyticsData.toolUsage['translate'] || 0) + 1;
+                saveAnalyticsData();
+                return;
+            }
+
+            // 12) Smart open/search/play commands that open a new window/tab
             // (use same checks you had — they call smartReplyAndOpen which creates AI reply + window.open)
             if (lc.startsWith("open whatsapp")) { smartReplyAndOpen("Opening WhatsApp Web for you, Sir.", "https://web.whatsapp.com"); hideTypingIndicator(); return; }
             if (lc.startsWith("open instagram")) { smartReplyAndOpen("Opening Instagram, Sir.", "https://www.instagram.com"); hideTypingIndicator(); return; }
@@ -1107,20 +1970,25 @@
             if (lc.startsWith("open youtube")) { smartReplyAndOpen("Opening YouTube, Sir.", "https://www.youtube.com"); hideTypingIndicator(); return; }
             if (lc.startsWith("open gmail")) { smartReplyAndOpen("Opening Gmail, Sir.", "https://mail.google.com"); hideTypingIndicator(); return; }
             if (lc.startsWith("set timer for ")) { const time = message.replace(/set timer for /i, "").trim(); smartReplyAndOpen(`Setting a timer for ${time}...`, `https://www.google.com/search?q=timer+for+${encodeURIComponent(time)}`); hideTypingIndicator(); return; }
-            if (lc.startsWith("translate ")) { const match = message.match(/translate (.+) to (.+)/i); if (match) { const phrase = encodeURIComponent(match[1]); const lang = encodeURIComponent(match[2]); smartReplyAndOpen(`Translating ${match[1]} to ${match[2]}...`, `https://translate.google.com/?sl=auto&tl=${lang}&text=${phrase}&op=translate`); hideTypingIndicator(); return; } }
             if (lc.startsWith("calculate ")) { const expression = encodeURIComponent(message.replace(/calculate /i, "").trim()); smartReplyAndOpen(`Calculating ${expression}...`, `https://www.google.com/search?q=${expression}`); hideTypingIndicator(); return; }
             if (lc.startsWith("define ")) { const word = encodeURIComponent(message.replace(/define /i, "").trim()); smartReplyAndOpen(`Defining ${word}...`, `https://www.google.com/search?q=define+${word}`); hideTypingIndicator(); return; }
 
             // ---- If no early tool matched, fall back to the original conversational/templated replies ----
             // Simulate a short response delay and then produce the same default replies you had
+            const startTime = Date.now();
             setTimeout(async () => {
                 hideTypingIndicator();
+                
+                // Record response time for analytics
+                const responseTime = Date.now() - startTime;
+                analyticsData.responseTimes.push(responseTime);
+                saveAnalyticsData();
 
                 let reply;
                 if (["hi", "hello"].includes(lc)) { reply = "Welcome back, Sir. How may I assist you today?"; }
                 else if (lc.includes("help")) { reply = "Of course, Sir. What would you like me to do?"; }
-                else if (lc.includes("who are you")) { reply = "I am Nexsera, Sir. Your dedicated assistant, optimized for precision and efficiency."; }
-                else if (lc.includes("features")) { reply = "Nexsera Ai can chat, summarize text, manage files, and more!"; }
+                else if (lc.includes("who are you")) { reply = "I am Nexsera, Sir. Your advanced AI assistant with enhanced capabilities for precision and efficiency."; }
+                else if (lc.includes("features")) { reply = "Nexsera Ai can chat, summarize text, manage files, analyze images, create charts, perform sentiment analysis, translate languages, and much more!"; }
                 else if (lc.includes("thank you") || lc.includes("thanks")) { reply = "Always a pleasure, Sir."; }
                 else if (lc.includes("goodbye") || lc.includes("bye")) { reply = "Farewell, Sir. I await your next command."; }
                 else if (lc.includes("make a password")) {
@@ -1144,8 +2012,8 @@
                     if (saved.length === 0) { reply = "You have no reminders yet, Sir."; }
                     else { reply = "Here are your reminders:<br>" + saved.map(r => `📌 ${r.task} (${r.time})`).join("<br>"); }
                 }
-                else if (lc.includes("who made you")) { reply = "Sir Samarth Nagpure engineered me to serve you with intelligence and reliability."; }
-                else if (lc.includes("what can you do")) { reply = "I can chat, generate passwords, tell jokes, show quotes, summarize text, and more!"; }
+                else if (lc.includes("who made you")) { reply = "Sir Samarth Nagpure engineered me to serve you with advanced intelligence and reliability."; }
+                else if (lc.includes("what can you do")) { reply = "I can chat, generate passwords, tell jokes, show quotes, summarize text, analyze images, create charts, perform sentiment analysis, translate languages, solve equations, and much more!"; }
                 else if (lc.includes("settings")) { reply = "You can access settings from the top right corner or the sidebar."; }
                 else if (lc.includes("dark mode") || lc.includes("light mode")) { reply = "You can toggle light/dark mode using the sun/moon icon in the header!"; }
                 else if (lc.includes("new chat")) { reply = "To start a new chat, click the 'New Chat' button in the sidebar."; }
@@ -1264,6 +2132,46 @@
                 chat.messages.splice(messageIndex, 1);
                 saveChatHistoryForUser();
                 loadChat(chatId);
+            }
+        }
+
+        function editMessage(chatId, messageIndex, messageElement) {
+            const chat = chatHistory.find(c => c.id === chatId);
+            if (chat && chat.messages.length > messageIndex) {
+                const currentContent = chat.messages[messageIndex].content;
+                const input = document.createElement('textarea');
+                input.value = currentContent;
+                input.className = 'w-full p-2 border border-gray-300 rounded-md text-sm';
+                
+                const saveBtn = document.createElement('button');
+                saveBtn.textContent = 'Save';
+                saveBtn.className = 'mt-2 px-3 py-1 bg-blue-500 text-white rounded text-sm';
+                
+                const cancelBtn = document.createElement('button');
+                cancelBtn.textContent = 'Cancel';
+                cancelBtn.className = 'mt-2 ml-2 px-3 py-1 bg-gray-300 text-gray-700 rounded text-sm';
+                
+                const container = document.createElement('div');
+                container.className = 'mt-2 p-2 border border-gray-300 rounded-md';
+                container.appendChild(input);
+                container.appendChild(saveBtn);
+                container.appendChild(cancelBtn);
+                
+                messageElement.innerHTML = '';
+                messageElement.appendChild(container);
+                
+                input.focus();
+                
+                saveBtn.addEventListener('click', () => {
+                    const newContent = input.value;
+                    chat.messages[messageIndex].content = newContent;
+                    saveChatHistoryForUser();
+                    loadChat(chatId);
+                });
+                
+                cancelBtn.addEventListener('click', () => {
+                    loadChat(chatId);
+                });
             }
         }
 
@@ -1449,6 +2357,163 @@
             if (emptyState) emptyState.style.display = "block";
         }
 
+        // New: Export chat history
+        function exportChatHistory() {
+            const dataStr = JSON.stringify(chatHistory, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `nexsera-chat-history-${new Date().toISOString().slice(0,10)}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showToast("Chat history exported successfully!");
+        }
+
+        // New: Import chat history
+        function importChatHistory() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = e => { 
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = event => {
+                    try {
+                        const importedHistory = JSON.parse(event.target.result);
+                        chatHistory = importedHistory;
+                        saveChatHistoryForUser();
+                        renderHistoryList();
+                        showToast("Chat history imported successfully!");
+                    } catch (error) {
+                        showToast("Error importing chat history. Please check the file format.");
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        // New: Save analytics data
+        function saveAnalyticsData() {
+            localStorage.setItem("analyticsData", JSON.stringify(analyticsData));
+        }
+
+        // New: Update analytics display
+        function updateAnalyticsDisplay() {
+            document.getElementById("totalChats").textContent = analyticsData.totalChats;
+            document.getElementById("totalMessages").textContent = analyticsData.totalMessages;
+            
+            // Find most used tool
+            let mostUsedTool = "None";
+            let maxCount = 0;
+            for (const [tool, count] of Object.entries(analyticsData.toolUsage)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    mostUsedTool = tool;
+                }
+            }
+            document.getElementById("mostUsedTool").textContent = mostUsedTool;
+            
+            // Calculate average response time
+            const avgTime = analyticsData.responseTimes.length > 0 
+                ? Math.round(analyticsData.responseTimes.reduce((a, b) => a + b, 0) / analyticsData.responseTimes.length)
+                : 0;
+            document.getElementById("avgResponseTime").textContent = avgTime + "ms";
+            
+            // Create message activity chart
+            const messageCtx = document.getElementById("messageChart").getContext('2d');
+            new Chart(messageCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Messages',
+                        data: [12, 19, 3, 5, 2, 3, 9], // Mock data
+                        fill: false,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // Create tool usage chart
+            const toolCtx = document.getElementById("toolChart").getContext('2d');
+            const toolLabels = Object.keys(analyticsData.toolUsage);
+            const toolData = Object.values(analyticsData.toolUsage);
+            
+            new Chart(toolCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: toolLabels.length > 0 ? toolLabels : ['No data'],
+                    datasets: [{
+                        data: toolData.length > 0 ? toolData : [1],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // New: Voice command processing
+        function processVoiceCommand(command) {
+            const cmd = command.toLowerCase();
+            
+            if (cmd.includes("new chat")) {
+                startNewChat();
+                showToast("New chat started");
+            } else if (cmd.includes("send message")) {
+                sendMessage();
+                showToast("Message sent");
+            } else if (cmd.includes("clear chat")) {
+                if (confirm("Are you sure you want to clear the current chat?")) {
+                    startNewChat();
+                    showToast("Chat cleared");
+                }
+            } else if (cmd.includes("toggle theme")) {
+                toggleDarkMode();
+                showToast("Theme toggled");
+            } else if (cmd.includes("open settings")) {
+                showPanel(settingsPanel);
+                showToast("Settings opened");
+            } else if (cmd.includes("help")) {
+                showToast("Available commands: new chat, send message, clear chat, toggle theme, open settings");
+            } else {
+                // If it's not a recognized command, treat it as a regular message
+                chatInput.value = command;
+                sendMessage();
+            }
+        }
+
         // --- Event Listeners ---
 
         // Chat Input & Send Button
@@ -1463,6 +2528,30 @@
             if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
                 sendMessage();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener("keydown", (e) => {
+            // Ctrl+K for quick commands
+            if (e.ctrlKey && e.key === "k") {
+                e.preventDefault();
+                keyboardHint.classList.remove("hidden");
+                setTimeout(() => {
+                    keyboardHint.classList.add("hidden");
+                }, 3000);
+            }
+            
+            // Ctrl+/ for help
+            if (e.ctrlKey && e.key === "/") {
+                e.preventDefault();
+                showToast("Available shortcuts: Ctrl+K (quick commands), Ctrl+/ (help), Ctrl+N (new chat)");
+            }
+            
+            // Ctrl+N for new chat
+            if (e.ctrlKey && e.key === "n") {
+                e.preventDefault();
+                startNewChat();
             }
         });
 
@@ -1500,23 +2589,69 @@
 
         // Settings Controls
         modelSelect.addEventListener("change", (e) => {
-            console.log("Selected AI Model:", e.target.value);
-            // In a real application, send this to backend
+            currentModel = e.target.value;
+            headerModelSelect.value = currentModel;
+            localStorage.setItem("currentModel", currentModel);
         });
+        
+        headerModelSelect.addEventListener("change", (e) => {
+            currentModel = e.target.value;
+            modelSelect.value = currentModel;
+            localStorage.setItem("currentModel", currentModel);
+        });
+        
         responseSpeed.addEventListener("input", (e) => {
             preferredResponseSpeed = parseInt(e.target.value);
             responseSpeedValue.textContent = `${preferredResponseSpeed} ms`;
             localStorage.setItem("preferredResponseSpeed", preferredResponseSpeed);
         });
+        
         document.getElementById("fontSizeSelector").addEventListener("change", (e) => {
             chatWindow.classList.remove("text-xs", "text-sm", "text-base", "text-lg");
             chatWindow.classList.add(e.target.value);
             localStorage.setItem("chatFontSize", e.target.value);
         });
+        
         document.getElementById("autoScrollSwitch").addEventListener("change", (e) => {
             autoScrollEnabled = e.target.checked;
             localStorage.setItem("autoScroll", autoScrollEnabled);
         });
+        
+        document.getElementById("markdownSwitch").addEventListener("change", (e) => {
+            markdownEnabled = e.target.checked;
+            localStorage.setItem("markdownEnabled", markdownEnabled);
+        });
+        
+        document.getElementById("mathSwitch").addEventListener("change", (e) => {
+            mathEnabled = e.target.checked;
+            localStorage.setItem("mathEnabled", mathEnabled);
+        });
+        
+        document.getElementById("contextMemory").addEventListener("change", (e) => {
+            contextMemory = parseInt(e.target.value);
+            localStorage.setItem("contextMemory", contextMemory);
+            document.getElementById("memoryStatus").textContent = contextMemory + " chats";
+        });
+        
+        document.getElementById("languageSelect").addEventListener("change", (e) => {
+            currentLanguage = e.target.value;
+            localStorage.setItem("currentLanguage", currentLanguage);
+            const langNames = {
+                'en': 'English',
+                'es': 'Spanish',
+                'fr': 'French',
+                'de': 'German',
+                'zh': 'Chinese',
+                'ja': 'Japanese'
+            };
+            document.getElementById("languageStatus").textContent = langNames[currentLanguage];
+        });
+        
+        document.getElementById("voiceCommandSwitch").addEventListener("change", (e) => {
+            voiceCommandsEnabled = e.target.checked;
+            localStorage.setItem("voiceCommandsEnabled", voiceCommandsEnabled);
+        });
+        
         document.getElementById("resetSettings").addEventListener("click", () => {
             if (confirm("Are you sure you want to reset all settings?")) {
                 localStorage.clear();
@@ -1618,6 +2753,92 @@
             };
         });
 
+        // Voice Commands
+        voiceCommandBtn.addEventListener("click", () => {
+            if (!voiceCommandsEnabled) {
+                showToast("Voice commands are disabled. Enable them in settings.");
+                return;
+            }
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                showToast("Sorry, your browser doesn't support voice commands.");
+                return;
+            }
+
+            if (isVoiceCommandActive) {
+                // Stop listening
+                isVoiceCommandActive = false;
+                voiceCommandIndicator.classList.add("hidden");
+                return;
+            }
+
+            // Start listening for commands
+            isVoiceCommandActive = true;
+            voiceCommandIndicator.classList.remove("hidden");
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = "en-US";
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.start();
+
+            recognition.onstart = () => {
+                showToast("Voice command activated. Say a command...");
+            };
+            
+            recognition.onresult = (event) => {
+                const command = event.results[0][0].transcript;
+                processVoiceCommand(command);
+                isVoiceCommandActive = false;
+                voiceCommandIndicator.classList.add("hidden");
+            };
+            
+            recognition.onerror = (event) => {
+                console.error("Voice command error", event.error);
+                showToast(`Voice command error: ${event.error}`);
+                isVoiceCommandActive = false;
+                voiceCommandIndicator.classList.add("hidden");
+            };
+            
+            recognition.onend = () => {
+                if (isVoiceCommandActive) {
+                    // Restart recognition if it ended without a result
+                    setTimeout(() => {
+                        if (isVoiceCommandActive) {
+                            recognition.start();
+                        }
+                    }, 100);
+                }
+            };
+        });
+
+        // Analytics Modal
+        analyticsBtn.addEventListener("click", () => {
+            analyticsModal.classList.remove("hidden");
+            updateAnalyticsDisplay();
+        });
+        
+        closeAnalyticsModal.addEventListener("click", () => {
+            analyticsModal.classList.add("hidden");
+        });
+
+        // Export/Import History
+        exportHistoryBtn.addEventListener("click", exportChatHistory);
+        importHistoryBtn.addEventListener("click", importChatHistory);
+
+        // Image Modal
+        imageModalClose.addEventListener("click", () => {
+            imageModal.classList.add("hidden");
+        });
+        
+        imageModal.addEventListener("click", (e) => {
+            if (e.target === imageModal) {
+                imageModal.classList.add("hidden");
+            }
+        });
+
         // --- Initializations ---
         document.addEventListener("DOMContentLoaded", () => {
             // Apply saved theme
@@ -1642,7 +2863,7 @@
                     const p = document.createElement("p");
                     p.id = "introText";
                     p.className = "text-center text-gray-600 text-sm dark:text-gray-400";
-                    p.textContent = "Hello! I'm Nexsera Ai, your personal assistant. How can I help you today?";
+                    p.textContent = "Hello! I'm Nexsera Ai, your advanced AI assistant. How can I help you today?";
                     chatWindow.appendChild(p);
                 }
             }
@@ -1657,6 +2878,26 @@
             document.getElementById("fontSizeSelector").value = savedFontSize;
 
             document.getElementById("autoScrollSwitch").checked = autoScrollEnabled;
+            document.getElementById("markdownSwitch").checked = markdownEnabled;
+            document.getElementById("mathSwitch").checked = mathEnabled;
+            document.getElementById("contextMemory").value = contextMemory;
+            document.getElementById("languageSelect").value = currentLanguage;
+            document.getElementById("voiceCommandSwitch").checked = voiceCommandsEnabled;
+            
+            modelSelect.value = currentModel;
+            headerModelSelect.value = currentModel;
+
+            // Update status displays
+            document.getElementById("memoryStatus").textContent = contextMemory + " chats";
+            const langNames = {
+                'en': 'English',
+                'es': 'Spanish',
+                'fr': 'French',
+                'de': 'German',
+                'zh': 'Chinese',
+                'ja': 'Japanese'
+            };
+            document.getElementById("languageStatus").textContent = langNames[currentLanguage];
 
             // Code highlighting for existing messages
             document.querySelectorAll('pre code').forEach(block => {
