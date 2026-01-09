@@ -12,11 +12,64 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --accent-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            font-size: 15px; /* Adjusting the base font size */
+            font-size: 15px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark {
+            background-color: #1e293b;
+            color: #e2e8f0;
+        }
+
+        .dark .bg-white {
+            background-color: #334155 !important;
+        }
+
+        .dark .bg-slate-50 {
+            background-color: #0f172a !important;
+        }
+
+        .dark .text-slate-800 {
+            color: #e2e8f0 !important;
+        }
+
+        .dark .text-slate-700 {
+            color: #cbd5e1 !important;
+        }
+
+        .dark .text-slate-600 {
+            color: #94a3b8 !important;
+        }
+
+        .dark .text-slate-500 {
+            color: #64748b !important;
+        }
+
+        .dark .border-slate-300 {
+            border-color: #475569 !important;
+        }
+
+        .dark .bg-slate-900 {
+            background-color: #0f172a !important;
+        }
+
+        .dark .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
         }
 
         /* Subtle Underline Hover Effect */
@@ -45,7 +98,7 @@
             transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
         }
         .btn-submit:hover {
-            background-color: #1d4ed8; /* Darker blue on hover */
+            background-color: var(--primary-dark);
             transform: translateY(-2px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
@@ -56,23 +109,533 @@
 
         /* Input focus state with a cleaner ring */
         .form-input-field:focus {
-            border-color: #3b82f6; /* More professional blue border */
-            box-shadow: 0 0 0 2px #bfdbfe; /* Lighter, cleaner ring */
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
             outline: none;
         }
         
         /* Custom styles for the terms section for better mobile readability */
         .prose h3 {
-            font-size: 1.5rem; /* H3 size for better scannability */
+            font-size: 1.5rem;
             font-weight: 600;
-            margin-top: 2rem; /* More space above headings */
+            margin-top: 2rem;
+        }
+
+        /* Dark mode toggle */
+        .theme-toggle {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background-color: #ccc;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .theme-toggle.active {
+            background-color: var(--primary-color);
+        }
+
+        .theme-toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle.active .theme-toggle-slider {
+            transform: translateX(30px);
+        }
+
+        /* FAQ Accordion */
+        .faq-item {
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .dark .faq-item {
+            border-color: #475569;
+        }
+
+        .faq-question {
+            cursor: pointer;
+            padding: 1rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.3s;
+        }
+
+        .faq-question:hover {
+            color: var(--primary-color);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .faq-answer.active {
+            max-height: 500px;
+        }
+
+        .faq-icon {
+            transition: transform 0.3s;
+        }
+
+        .faq-icon.active {
+            transform: rotate(180deg);
+        }
+
+        /* Social media links */
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f1f5f9;
+            color: #64748b;
+            transition: all 0.3s ease;
+        }
+
+        .dark .social-link {
+            background-color: #334155;
+            color: #cbd5e1;
+        }
+
+        .social-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        /* Form validation styles */
+        .form-input-field.error {
+            border-color: var(--error-color);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease-out;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background-color: var(--success-color);
+        }
+
+        .toast.error {
+            background-color: var(--error-color);
+        }
+
+        /* Tab navigation */
+        .tab-nav {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+        }
+
+        .dark .tab-nav {
+            border-color: #475569;
+        }
+
+        .tab-button {
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            color: var(--secondary-color);
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Floating action button */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .fab:hover {
+            background-color: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background-color: var(--primary-color);
+        }
+
+        /* Mobile menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100vh;
+            background-color: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .dark .mobile-menu {
+            background-color: #334155;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .mobile-menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background-color: var(--primary-color);
+            z-index: 1001;
+            transition: width 0.3s ease;
+        }
+
+        /* Language selector */
+        .language-selector {
+            position: relative;
+        }
+
+        .language-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 0.5rem 0;
+            min-width: 150px;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+        }
+
+        .language-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .language-option {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .language-option:hover {
+            background-color: #f1f5f9;
+        }
+
+        .dark .language-option:hover {
+            background-color: #475569;
+        }
+
+        /* Newsletter form */
+        .newsletter-form {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .newsletter-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+        }
+
+        .dark .newsletter-input {
+            background-color: #475569;
+            border-color: #64748b;
+            color: #e2e8f0;
+        }
+
+        /* File upload */
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .file-upload input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-upload-label {
+            display: block;
+            padding: 0.75rem;
+            border: 1px dashed #e2e8f0;
+            border-radius: 0.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-label:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+
+        .file-list {
+            margin-top: 0.5rem;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem;
+            background-color: #f1f5f9;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dark .file-item {
+            background-color: #475569;
+        }
+
+        .file-remove {
+            color: var(--error-color);
+            cursor: pointer;
+        }
+
+        /* Skeleton loading */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Print styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            
+            body {
+                font-size: 12pt;
+                line-height: 1.4;
+            }
+            
+            a {
+                text-decoration: underline;
+            }
+            
+            h1, h2, h3 {
+                page-break-after: avoid;
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .fab {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+            }
+            
+            .back-to-top {
+                bottom: 20px;
+                left: 20px;
+                width: 40px;
+                height: 40px;
+            }
+            
+            .tab-nav {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
         }
     </style>
 </head>
 
 <body class="bg-slate-50 text-slate-800 leading-relaxed">
 
-    <header class="bg-white shadow-lg p-6 flex flex-col sm:flex-row justify-between items-center sticky top-0 z-10">
+    <!-- Progress Bar -->
+    <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Back to Top Button -->
+    <div id="backToTop" class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Floating Action Button -->
+    <div id="fab" class="fab">
+        <i class="fas fa-comment-dots"></i>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+        <div class="p-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-semibold">Menu</h3>
+                <button id="closeMobileMenu" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <nav class="space-y-4">
+                <a href="#terms" class="block py-2 link-hover-underline text-slate-700 hover:text-blue-600">Terms</a>
+                <a href="#faq" class="block py-2 link-hover-underline text-slate-700 hover:text-blue-600">FAQ</a>
+                <a href="#contact" class="block py-2 link-hover-underline text-slate-700 hover:text-blue-600">Contact</a>
+                <a href="privacy.html" class="block py-2 link-hover-underline text-slate-700 hover:text-blue-600">Privacy</a>
+                <a href="index.html" class="block py-2 link-hover-underline text-slate-700 hover:text-blue-600">Home</a>
+            </nav>
+            
+            <div class="mt-8 pt-8 border-t border-slate-200">
+                <h4 class="font-medium mb-4">Language</h4>
+                <div class="language-selector">
+                    <button id="mobileLanguageToggle" class="flex items-center justify-between w-full py-2 px-3 bg-slate-100 rounded-lg">
+                        <span id="currentLanguage">English</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div id="mobileLanguageDropdown" class="language-dropdown">
+                        <div class="language-option" data-lang="en">English</div>
+                        <div class="language-option" data-lang="es">Español</div>
+                        <div class="language-option" data-lang="fr">Français</div>
+                        <div class="language-option" data-lang="de">Deutsch</div>
+                        <div class="language-option" data-lang="zh">中文</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <header class="bg-white shadow-lg p-6 flex flex-col sm:flex-row justify-between items-center sticky top-0 z-10 no-print">
         <div class="flex items-center space-x-2">
             <img src="https://img.icons8.com/pulsar-line/48/nfc-n.png" alt="nfc-n" class="w-10 h-10" />
             <a href="index.html" class="text-2xl sm:text-3xl font-extrabold text-slate-900 link-hover-underline text-blue-600">
@@ -80,107 +643,952 @@
             </a>
         </div>
         
+        <div class="flex items-center space-x-4 mt-4 sm:mt-0">
+            <nav class="hidden sm:flex space-x-6">
+                <a href="#terms" class="link-hover-underline text-slate-700 hover:text-blue-600">Terms</a>
+                <a href="#faq" class="link-hover-underline text-slate-700 hover:text-blue-600">FAQ</a>
+                <a href="#contact" class="link-hover-underline text-slate-700 hover:text-blue-600">Contact</a>
+                <a href="privacy.html" class="link-hover-underline text-slate-700 hover:text-blue-600">Privacy</a>
+            </nav>
+            
+            <div class="language-selector hidden sm:block">
+                <button id="languageToggle" class="flex items-center justify-between py-1 px-2 bg-slate-100 rounded-lg">
+                    <span id="desktopCurrentLanguage">EN</span>
+                    <i class="fas fa-chevron-down ml-1"></i>
+                </button>
+                <div id="languageDropdown" class="language-dropdown">
+                    <div class="language-option" data-lang="en">English</div>
+                    <div class="language-option" data-lang="es">Español</div>
+                    <div class="language-option" data-lang="fr">Français</div>
+                    <div class="language-option" data-lang="de">Deutsch</div>
+                    <div class="language-option" data-lang="zh">中文</div>
+                </div>
+            </div>
+            
+            <div class="theme-toggle" id="themeToggle">
+                <div class="theme-toggle-slider">
+                    <i class="fas fa-sun text-yellow-500" id="themeIcon"></i>
+                </div>
+            </div>
+            
+            <button id="mobileMenuToggle" class="sm:hidden text-slate-700">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
     </header>
 
     <main class="p-4 md:p-8 max-w-5xl mx-auto space-y-16">
 
-        <section class="mt-8 md:mt-12">
-            <h2 class="text-3xl sm:text-4xl font-extrabold text-center mb-8 md:mb-12 text-slate-900 border-b-2 border-slate-200 pb-4">
-                Terms and Conditions
-            </h2>
-            
-            <div class="prose text-slate-700 mx-auto space-y-6">
-                <p class="text-sm text-slate-500"><strong>Last Updated:</strong> 17/09/2025</p>
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-button active" data-tab="terms">Terms & Conditions</button>
+            <button class="tab-button" data-tab="faq">Frequently Asked Questions</button>
+            <button class="tab-button" data-tab="contact">Contact Us</button>
+        </div>
 
-                <p>Welcome to <strong>Nexsera</strong>. By accessing or using our services, you agree to the following Terms and Conditions. Please read them carefully before using Nexsera.</p>
+        <!-- Terms & Conditions Tab -->
+        <div id="terms" class="tab-content active">
+            <section class="mt-8 md:mt-12">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900">Terms and Conditions</h2>
+                    <button id="printTerms" class="no-print bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-print mr-2"></i>Print
+                    </button>
+                </div>
+                
+                <div class="prose text-slate-700 mx-auto space-y-6">
+                    <p class="text-sm text-slate-500"><strong>Last Updated:</strong> <span id="lastUpdated">17/09/2025</span></p>
 
-                <h3 class="text-2xl font-semibold text-slate-900 mt-8">1. Acceptance of Terms</h3>
-                <p>By using Nexsera, you acknowledge that you have read, understood, and agreed to these Terms. If you do not agree, please discontinue use immediately.</p>
+                    <p>Welcome to <strong>Nexsera</strong>. By accessing or using our services, you agree to the following Terms and Conditions. Please read them carefully before using Nexsera.</p>
 
-                <h3 class="text-2xl font-semibold text-slate-900 mt-8">2. Service Description</h3>
-                <p>Nexsera is an AI-powered interface designed to provide information, assistance, and interaction. While we strive for accuracy, the service may sometimes generate incorrect, incomplete, or outdated responses.</p>
+                    <h3 class="text-2xl font-semibold text-slate-900 mt-8">1. Acceptance of Terms</h3>
+                    <p>By using Nexsera, you acknowledge that you have read, understood, and agreed to these Terms. If you do not agree, please discontinue use immediately.</p>
 
-                <h3 class="text-2xl font-semibold text-slate-900 mt-8">3. User Responsibilities</h3>
-                <ul>
-                    <li>You agree to use Nexsera for lawful purposes only.</li>
-                    <li>You will not misuse the service for harmful, abusive, or fraudulent activities.</li>
-                    <li>You are responsible for maintaining the security of your account and any activity under it (if applicable).</li>
-                </ul>
+                    <h3 class="text-2xl font-semibold text-slate-900 mt-8">2. Service Description</h3>
+                    <p>Nexsera is an AI-powered interface designed to provide information, assistance, and interaction. While we strive for accuracy, the service may sometimes generate incorrect, incomplete, or outdated responses.</p>
 
-                <h3 class="text-2xl font-semibold text-slate-900 mt-8">4. Limitations of the Service</h3>
-                <ul>
-                    <li>Nexsera may rely on third-party APIs (e.g., weather, search, AI models). We are not responsible for the accuracy, reliability, or availability of third-party services.</li>
-                    <li>The service should not be used as a substitute for professional advice (medical, legal, financial, etc.). Always consult a qualified professional for critical matters.</li>
-                </ul>
+                    <h3 class="text-2xl font-semibold text-slate-900 mt-8">3. User Responsibilities</h3>
+                    <ul>
+                        <li>You agree to use Nexsera for lawful purposes only.</li>
+                        <li>You will not misuse the service for harmful, abusive, or fraudulent activities.</li>
+                        <li>You are responsible for maintaining the security of your account and any activity under it (if applicable).</li>
+                    </ul>
 
-                <h3 class="text-2xl font-semibold text-slate-900 mt-8">5. Intellectual Property</h3>
-                <ul>
-                    <li>All content, design, and technology associated with Nexsera are protected under applicable copyright and intellectual property laws.</li>
-                    <li>You may not copy, modify, distribute, or exploit any part of the service without prior written permission.</li>
-                </ul>
+                    <h3 class="text-2xl font-semibold text-slate-900 mt-8">4. Limitations of the Service</h3>
+                    <ul>
+                        <li>Nexsera may rely on third-party APIs (e.g., weather, search, AI models). We are not responsible for the accuracy, reliability, or availability of third-party services.</li>
+                        <li>The service should not be used as a substitute for professional advice (medical, legal, financial, etc.). Always consult a qualified professional for critical matters.</li>
+                    </ul>
 
-                <h3 class="2xl font-semibold text-slate-900 mt-8">6. Privacy & Data</h3>
-                <ul>
-                    <li>Nexsera may collect and process certain data to improve functionality (such as queries, preferences, or usage logs).</li>
-                    <li>We do not sell or share personal information with third parties without consent, except as required by law.</li>
-                    <li>By using the service, you agree to our <a href="privacy.html" class="link-hover-underline text-blue-600">Privacy Policy</a>.</li>
-                </ul>
+                    <h3 class="text-2xl font-semibold text-slate-900 mt-8">5. Intellectual Property</h3>
+                    <ul>
+                        <li>All content, design, and technology associated with Nexsera are protected under applicable copyright and intellectual property laws.</li>
+                        <li>You may not copy, modify, distribute, or exploit any part of the service without prior written permission.</li>
+                    </ul>
 
-                <h3 class="text-2xl font-semibold text-slate-900 mt-8">7. Disclaimer of Liability</h3>
-                <ul>
-                    <li>Nexsera is provided “as is” without warranties of any kind.</li>
-                    <li>We are not liable for any direct, indirect, or incidental damages resulting from the use or inability to use the service.</li>
-                    <li>Users assume full responsibility for any decisions made based on the information provided by Nexsera.</li>
-                </ul>
+                    <h3 class="text-2xl font-semibold text-slate-900 mt-8">6. Privacy & Data</h3>
+                    <ul>
+                        <li>Nexsera may collect and process certain data to improve functionality (such as queries, preferences, or usage logs).</li>
+                        <li>We do not sell or share personal information with third parties without consent, except as required by law.</li>
+                        <li>By using the service, you agree to our <a href="privacy.html" class="link-hover-underline text-blue-600">Privacy Policy</a>.</li>
+                    </ul>
 
-                <h3 class="text-2xl font-semibold text-slate-900 mt-8">8. Termination</h3>
-                <p>We reserve the right to suspend or terminate access to Nexsera at any time if a user violates these Terms or engages in misuse.</p>
+                    <h3 class="text-2xl font-semibold text-slate-900 mt-8">7. Disclaimer of Liability</h3>
+                    <ul>
+                        <li>Nexsera is provided "as is" without warranties of any kind.</li>
+                        <li>We are not liable for any direct, indirect, or incidental damages resulting from the use or inability to use the service.</li>
+                        <li>Users assume full responsibility for any decisions made based on the information provided by Nexsera.</li>
+                    </ul>
 
-                <h3 class="text-2xl font-semibold text-slate-900 mt-8">9. Governing Law</h3>
-                <p>These Terms shall be governed by and construed under the laws of [Insert Country/State]. Any disputes will be subject to the jurisdiction of the courts in [Insert Location].</p>
+                    <h3 class="text-2xl font-semibold text-slate-900 mt-8">8. Termination</h3>
+                    <p>We reserve the right to suspend or terminate access to Nexsera at any time if a user violates these Terms or engages in misuse.</p>
 
-                <h3 class="text-2xl font-semibold text-slate-900 mt-8">10. Changes to Terms</h3>
-                <p>We may update these Terms from time to time. Continued use of Nexsera after changes means you accept the updated Terms.</p>
+                    <h3 class="text-2xl font-semibold text-slate-900 mt-8">9. Governing Law</h3>
+                    <p>These Terms shall be governed by and construed under the laws of [Insert Country/State]. Any disputes will be subject to the jurisdiction of the courts in [Insert Location].</p>
 
-                <h3 class="text-2xl font-semibold text-slate-900 mt-8">11. Contact</h3>
-                <p>If you have questions about these Terms, please contact us at:
-                    <a href="mailto:samarthnagpure47@gmail.com" class="link-hover-underline text-blue-600">samarthnagpure47@gmail.com</a>
-                </p>
+                    <h3 class="text-2xl font-semibold text-slate-900 mt-8">10. Changes to Terms</h3>
+                    <p>We may update these Terms from time to time. Continued use of Nexsera after changes means you accept the updated Terms.</p>
+
+                    <h3 class="text-2xl font-semibold text-slate-900 mt-8">11. Contact</h3>
+                    <p>If you have questions about these Terms, please contact us at:
+                        <a href="mailto:samarthnagpure47@gmail.com" class="link-hover-underline text-blue-600">samarthnagpure47@gmail.com</a>
+                    </p>
+                </div>
+            </section>
+        </div>
+
+        <!-- FAQ Tab -->
+        <div id="faq" class="tab-content">
+            <section class="mt-8 md:mt-12">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900">Frequently Asked Questions</h2>
+                    <div class="relative">
+                        <input type="text" id="faqSearch" placeholder="Search FAQs..." class="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-search absolute right-3 top-3 text-slate-400"></i>
+                    </div>
+                </div>
+                
+                <div id="faqList" class="space-y-4">
+                    <div class="faq-item" data-tags="general what">
+                        <div class="faq-question">
+                            <h3 class="font-semibold text-lg">What is Nexsera AI?</h3>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="pb-4 text-slate-700">Nexsera AI is an advanced artificial intelligence assistant designed to help with a wide range of tasks, from answering questions to generating content, analyzing data, and providing personalized recommendations.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" data-tags="technical how">
+                        <div class="faq-question">
+                            <h3 class="font-semibold text-lg">How does Nexsera AI work?</h3>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="pb-4 text-slate-700">Nexsera AI uses advanced machine learning algorithms and natural language processing to understand and respond to user queries. It continuously learns from interactions to improve its responses over time.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" data-tags="security privacy">
+                        <div class="faq-question">
+                            <h3 class="font-semibold text-lg">Is my data secure with Nexsera?</h3>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="pb-4 text-slate-700">Yes, we take data security seriously. All communications with Nexsera are encrypted, and we follow strict privacy protocols. We never share your personal information with third parties without your consent.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" data-tags="business commercial">
+                        <div class="faq-question">
+                            <h3 class="font-semibold text-lg">Can I use Nexsera for commercial purposes?</h3>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="pb-4 text-slate-700">Yes, Nexsera offers commercial plans for businesses. Please contact our sales team for more information about enterprise features and pricing.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" data-tags="accuracy reliability">
+                        <div class="faq-question">
+                            <h3 class="font-semibold text-lg">How accurate is the information provided by Nexsera?</h3>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="pb-4 text-slate-700">While Nexsera strives to provide accurate information, it's always recommended to verify critical information from multiple sources, especially for medical, legal, or financial matters.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item" data-tags="support feedback">
+                        <div class="faq-question">
+                            <h3 class="font-semibold text-lg">How can I report issues or provide feedback?</h3>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="pb-4 text-slate-700">We welcome feedback! You can report issues or share suggestions through our contact form or by emailing us directly at samarthnagpure47@gmail.com.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="noResults" class="hidden text-center py-8">
+                    <i class="fas fa-search text-4xl text-slate-300 mb-4"></i>
+                    <p class="text-slate-500">No FAQs found matching your search. Try different keywords.</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Contact Tab -->
+        <div id="contact" class="tab-content">
+            <section class="bg-white p-6 md:p-8 rounded-2xl shadow-xl max-w-4xl mx-auto mt-12">
+                <h2 class="text-2xl font-bold text-center mb-4 text-slate-900">Get in Touch</h2>
+                <p class="text-center text-slate-600 mb-6 md:mb-8">Have a question? We'd love to hear from you.</p>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Contact Form -->
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4 text-slate-800">Send us a Message</h3>
+                        <form id="contactForm" class="space-y-4">
+                            <div>
+                                <label for="name" class="block font-medium mb-2 text-slate-700">Name</label>
+                                <input type="text" id="name" name="name" required class="form-input-field w-full p-3 border border-slate-300 rounded-lg" placeholder="Your Name" />
+                                <span class="error-message" id="nameError"></span>
+                            </div>
+
+                            <div>
+                                <label for="email" class="block font-medium mb-2 text-slate-700">Email</label>
+                                <input type="email" id="email" name="email" required class="form-input-field w-full p-3 border border-slate-300 rounded-lg" placeholder="you@example.com" />
+                                <span class="error-message" id="emailError"></span>
+                            </div>
+
+                            <div>
+                                <label for="subject" class="block font-medium mb-2 text-slate-700">Subject</label>
+                                <select id="subject" name="subject" required class="form-input-field w-full p-3 border border-slate-300 rounded-lg">
+                                    <option value="">Select a subject</option>
+                                    <option value="general">General Inquiry</option>
+                                    <option value="technical">Technical Support</option>
+                                    <option value="feedback">Feedback</option>
+                                    <option value="partnership">Partnership</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <span class="error-message" id="subjectError"></span>
+                            </div>
+
+                            <div>
+                                <label for="message" class="block font-medium mb-2 text-slate-700">Message</label>
+                                <textarea id="message" name="message" rows="5" required class="form-input-field w-full p-3 border border-slate-300 rounded-lg" placeholder="Your message here..."></textarea>
+                                <span class="error-message" id="messageError"></span>
+                            </div>
+
+                            <div>
+                                <label class="block font-medium mb-2 text-slate-700">Attachments (optional)</label>
+                                <div class="file-upload">
+                                    <input type="file" id="attachments" name="attachments" multiple>
+                                    <label for="attachments" class="file-upload-label">
+                                        <i class="fas fa-cloud-upload-alt mr-2"></i>
+                                        Click to upload or drag and drop
+                                    </label>
+                                </div>
+                                <div id="fileList" class="file-list"></div>
+                            </div>
+
+                            <div class="flex items-center">
+                                <input type="checkbox" id="consent" name="consent" required class="mr-2">
+                                <label for="consent" class="text-sm text-slate-600">I agree to the <a href="#terms" class="text-blue-600 hover:underline">Terms and Conditions</a> and <a href="privacy.html" class="text-blue-600 hover:underline">Privacy Policy</a>.</label>
+                            </div>
+
+                            <div class="flex items-center">
+                                <input type="checkbox" id="saveInfo" name="saveInfo" class="mr-2">
+                                <label for="saveInfo" class="text-sm text-slate-600">Save my information for future inquiries</label>
+                            </div>
+
+                            <button type="submit" class="btn-submit w-full bg-blue-600 text-white font-semibold py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                <span id="submitButtonText">Submit Form</span>
+                                <span id="submitSpinner" class="spinner" style="display: none;"></span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4 text-slate-800">Contact Information</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-3">
+                                <i class="fas fa-envelope text-blue-600 mt-1"></i>
+                                <div>
+                                    <p class="font-medium text-slate-700">Email</p>
+                                    <p class="text-slate-600">samarthnagpure47@gmail.com</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-3">
+                                <i class="fas fa-phone text-blue-600 mt-1"></i>
+                                <div>
+                                    <p class="font-medium text-slate-700">Phone</p>
+                                    <p class="text-slate-600">+1 (555) 123-4567</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-3">
+                                <i class="fas fa-map-marker-alt text-blue-600 mt-1"></i>
+                                <div>
+                                    <p class="font-medium text-slate-700">Address</p>
+                                    <p class="text-slate-600">123 Tech Street<br>Silicon Valley, CA 94025</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-3">
+                                <i class="fas fa-clock text-blue-600 mt-1"></i>
+                                <div>
+                                    <p class="font-medium text-slate-700">Business Hours</p>
+                                    <p class="text-slate-600">Monday - Friday: 9am - 6pm PST<br>Weekend: Closed</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h3 class="text-xl font-semibold mb-4 text-slate-800">Follow Us</h3>
+                            <div class="flex space-x-4">
+                                <a href="https://twitter.com/nexsera" target="_blank" rel="noopener" class="social-link">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="https://facebook.com/nexsera" target="_blank" rel="noopener" class="social-link">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="https://linkedin.com/company/nexsera" target="_blank" rel="noopener" class="social-link">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </a>
+                                <a href="https://instagram.com/nexsera" target="_blank" rel="noopener" class="social-link">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="https://github.com/nexsera" target="_blank" rel="noopener" class="social-link">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- Newsletter Section -->
+        <section class="bg-blue-600 text-white p-8 rounded-2xl shadow-xl max-w-4xl mx-auto mt-12">
+            <div class="text-center">
+                <h2 class="text-2xl font-bold mb-4">Stay Updated</h2>
+                <p class="mb-6">Subscribe to our newsletter for the latest updates and features.</p>
+                <form id="newsletterForm" class="newsletter-form max-w-md mx-auto">
+                    <input type="email" id="newsletterEmail" placeholder="Your email address" required class="newsletter-input">
+                    <button type="submit" class="bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition">Subscribe</button>
+                </form>
+                <p class="text-sm mt-4 opacity-75">We respect your privacy. Unsubscribe at any time.</p>
             </div>
         </section>
-
-        <section id="contact" class="bg-white p-6 md:p-8 rounded-2xl shadow-xl max-w-md mx-auto mt-12">
-            <h2 class="text-2xl font-bold text-center mb-4 text-slate-900">Send a Message</h2>
-            <p class="text-center text-slate-600 mb-6 md:mb-8">Have a question? We'd love to hear from you.</p>
-
-            <form action="https://api.web3forms.com/submit" method="POST" class="space-y-6">
-                <input type="hidden" name="access_key" value="17b94126-3608-4f08-b99c-6f54ffe3875d" />
-
-                <div>
-                    <label for="name" class="block font-medium mb-2 text-slate-700">Name</label>
-                    <input type="text" id="name" name="name" required class="form-input-field w-full p-3 border border-slate-300 rounded-lg" placeholder="Your Name" />
-                </div>
-
-                <div>
-                    <label for="email" class="block font-medium mb-2 text-slate-700">Email</label>
-                    <input type="email" id="email" name="email" required class="form-input-field w-full p-3 border border-slate-300 rounded-lg" placeholder="you@example.com" />
-                </div>
-
-                <div>
-                    <label for="message" class="block font-medium mb-2 text-slate-700">Message</label>
-                    <textarea id="message" name="message" rows="5" required class="form-input-field w-full p-3 border border-slate-300 rounded-lg" placeholder="Your message here..."></textarea>
-                </div>
-
-                <button type="submit" class="btn-submit w-full bg-blue-600 text-white font-semibold py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Submit Form</button>
-            </form>
-        </section>
-
     </main>
 
     <footer class="bg-slate-900 text-slate-400 text-center p-6 mt-16 shadow-inner">
-        <p class="text-sm">&copy; 2025 Nexsera HQ. All rights reserved.</p>
+        <div class="max-w-5xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="text-white font-semibold mb-3">Product</h3>
+                    <ul class="space-y-2">
+                        <li><a href="index.html#features" class="hover:text-white transition">Features</a></li>
+                        <li><a href="index.html#pricing" class="hover:text-white transition">Pricing</a></li>
+                        <li><a href="index.html#api" class="hover:text-white transition">API</a></li>
+                        <li><a href="index.html#integrations" class="hover:text-white transition">Integrations</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white font-semibold mb-3">Company</h3>
+                    <ul class="space-y-2">
+                        <li><a href="index.html#about" class="hover:text-white transition">About</a></li>
+                        <li><a href="index.html#blog" class="hover:text-white transition">Blog</a></li>
+                        <li><a href="index.html#careers" class="hover:text-white transition">Careers</a></li>
+                        <li><a href="index.html#press" class="hover:text-white transition">Press</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white font-semibold mb-3">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="index.html#documentation" class="hover:text-white transition">Documentation</a></li>
+                        <li><a href="index.html#tutorials" class="hover:text-white transition">Tutorials</a></li>
+                        <li><a href="index.html#community" class="hover:text-white transition">Community</a></li>
+                        <li><a href="index.html#support" class="hover:text-white transition">Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white font-semibold mb-3">Legal</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#terms" class="hover:text-white transition">Terms of Service</a></li>
+                        <li><a href="privacy.html" class="hover:text-white transition">Privacy Policy</a></li>
+                        <li><a href="index.html#cookies" class="hover:text-white transition">Cookie Policy</a></li>
+                        <li><a href="index.html#license" class="hover:text-white transition">License</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-slate-700 pt-6 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-sm">&copy; 2025 Nexsera HQ. All rights reserved.</p>
+                <div class="flex space-x-4 mt-4 md:mt-0">
+                    <a href="#terms" class="hover:text-white transition">Privacy</a>
+                    <a href="#terms" class="hover:text-white transition">Terms</a>
+                    <a href="index.html#sitemap" class="hover:text-white transition">Sitemap</a>
+                </div>
+            </div>
+        </div>
     </footer>
 
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set current date for terms
+            const today = new Date();
+            const formattedDate = today.toLocaleDateString('en-GB', { 
+                day: 'numeric', 
+                month: 'numeric', 
+                year: 'numeric' 
+            });
+            document.getElementById('lastUpdated').textContent = formattedDate;
+            
+            // Check for saved theme preference
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            if (currentTheme === 'dark') {
+                document.body.classList.add('dark');
+                document.getElementById('themeToggle').classList.add('active');
+                document.getElementById('themeIcon').className = 'fas fa-moon text-blue-300';
+            }
+            
+            // Check for saved language preference
+            const savedLanguage = localStorage.getItem('language') || 'en';
+            updateLanguage(savedLanguage);
+            
+            // Load saved user information if available
+            const savedUserInfo = localStorage.getItem('userInfo');
+            if (savedUserInfo) {
+                const userInfo = JSON.parse(savedUserInfo);
+                document.getElementById('name').value = userInfo.name || '';
+                document.getElementById('email').value = userInfo.email || '';
+                document.getElementById('saveInfo').checked = true;
+            }
+        });
+        
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            themeToggle.classList.toggle('active');
+            
+            const isDark = document.body.classList.contains('dark');
+            
+            if (isDark) {
+                themeIcon.className = 'fas fa-moon text-blue-300';
+            } else {
+                themeIcon.className = 'fas fa-sun text-yellow-500';
+            }
+            
+            // Save theme preference
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+        
+        // Mobile Menu
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+        const closeMobileMenu = document.getElementById('closeMobileMenu');
+        
+        mobileMenuToggle.addEventListener('click', () => {
+            mobileMenu.classList.add('active');
+            mobileMenuOverlay.classList.add('active');
+        });
+        
+        closeMobileMenu.addEventListener('click', closeMobileMenuFunc);
+        mobileMenuOverlay.addEventListener('click', closeMobileMenuFunc);
+        
+        function closeMobileMenuFunc() {
+            mobileMenu.classList.remove('active');
+            mobileMenuOverlay.classList.remove('active');
+        }
+        
+        // Language Selector
+        const languageToggle = document.getElementById('languageToggle');
+        const languageDropdown = document.getElementById('languageDropdown');
+        const mobileLanguageToggle = document.getElementById('mobileLanguageToggle');
+        const mobileLanguageDropdown = document.getElementById('mobileLanguageDropdown');
+        
+        languageToggle.addEventListener('click', () => {
+            languageDropdown.classList.toggle('active');
+        });
+        
+        mobileLanguageToggle.addEventListener('click', () => {
+            mobileLanguageDropdown.classList.toggle('active');
+        });
+        
+        // Handle language selection
+        document.querySelectorAll('.language-option').forEach(option => {
+            option.addEventListener('click', () => {
+                const selectedLang = option.getAttribute('data-lang');
+                updateLanguage(selectedLang);
+                
+                // Close dropdowns
+                languageDropdown.classList.remove('active');
+                mobileLanguageDropdown.classList.remove('active');
+            });
+        });
+        
+        function updateLanguage(lang) {
+            localStorage.setItem('language', lang);
+            
+            // Update language display
+            const langNames = {
+                'en': 'English',
+                'es': 'Español',
+                'fr': 'Français',
+                'de': 'Deutsch',
+                'zh': '中文'
+            };
+            
+            const langCodes = {
+                'en': 'EN',
+                'es': 'ES',
+                'fr': 'FR',
+                'de': 'DE',
+                'zh': 'ZH'
+            };
+            
+            document.getElementById('currentLanguage').textContent = langNames[lang];
+            document.getElementById('desktopCurrentLanguage').textContent = langCodes[lang];
+            
+            // In a real application, this would trigger translation of the page content
+            // For this demo, we'll just show a toast notification
+            showToast(`Language changed to ${langNames[lang]}`, 'success');
+        }
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!languageToggle.contains(e.target) && !languageDropdown.contains(e.target)) {
+                languageDropdown.classList.remove('active');
+            }
+            
+            if (!mobileLanguageToggle.contains(e.target) && !mobileLanguageDropdown.contains(e.target)) {
+                mobileLanguageDropdown.classList.remove('active');
+            }
+        });
+        
+        // Tab Navigation
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.getAttribute('data-tab');
+                
+                // Remove active class from all buttons and contents
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked button and corresponding content
+                button.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+                
+                // Update URL hash
+                window.location.hash = tabId;
+            });
+        });
+        
+        // Check URL hash on page load
+        if (window.location.hash) {
+            const tabId = window.location.hash.substring(1);
+            const tabButton = document.querySelector(`[data-tab="${tabId}"]`);
+            
+            if (tabButton) {
+                tabButton.click();
+            }
+        }
+        
+        // FAQ Accordion
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        
+        faqQuestions.forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                const icon = question.querySelector('.faq-icon');
+                
+                // Toggle answer visibility
+                answer.classList.toggle('active');
+                icon.classList.toggle('active');
+                
+                // Close other answers
+                faqQuestions.forEach(otherQuestion => {
+                    if (otherQuestion !== question) {
+                        otherQuestion.nextElementSibling.classList.remove('active');
+                        otherQuestion.querySelector('.faq-icon').classList.remove('active');
+                    }
+                });
+            });
+        });
+        
+        // FAQ Search
+        const faqSearch = document.getElementById('faqSearch');
+        const faqList = document.getElementById('faqList');
+        const noResults = document.getElementById('noResults');
+        
+        if (faqSearch) {
+            faqSearch.addEventListener('input', () => {
+                const searchTerm = faqSearch.value.toLowerCase();
+                let hasResults = false;
+                
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    const question = item.querySelector('h3').textContent.toLowerCase();
+                    const answer = item.querySelector('.faq-answer p').textContent.toLowerCase();
+                    const tags = item.getAttribute('data-tags').toLowerCase();
+                    
+                    if (question.includes(searchTerm) || answer.includes(searchTerm) || tags.includes(searchTerm)) {
+                        item.style.display = 'block';
+                        hasResults = true;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                
+                if (hasResults) {
+                    noResults.classList.add('hidden');
+                } else {
+                    noResults.classList.remove('hidden');
+                }
+            });
+        }
+        
+        // Form Validation
+        const contactForm = document.getElementById('contactForm');
+        const submitButton = contactForm.querySelector('button[type="submit"]');
+        const submitButtonText = document.getElementById('submitButtonText');
+        const submitSpinner = document.getElementById('submitSpinner');
+        
+        function validateEmail(email) {
+            const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(String(email).toLowerCase());
+        }
+        
+        function showError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const errorElement = document.getElementById(fieldId + 'Error');
+            
+            field.classList.add('error');
+            errorElement.textContent = message;
+        }
+        
+        function clearError(fieldId) {
+            const field = document.getElementById(fieldId);
+            const errorElement = document.getElementById(fieldId + 'Error');
+            
+            field.classList.remove('error');
+            errorElement.textContent = '';
+        }
+        
+        function validateForm() {
+            let isValid = true;
+            
+            // Clear previous errors
+            ['name', 'email', 'subject', 'message'].forEach(fieldId => clearError(fieldId));
+            
+            // Validate name
+            const name = document.getElementById('name').value.trim();
+            if (name === '') {
+                showError('name', 'Name is required');
+                isValid = false;
+            } else if (name.length < 2) {
+                showError('name', 'Name must be at least 2 characters');
+                isValid = false;
+            }
+            
+            // Validate email
+            const email = document.getElementById('email').value.trim();
+            if (email === '') {
+                showError('email', 'Email is required');
+                isValid = false;
+            } else if (!validateEmail(email)) {
+                showError('email', 'Please enter a valid email address');
+                isValid = false;
+            }
+            
+            // Validate subject
+            const subject = document.getElementById('subject').value;
+            if (subject === '') {
+                showError('subject', 'Please select a subject');
+                isValid = false;
+            }
+            
+            // Validate message
+            const message = document.getElementById('message').value.trim();
+            if (message === '') {
+                showError('message', 'Message is required');
+                isValid = false;
+            } else if (message.length < 10) {
+                showError('message', 'Message must be at least 10 characters');
+                isValid = false;
+            }
+            
+            // Validate consent
+            const consent = document.getElementById('consent').checked;
+            if (!consent) {
+                showToast('You must agree to the Terms and Conditions and Privacy Policy', 'error');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        // File Upload
+        const fileInput = document.getElementById('attachments');
+        const fileList = document.getElementById('fileList');
+        const uploadedFiles = [];
+        
+        fileInput.addEventListener('change', () => {
+            const files = Array.from(fileInput.files);
+            
+            files.forEach(file => {
+                // Check file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast(`File ${file.name} is too large. Maximum size is 5MB.`, 'error');
+                    return;
+                }
+                
+                // Check file type
+                const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                if (!allowedTypes.includes(file.type)) {
+                    showToast(`File ${file.name} is not an allowed type.`, 'error');
+                    return;
+                }
+                
+                uploadedFiles.push(file);
+                
+                // Create file item
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <span>${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
+                    <i class="fas fa-times file-remove" data-file="${file.name}"></i>
+                `;
+                
+                fileList.appendChild(fileItem);
+            });
+            
+            // Clear file input
+            fileInput.value = '';
+        });
+        
+        // Remove file
+        fileList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('file-remove')) {
+                const fileName = e.target.getAttribute('data-file');
+                const fileIndex = uploadedFiles.findIndex(file => file.name === fileName);
+                
+                if (fileIndex > -1) {
+                    uploadedFiles.splice(fileIndex, 1);
+                    e.target.parentElement.remove();
+                }
+            }
+        });
+        
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Handle form submission
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+            
+            // Show loading state
+            submitButton.disabled = true;
+            submitButtonText.textContent = 'Submitting';
+            submitSpinner.style.display = 'inline-block';
+            
+            // Save user information if requested
+            if (document.getElementById('saveInfo').checked) {
+                const userInfo = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value
+                };
+                localStorage.setItem('userInfo', JSON.stringify(userInfo));
+            }
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('name', document.getElementById('name').value);
+            formData.append('email', document.getElementById('email').value);
+            formData.append('subject', document.getElementById('subject').value);
+            formData.append('message', document.getElementById('message').value);
+            
+            // Add files to form data
+            uploadedFiles.forEach(file => {
+                formData.append('files[]', file);
+            });
+            
+            // Submit to Web3Forms
+            fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Reset form
+                contactForm.reset();
+                fileList.innerHTML = '';
+                uploadedFiles.length = 0;
+                
+                // Reset button state
+                submitButton.disabled = false;
+                submitButtonText.textContent = 'Submit Form';
+                submitSpinner.style.display = 'none';
+                
+                if (data.success) {
+                    showToast('Your message has been sent successfully! We\'ll get back to you soon.');
+                } else {
+                    showToast('There was an error sending your message. Please try again.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                
+                // Reset button state
+                submitButton.disabled = false;
+                submitButtonText.textContent = 'Submit Form';
+                submitSpinner.style.display = 'none';
+                
+                showToast('There was an error sending your message. Please try again.', 'error');
+            });
+        });
+        
+        // Newsletter Form
+        const newsletterForm = document.getElementById('newsletterForm');
+        
+        newsletterForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('newsletterEmail').value;
+            
+            if (!validateEmail(email)) {
+                showToast('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = newsletterForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Subscribing...';
+            submitBtn.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Reset form
+                newsletterForm.reset();
+                
+                // Reset button state
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                
+                showToast('Thank you for subscribing to our newsletter!', 'success');
+            }, 1000);
+        });
+        
+        // Print Terms
+        document.getElementById('printTerms').addEventListener('click', () => {
+            window.print();
+        });
+        
+        // Back to Top Button
+        const backToTopButton = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
+            
+            // Update progress bar
+            const scrollPercentage = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            document.getElementById('progressBar').style.width = `${scrollPercentage}%`;
+        });
+        
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Floating Action Button
+        const fab = document.getElementById('fab');
+        
+        fab.addEventListener('click', () => {
+            // Switch to contact tab
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            document.querySelector('[data-tab="contact"]').classList.add('active');
+            document.getElementById('contact').classList.add('active');
+            
+            // Scroll to contact form
+            document.getElementById('contact').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Add animation to elements when they come into view
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all sections
+        document.querySelectorAll('section').forEach(section => {
+            section.style.opacity = 0;
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(section);
+        });
+    </script>
 </body>
 </html>
-
